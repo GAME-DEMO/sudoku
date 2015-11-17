@@ -160,6 +160,8 @@ private:
     CXYGroup * m_pGroups[eachCount][eachCount]; // All data cache
     CXYCube *m_pCube; // Set guess from this node
     int m_applyGuessValue;
+    
+    CNode * m_pParentNode; // One direction tree
 };
 
 
