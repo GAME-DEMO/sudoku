@@ -29,10 +29,7 @@ typedef enum _PRINT_TYPE
     PRINT_CUBE_VALUE,
     PRINT_CUBE_GUESS,
     PRINT_CUBE_LOCAL_XY,
-    PRINT_CUBE_GLOABAL_XY,
-    PRINT_HISTORY,
-    PRINT_HISTORY_VALUE,
-    PRINT_HISTORY_GUESS_VALUE
+    PRINT_CUBE_GLOABAL_XY
 } PRINT_TYPE;
 
 typedef enum _PARM_TYPE
@@ -54,11 +51,7 @@ typedef enum _CHECK_RESULT
 
 class CXYCube;
 class CXYGroup;
-class CLocalXY;
-class CGlobalXY;
-class CHistory;
-class CCubeValueHistory;
-class CCubeGuessValueHistory;
+class CNode;
 
 typedef CXYCube * (*GROUP_CUBE)[eachCount][eachCount];
 typedef vector<CXYCube *> CUBE_VECTOR;
@@ -71,8 +64,6 @@ typedef function<void (CUBE_VECTOR)> CUBE_VECTOR_FN;
 typedef function<void (void)> VOID_FN;
 typedef vector<int> INDEX_VECTOR;
 typedef INDEX_VECTOR::iterator INDEX_ITERATOR;
-typedef vector<CHistory *> HISTORY_VECTOR;
-typedef HISTORY_VECTOR::iterator HISTORY_ITERATOR;
 
 void PrintFunc(PRINT_TYPE type);
 
@@ -81,7 +72,8 @@ void PrintFunc(PRINT_TYPE type);
 
 CXYGroup * g_pGroups[eachCount][eachCount];
 CXYCube * g_pCubes[cubesCount][cubesCount]; // Global coordination
-HISTORY_VECTOR g_history;
+bool g_bCubeValueChanged;
+bool g_bCubeGuessValueChanged;
 
 /////////////////////////////////////////
 // Class Headers
@@ -119,10 +111,10 @@ public:
     int GetGroupX();
     int GetGroupY();
     
-    void SetValue(int value, bool bSaveHistory = true, bool bIsConjecture = false);
+    void SetValue(int value);
     int GetValue();
     
-    bool SetGuess(int index, int guessValue, bool bSaveHistory = true);
+    bool SetGuess(int index, int guessValue);
     int GetGuess(int index);
     int * GetGuess();
     bool ClearGuessAt(int index);
@@ -137,6 +129,8 @@ public:
     bool HasThisGuessValue(int guessValue);
     bool HasSameGuess(CXYCube *cube);
     void MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVector);
+    
+    CXYCube * DeepCopy();
     
     virtual string Description();
 };
@@ -153,96 +147,39 @@ public:
     
     int GetX();
     int GetY();
-    CXYCube * GetCube(int row, int col);
+    CXYCube * GetCube(int row, int col); // Local coordination
     CXYCube * GetCube(int index);
     GROUP_CUBE GetCube();
+    
+    CXYGroup * DeepCopy();
 };
 
-/////////////////////////////////////////
-// History Data
-// TODO: use multi-thread and multi-way tree to improve performance
-class CHistory
-{
-protected:
-    CXYCube *m_pCube;
-    bool m_bIsConjecture;
-public:
-    CHistory();
-    virtual ~CHistory();
-    void SetCube(CXYCube *cube);
-    CXYCube *GetCube();
-    void SetIsConjecture(bool bIsConjecture);
-    bool IsConjecture();
-    virtual void Backtrack();
-    virtual string Description();
-};
-
-class CCubeValueHistory : public CHistory
+class CNode
 {
 private:
-    int m_value;
-public:
-    CCubeValueHistory();
-    void SetValue(int value);
-    int GetValue();
-    virtual void Backtrack();
-    virtual string Description();
+    CXYGroup * m_pGroups[eachCount][eachCount]; // All data cache
+    CXYCube *m_pCube; // Set guess from this node
+    int m_applyGuessValue;
 };
 
-
-class CCubeGuessValueHistory : public CHistory
-{
-private:
-    int m_guessValue;
-public:
-    CCubeGuessValueHistory();
-    int GetGuessValue();
-    void SetGuessValue(int guessValue);
-    virtual void Backtrack();
-    virtual string Description();
-};
 
 
 /////////////////////////////////////////
-// Algorithm History Helper
-void PushHistory(CHistory *history)
-{
-    printf("Push History: %s\n", history->Description().c_str());
-    g_history.push_back(history);
+// Algorithm Helper
+#pragma mark - Algorithm Helper
+void clearAllFlags() {
+    g_bCubeValueChanged = false;
+    g_bCubeGuessValueChanged = false;
 }
 
-int GetHistoryCount()
-{
-    return (int)g_history.size();
-}
-
-CHistory * GetHistory(int index)
-{
-    if (index >= 0 && index < GetHistoryCount()) return g_history[index];
-    return NULL;
-}
-
-CHistory * GetLastHistory()
-{
-    return GetHistory(GetHistoryCount() - 1);
-}
-
-void PopHistory()
-{
-    if (GetLastHistory())
-    {
-        printf("Pop History: %s\n", GetLastHistory()->Description().c_str());
-    }
-    else
-    {
-        printf("No History\n");
-    }
-    return g_history.pop_back();
+bool isValueFlagChanged() {
+    return g_bCubeValueChanged || g_bCubeGuessValueChanged;
 }
 
 /////////////////////////////////////////
 // Class Implements
 /////////////////////////////////////////
+#pragma mark - Class Implements
 // CXYCube
 CXYCube::CXYCube() :
 m_localX(0),
@@ -307,20 +244,12 @@ int CXYCube::GetGroupY()
     return m_globalY / eachCount;
 }
 
-void CXYCube::SetValue(int value, bool bSaveHistory, bool bIsConjecture)
+void CXYCube::SetValue(int value)
 {
     if (m_value != value)
     {
-        if (bSaveHistory)
-        {
-            CCubeValueHistory * cubeValueHistory = new CCubeValueHistory();
-            cubeValueHistory->SetCube(this);
-            cubeValueHistory->SetValue(m_value);
-            cubeValueHistory->SetIsConjecture(bIsConjecture);
-            //printf("CXYCube:SetValue: %s\n", cubeValueHistory->Description().c_str());
-            PushHistory(cubeValueHistory);
-        }
         m_value = value;
+        g_bCubeValueChanged = true;
     }
 }
 
@@ -329,22 +258,14 @@ int CXYCube::GetValue()
     return m_value;
 }
 
-bool CXYCube::SetGuess(int index, int guessValue, bool bSaveHistory)
+bool CXYCube::SetGuess(int index, int guessValue)
 {
     if (index >= 0 && index < guessesCount)
     {
         if (m_guess[index] != guessValue)
         {
-            if (bSaveHistory)
-            {
-                CCubeGuessValueHistory * cubeGuessValueHistory = new CCubeGuessValueHistory();
-                cubeGuessValueHistory->SetCube(this);
-                cubeGuessValueHistory->SetGuessValue(m_guess[index]);
-                cubeGuessValueHistory->SetIsConjecture(false);
-                //printf("CXYCube::SetGuess: %s\n", cubeGuessValueHistory->Description().c_str());
-                PushHistory(cubeGuessValueHistory);
-            }
             m_guess[index] = guessValue;
+            g_bCubeGuessValueChanged = true;
             return true;
         }
     }
@@ -502,6 +423,21 @@ void CXYCube::MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVe
     }
 }
 
+CXYCube * CXYCube::DeepCopy()
+{
+    CXYCube * cube = new CXYCube();
+    cube->m_globalX = this->m_globalX;
+    cube->m_globalY = this->m_globalY;
+    cube->m_localX = this->m_localX;
+    cube->m_localY = this->m_localY;
+    cube->m_value = this->m_value;
+    for (int i = 0; i < guessesCount; i++)
+    {
+        cube->m_guess[i] = this->m_guess[i];
+    }
+    return cube;
+}
+
 string CXYCube::Description()
 {
     const int cnt = 128;
@@ -579,139 +515,27 @@ GROUP_CUBE CXYGroup::GetCube()
     return &m_pCubes;
 }
 
-/////////////////////////////////////////
-// CHistory
-CHistory::CHistory() :
-m_pCube(NULL)
+CXYGroup * CXYGroup::DeepCopy()
 {
-    
-}
-
-CHistory::~CHistory()
-{
-    
-}
-
-void CHistory::SetCube(CXYCube *cube)
-{
-    m_pCube = cube;
-}
-
-CXYCube *CHistory::GetCube()
-{
-    return m_pCube;
-}
-
-void CHistory::SetIsConjecture(bool bIsConjecture)
-{
-    m_bIsConjecture = bIsConjecture;
-}
-
-bool CHistory::IsConjecture()
-{
-    return m_bIsConjecture;
-}
-
-void CHistory::Backtrack()
-{
-    return;
-}
-
-string CHistory::Description()
-{
-    const int cnt = 128;
-    static char buf[cnt];
-    
-    memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CHistory, CXYCube (%d, %d)", m_pCube->GetGlobalX(), m_pCube->GetGlobalY());
-    
-    return buf;
-}
-
-/////////////////////////////////////////
-// CCubeValueHistory
-CCubeValueHistory::CCubeValueHistory() :
-CHistory(),
-m_value(0)
-{
-    
-}
-
-void CCubeValueHistory::SetValue(int value)
-{
-    m_value = value;
-}
-
-int CCubeValueHistory::GetValue()
-{
-    return m_value;
-}
-
-void CCubeValueHistory::Backtrack()
-{
-    if (m_pCube)
+    CXYGroup * group = new CXYGroup(this->m_X, this->m_Y);
+    for (int row = 0; row < eachCount; ++row)
     {
-        printf("CCubeValueHistory:Backtrack: %s\n", Description().c_str());
-        PrintFunc(PRINT_CUBE_VALUE);
-        m_pCube->SetValue(m_value, false);
+        for (int col = 0; col < eachCount; ++col)
+        {
+            if (group->m_pCubes[row][col]) {
+                delete group->m_pCubes[row][col];
+                group->m_pCubes[row][col] = NULL;
+            }
+            
+            group->m_pCubes[row][col] = this->m_pCubes[row][col]->DeepCopy();
+        }
     }
-    return;
-}
-
-string CCubeValueHistory::Description()
-{
-    const int cnt = 128;
-    static char buf[cnt];
-    
-    memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CCubeValueHistory, CXYCube (%d, %d):%d, history:%d, %s",
-            m_pCube->GetGlobalX(), m_pCube->GetGlobalY(), m_pCube->GetValue(), m_value, 
-            m_bIsConjecture ? "is Conjecture" : "is not Conjecture");
-    
-    return buf;
-}
-
-/////////////////////////////////////////
-// CCubeGuessValueHistory
-CCubeGuessValueHistory::CCubeGuessValueHistory() :
-CHistory()
-{
-    
-}
-
-int CCubeGuessValueHistory::GetGuessValue()
-{
-    return m_guessValue;
-}
-
-void CCubeGuessValueHistory::SetGuessValue(int guessValue)
-{
-    m_guessValue = guessValue;
-}
-
-void CCubeGuessValueHistory::Backtrack()
-{
-    if (m_pCube)
-    {
-        m_pCube->SetGuess(m_guessValue - 1, m_guessValue, false);
-    }
-    return;
-}
-
-string CCubeGuessValueHistory::Description()
-{
-    const int cnt = 128;
-    static char buf[cnt];
-    
-    memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CCubeGuessValueHistory, CXYCube (%d, %d):(%d)",
-            m_pCube->GetGlobalX(), m_pCube->GetGlobalY(), m_guessValue);
-    
-    return buf;
+    return group;
 }
 
 /////////////////////////////////////////
 // Initialize
+#pragma mark - Initialize
 bool InitializeData()
 {
     for (int row = 0; row < eachCount; ++row)
@@ -731,6 +555,7 @@ bool InitializeData()
         }
     }
     
+    clearAllFlags();
     return true;
 };
 
@@ -764,14 +589,6 @@ bool isPrintForCube(PRINT_TYPE type)
     type == PRINT_CUBE_GUESS ||
     type == PRINT_CUBE_LOCAL_XY ||
     type == PRINT_CUBE_GLOABAL_XY;
-}
-
-bool isPrintForHistory(PRINT_TYPE type)
-{
-    return
-    type == PRINT_HISTORY ||
-    type == PRINT_HISTORY_VALUE ||
-    type == PRINT_HISTORY_GUESS_VALUE;
 }
 
 void PrintFunc(PRINT_TYPE type)
@@ -843,22 +660,6 @@ void PrintFunc(PRINT_TYPE type)
             if (i % eachCount == 0)
             {
                 printf("\n");
-            }
-        }
-    }
-    else if (isPrintForHistory(type))
-    {
-        for (int i = GetHistoryCount() - 1; i >= 0; --i)
-        {
-            CHistory *history = GetHistory(i);
-            if (history)
-            {
-                if ((type == PRINT_HISTORY) ||
-                    (type == PRINT_HISTORY_VALUE && dynamic_cast<CCubeValueHistory *>(history)) ||
-                    (type == PRINT_HISTORY_GUESS_VALUE && dynamic_cast<CCubeGuessValueHistory *>(history)))
-                {
-                    printf("%s\n", history->Description().c_str());
-                }
             }
         }
     }
@@ -1455,7 +1256,7 @@ void AlgAdvancedLongRanger(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_
 
 void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
 {
-    int preHistoryCount = GetHistoryCount();
+    clearAllFlags();
     for (CUBE_ITERATOR it = twinCubeVector.begin(); it != twinCubeVector.end(); ++it)
     {
         if ((*it)->NonZeroGuessCount() != 2) continue;
@@ -1486,8 +1287,7 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
         }
     }
     
-    int posHistoryCount = GetHistoryCount();
-    if (posHistoryCount > preHistoryCount)
+    if (isValueFlagChanged())
     {
         // if twin made some change, do again.
         AlgAdvancedTwinsChip(twinCubeVector);
@@ -1570,7 +1370,7 @@ void AlgAdvancedTwins(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL)
 
 void AlgAdvancedTriplesChip(CUBE_VECTOR tripleCubeVector)
 {
-    int preHistoryCount = GetHistoryCount();
+    clearAllFlags();
     for (CUBE_ITERATOR it = tripleCubeVector.begin(); it != tripleCubeVector.end(); ++it)
     {
         int itGuessCount = (*it)->NonZeroGuessCount();
@@ -1615,8 +1415,7 @@ void AlgAdvancedTriplesChip(CUBE_VECTOR tripleCubeVector)
         }
     }
     
-    int posHistoryCount = GetHistoryCount();
-    if (posHistoryCount > preHistoryCount)
+    if (isValueFlagChanged())
     {
         // if triple made some change, do again.
         AlgAdvancedTriplesChip(tripleCubeVector);
@@ -1694,7 +1493,7 @@ void AlgAdvancedTriples(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL
 
 /////////////////////////////////////////
 // Algorithm Check Result
-
+#pragma mark - Algorithm Check Result
 CHECK_RESULT AlgCheckResultChip(CUBE_VECTOR checkResultCubeVector)
 {
     bool unfinished = false;
@@ -1743,123 +1542,68 @@ CHECK_RESULT AlgCheckResult()
     return CHECK_RESULT_DONE;
 }
 
-CXYCube *AlgMakeNextConjecture(CXYCube *cube, int value = 0, bool nextCube = false)
-{
-    if (cube == NULL || nextCube == true)
-    {
-        for (int i = cube ? AlgCubeLinearIndex(cube) + 1 : 0; i < cubesCount * cubesCount; ++i)
-        {
-            CXYCube *nextCube = AlgGetCubeByLinear(i);
-            if (nextCube->GetValue() > 0) continue;
-            if (nextCube->FirstNonZeroGuess() == 0) return NULL;
-            nextCube->SetValue(nextCube->FirstNonZeroGuess(), true, true);
-            return nextCube;
-        }
-        return NULL;
-    }
-    
-    if (nextCube == false)
-    {
-        for (int i = value; i < guessesCount; ++i)
-        {
-            if (cube->GetGuess(i) > 0)
-            {
-                cube->SetValue(cube->GetGuess(i), true, true);
-                return cube;
-            }
-        }
-        return NULL;
-    }
-    
-    return NULL;
-}
-
-CHistory *AlgFindPreviousConjecture()
-{
-    for (int i = GetHistoryCount() - 1; i >= 0; --i)
-    {
-        if (GetHistory(i) == NULL) {
-            PopHistory();
-            continue;
-        }
-        
-        if (GetHistory(i)->IsConjecture() == true)
-        {
-            // TODO: create a new history and return, call backtrace here
-            return GetHistory(i);
-        }
-        else
-        {
-            GetHistory(i)->Backtrack();
-            PopHistory();
-        }
-    }
-    return NULL;
-}
-
-
 CHECK_RESULT AlgBruteForce()
 {
     CHECK_RESULT result = CHECK_RESULT_NONE;
-    CXYCube *cube = AlgMakeNextConjecture(NULL);
-    result = AlgCheckResult();
+//    CXYCube *cube = AlgMakeNextConjecture(NULL);
+//    result = AlgCheckResult();
     
-    // TODO: Update performance here:
-    while(cube != NULL && result != CHECK_RESULT_DONE)
-    {
-        printf("AlgBruteForce continue %s, %d\n", cube->Description().c_str(), result);
-        AlgUpdateGuess();
-        AlgAdvancedCRME();
-        int preHistoryCount = 0;
-        int posHistoryCount = 0;
-        do
-        {
-            preHistoryCount = GetHistoryCount();
-            AlgAdvancedLongRanger();
-            posHistoryCount = GetHistoryCount();
-        }
-        while (preHistoryCount != posHistoryCount);
-        preHistoryCount = 0;
-        posHistoryCount = 0;
-        do
-        {
-            preHistoryCount = GetHistoryCount();
-            AlgAdvancedTwins();
-            AlgAdvancedTriples();
-            posHistoryCount = GetHistoryCount();
-        }
-        while (preHistoryCount != posHistoryCount);
-        
-        result = AlgCheckResult();
-        if (result == CHECK_RESULT_DONE) break;
-        if (result == CHECK_RESULT_UNFINISH)
-        {
-            printf("CHECK_RESULT_UNFINISH: BEFORE: %s \n", cube->Description().c_str());
-            cube = AlgMakeNextConjecture(NULL);
-            if (cube)
-            {
-                printf("CHECK_RESULT_UNFINISH: AFTER: %s \n", cube->Description().c_str());
-            }
-        }
-        
-        while (result == CHECK_RESULT_ERROR || cube == NULL)
-        {
-            printf("AlgBruteForce cube continue\n");
-            CCubeValueHistory *history = (CCubeValueHistory *)AlgFindPreviousConjecture();
-            if (history == NULL) return CHECK_RESULT_ERROR;
-            printf("Find History: %s\n", history->Description().c_str());
-            CXYCube *historyCube = history->GetCube();
-            int historyValue = history->GetValue();
-            history->Backtrack();
-            PopHistory();
-            cube = AlgMakeNextConjecture(historyCube, historyValue);
-            result = CHECK_RESULT_NONE;
-            if (cube)
-            {
-                printf("Next Cube: %s \n", cube->Description().c_str());
-            }
-        }
-    }
+//    // TODO: Update performance here:
+//    while(cube != NULL && result != CHECK_RESULT_DONE)
+//    {
+//        printf("AlgBruteForce continue %s, %d\n", cube->Description().c_str(), result);
+//        AlgUpdateGuess();
+//        AlgAdvancedCRME();
+//        int preHistoryCount = 0;
+//        int posHistoryCount = 0;
+//        do
+//        {
+//            preHistoryCount = GetHistoryCount();
+//            AlgAdvancedLongRanger();
+//            posHistoryCount = GetHistoryCount();
+//        }
+//        while (preHistoryCount != posHistoryCount);
+//        preHistoryCount = 0;
+//        posHistoryCount = 0;
+//        do
+//        {
+//            preHistoryCount = GetHistoryCount();
+//            AlgAdvancedTwins();
+//            AlgAdvancedTriples();
+//            posHistoryCount = GetHistoryCount();
+//        }
+//        while (preHistoryCount != posHistoryCount);
+//        
+//        result = AlgCheckResult();
+//        if (result == CHECK_RESULT_DONE) break;
+//        if (result == CHECK_RESULT_UNFINISH)
+//        {
+//            printf("CHECK_RESULT_UNFINISH: BEFORE: %s \n", cube->Description().c_str());
+//            cube = AlgMakeNextConjecture(NULL);
+//            if (cube)
+//            {
+//                printf("CHECK_RESULT_UNFINISH: AFTER: %s \n", cube->Description().c_str());
+//            }
+//        }
+//        
+//        while (result == CHECK_RESULT_ERROR || cube == NULL)
+//        {
+//            printf("AlgBruteForce cube continue\n");
+//            CCubeValueHistory *history = (CCubeValueHistory *)AlgFindPreviousConjecture();
+//            if (history == NULL) return CHECK_RESULT_ERROR;
+//            printf("Find History: %s\n", history->Description().c_str());
+//            CXYCube *historyCube = history->GetCube();
+//            int historyValue = history->GetValue();
+//            history->Backtrack();
+//            PopHistory();
+//            cube = AlgMakeNextConjecture(historyCube, historyValue);
+//            result = CHECK_RESULT_NONE;
+//            if (cube)
+//            {
+//                printf("Next Cube: %s \n", cube->Description().c_str());
+//            }
+//        }
+//    }
     
     return result;
 }
