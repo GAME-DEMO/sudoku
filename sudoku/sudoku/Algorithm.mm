@@ -129,8 +129,10 @@ public:
     bool HasThisGuessValue(int guessValue);
     bool HasSameGuess(CXYCube *cube);
     void MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVector);
+    int NextGuessValue(int guessValue);
     
     CXYCube * DeepCopy();
+    void DeepCopy(CXYCube *cube);
     
     virtual string Description();
 };
@@ -152,16 +154,33 @@ public:
     GROUP_CUBE GetCube();
     
     CXYGroup * DeepCopy();
+    void DeepCopy(CXYGroup *group);
 };
 
 class CNode
 {
 private:
-    CXYGroup * m_pGroups[eachCount][eachCount]; // All data cache
+    CXYGroup *m_pGroups[eachCount][eachCount]; // All data cache
     CXYCube *m_pCube; // Set guess from this node
-    int m_applyGuessValue;
+    int m_guessValue;
     
     CNode * m_pParentNode; // One direction tree
+    
+public:
+    CNode();
+    ~CNode();
+    
+    void SetGroups(CXYGroup * groups[eachCount][eachCount]);
+    CXYGroup ** GetGroups();
+    
+    void SetCube(CXYCube *cube);
+    CXYCube * GetCube();
+    
+    void SetGuessValue(int guessValue);
+    int GetGuessValue();
+    
+    void SetParentNode(CNode *parentNode);
+    CNode * GetParentNode();
 };
 
 
@@ -425,9 +444,25 @@ void CXYCube::MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVe
     }
 }
 
+int CXYCube::NextGuessValue(int guessValue)
+{
+    for (int i = guessValue; i < guessesCount; ++i) {
+        if (m_guess[i] > 0) {
+            return m_guess[i];
+        }
+    }
+    return 0;
+}
+
 CXYCube * CXYCube::DeepCopy()
 {
     CXYCube * cube = new CXYCube();
+    this->DeepCopy(cube);
+    return cube;
+}
+
+void CXYCube::DeepCopy(CXYCube *cube)
+{
     cube->m_globalX = this->m_globalX;
     cube->m_globalY = this->m_globalY;
     cube->m_localX = this->m_localX;
@@ -437,7 +472,6 @@ CXYCube * CXYCube::DeepCopy()
     {
         cube->m_guess[i] = this->m_guess[i];
     }
-    return cube;
 }
 
 string CXYCube::Description()
@@ -520,19 +554,85 @@ GROUP_CUBE CXYGroup::GetCube()
 CXYGroup * CXYGroup::DeepCopy()
 {
     CXYGroup * group = new CXYGroup(this->m_X, this->m_Y);
+    this->DeepCopy(group);
+    return group;
+}
+
+
+void CXYGroup::DeepCopy(CXYGroup *group)
+{
+    group->m_X = this->m_X;
+    group->m_Y = this->m_Y;
     for (int row = 0; row < eachCount; ++row)
     {
         for (int col = 0; col < eachCount; ++col)
         {
-            if (group->m_pCubes[row][col]) {
-                delete group->m_pCubes[row][col];
-                group->m_pCubes[row][col] = NULL;
+            if (group->m_pCubes[row][col])
+            {
+                group->m_pCubes[row][col] = this->m_pCubes[row][col]->DeepCopy();
             }
-            
-            group->m_pCubes[row][col] = this->m_pCubes[row][col]->DeepCopy();
+            else
+            {
+                this->m_pCubes[row][col]->DeepCopy(group->m_pCubes[row][col]);
+            }
         }
     }
-    return group;
+}
+
+/////////////////////////////////////////
+// CNode
+CNode::CNode()
+{
+    
+}
+
+CNode::~CNode()
+{
+
+}
+
+void CNode::SetGroups(CXYGroup * groups[eachCount][eachCount])
+{
+    for (int row = 0; row < eachCount; ++row) {
+        for (int col = 0; col < eachCount; ++col) {
+            groups[row][col]->DeepCopy(this->m_pGroups[row][col]);
+        }
+    }
+}
+
+CXYGroup ** CNode::GetGroups()
+{
+    return &m_pGroups[0][0];
+}
+
+void CNode::SetCube(CXYCube *cube)
+{
+    m_pCube = cube;
+}
+
+CXYCube * CNode::GetCube()
+{
+    return m_pCube;
+}
+
+void CNode::SetGuessValue(int guessValue)
+{
+    m_guessValue = guessValue;
+}
+
+int CNode::GetGuessValue()
+{
+    return m_guessValue;
+}
+
+void CNode::SetParentNode(CNode *parentNode)
+{
+    m_pParentNode = parentNode;
+}
+
+CNode * CNode::GetParentNode()
+{
+    return m_pParentNode;
 }
 
 /////////////////////////////////////////
