@@ -201,6 +201,7 @@ bool isValueFlagChanged() {
 // Class Implements
 /////////////////////////////////////////
 #pragma mark - Class Implements
+#pragma mark - CXYCube Implement
 // CXYCube
 CXYCube::CXYCube() :
 m_localX(0),
@@ -457,20 +458,20 @@ int CXYCube::NextGuessValue(int guessValue)
 CXYCube * CXYCube::DeepCopy()
 {
     CXYCube * cube = new CXYCube();
-    this->DeepCopy(cube);
+    DeepCopy(cube);
     return cube;
 }
 
 void CXYCube::DeepCopy(CXYCube *cube)
 {
-    cube->m_globalX = this->m_globalX;
-    cube->m_globalY = this->m_globalY;
-    cube->m_localX = this->m_localX;
-    cube->m_localY = this->m_localY;
-    cube->m_value = this->m_value;
+    cube->m_globalX = m_globalX;
+    cube->m_globalY = m_globalY;
+    cube->m_localX = m_localX;
+    cube->m_localY = m_localY;
+    cube->m_value = m_value;
     for (int i = 0; i < guessesCount; i++)
     {
-        cube->m_guess[i] = this->m_guess[i];
+        cube->m_guess[i] = m_guess[i];
     }
 }
 
@@ -488,6 +489,7 @@ string CXYCube::Description()
 
 /////////////////////////////////////////
 // CXYGroup
+#pragma mark - CXYGroup Implement
 CXYGroup::CXYGroup(int x, int y):
 m_X(x),
 m_Y(y)
@@ -553,27 +555,27 @@ GROUP_CUBE CXYGroup::GetCube()
 
 CXYGroup * CXYGroup::DeepCopy()
 {
-    CXYGroup * group = new CXYGroup(this->m_X, this->m_Y);
-    this->DeepCopy(group);
+    CXYGroup * group = new CXYGroup(m_X, m_Y);
+    DeepCopy(group);
     return group;
 }
 
 
 void CXYGroup::DeepCopy(CXYGroup *group)
 {
-    group->m_X = this->m_X;
-    group->m_Y = this->m_Y;
+    group->m_X = m_X;
+    group->m_Y = m_Y;
     for (int row = 0; row < eachCount; ++row)
     {
         for (int col = 0; col < eachCount; ++col)
         {
             if (group->m_pCubes[row][col])
             {
-                group->m_pCubes[row][col] = this->m_pCubes[row][col]->DeepCopy();
+                group->m_pCubes[row][col] = m_pCubes[row][col]->DeepCopy();
             }
             else
             {
-                this->m_pCubes[row][col]->DeepCopy(group->m_pCubes[row][col]);
+                m_pCubes[row][col]->DeepCopy(group->m_pCubes[row][col]);
             }
         }
     }
@@ -581,21 +583,47 @@ void CXYGroup::DeepCopy(CXYGroup *group)
 
 /////////////////////////////////////////
 // CNode
-CNode::CNode()
+#pragma mark - CNode Implement
+CNode::CNode() :
+m_pCube(NULL),
+m_guessValue(0),
+m_pParentNode(NULL)
 {
-    
+    for (int row = 0; row < eachCount; ++row)
+    {
+        for (int col = 0; col < eachCount; ++col)
+        {
+            m_pGroups[row][col] = new CXYGroup(col, row);
+        }
+    }
 }
 
 CNode::~CNode()
 {
-
+    for (int row = 0; row < eachCount; ++row)
+    {
+        for (int col = 0; col < eachCount; ++col)
+        {
+            delete m_pGroups[row][col];
+            m_pGroups[row][col] = NULL;
+        }
+    }
 }
 
 void CNode::SetGroups(CXYGroup * groups[eachCount][eachCount])
 {
-    for (int row = 0; row < eachCount; ++row) {
-        for (int col = 0; col < eachCount; ++col) {
-            groups[row][col]->DeepCopy(this->m_pGroups[row][col]);
+    for (int row = 0; row < eachCount; ++row)
+    {
+        for (int col = 0; col < eachCount; ++col)
+        {
+            if (m_pGroups[row][col])
+            {
+                groups[row][col]->DeepCopy(m_pGroups[row][col]);
+            }
+            else
+            {
+                m_pGroups[row][col] = groups[row][col]->DeepCopy();
+            }
         }
     }
 }
@@ -607,7 +635,14 @@ CXYGroup ** CNode::GetGroups()
 
 void CNode::SetCube(CXYCube *cube)
 {
-    m_pCube = cube;
+    if (m_pCube)
+    {
+        cube->DeepCopy(m_pCube);
+    }
+    else
+    {
+        m_pCube = cube->DeepCopy();
+    }
 }
 
 CXYCube * CNode::GetCube()
