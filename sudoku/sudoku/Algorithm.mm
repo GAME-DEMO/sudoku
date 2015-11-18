@@ -69,15 +69,19 @@ void PrintFunc(PRINT_TYPE type);
 
 /////////////////////////////////////////
 // Data
-
+#pragma mark - Data
 CXYGroup * g_pGroups[eachCount][eachCount];
 CXYCube * g_pCubes[cubesCount][cubesCount]; // Global coordination
 bool g_bCubeValueChanged;
 bool g_bCubeGuessValueChanged;
+CNode * g_pHistoryHead;
+CNode * g_pHistoryTail;
 
 /////////////////////////////////////////
 // Class Headers
+#pragma mark - CXYNode Class
 /////////////////////////////////////////
+// Compose coordinate system
 /// Y, ROW
 /// |-------------------
 /// |----6----7----8----
@@ -85,7 +89,7 @@ bool g_bCubeGuessValueChanged;
 /// |----0----1----2----
 /// |------------------- X, COL
 /////////////////////////////////////////
-// Compose coordinate system
+// CXYCube Class Headers
 class CXYCube
 {
 private:
@@ -137,6 +141,9 @@ public:
     virtual string Description();
 };
 
+/////////////////////////////////////////
+// CXYGroup Class Headers
+#pragma mark - CXYGroup Class
 class CXYGroup
 {
 private:
@@ -157,6 +164,8 @@ public:
     void DeepCopy(CXYGroup *group);
 };
 
+/////////////////////////////////////////
+// CNode Class Headers
 class CNode
 {
 private:
