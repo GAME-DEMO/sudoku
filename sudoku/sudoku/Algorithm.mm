@@ -51,8 +51,9 @@ typedef enum _CHECK_RESULT
 
 class CXYCube;
 class CXYGroup;
-class CNode;
+class CHistoryNode;
 
+typedef CXYGroup * (*GROUP)[eachCount][eachCount];
 typedef CXYCube * (*GROUP_CUBE)[eachCount][eachCount];
 typedef vector<CXYCube *> CUBE_VECTOR;
 typedef CUBE_VECTOR::iterator CUBE_ITERATOR;
@@ -74,8 +75,8 @@ CXYGroup * g_pGroups[eachCount][eachCount];
 CXYCube * g_pCubes[cubesCount][cubesCount]; // Global coordination
 bool g_bCubeValueChanged;
 bool g_bCubeGuessValueChanged;
-CNode * g_pHistoryHead;
-CNode * g_pHistoryTail;
+CHistoryNode * g_pHistoryHeadNode;
+CHistoryNode * g_pHistoryTailNode;
 
 /////////////////////////////////////////
 // Class Headers
@@ -165,22 +166,22 @@ public:
 };
 
 /////////////////////////////////////////
-// CNode Class Headers
-class CNode
+// CHistoryNode Class Headers
+class CHistoryNode
 {
 private:
     CXYGroup *m_pGroups[eachCount][eachCount]; // All data cache
     CXYCube *m_pCube; // Set guess from this node
     int m_guessValue;
     
-    CNode * m_pParentNode; // One direction tree
+    CHistoryNode * m_pParentNode; // One direction tree
     
 public:
-    CNode();
-    ~CNode();
+    CHistoryNode();
+    ~CHistoryNode();
     
     void SetGroups(CXYGroup * groups[eachCount][eachCount]);
-    CXYGroup ** GetGroups();
+    GROUP GetGroups();
     
     void SetCube(CXYCube *cube);
     CXYCube * GetCube();
@@ -188,8 +189,8 @@ public:
     void SetGuessValue(int guessValue);
     int GetGuessValue();
     
-    void SetParentNode(CNode *parentNode);
-    CNode * GetParentNode();
+    void SetParentNode(CHistoryNode *parentNode);
+    CHistoryNode * GetParentNode();
 };
 
 
@@ -197,12 +198,14 @@ public:
 /////////////////////////////////////////
 // Algorithm Helper
 #pragma mark - Algorithm Helper
-void clearAllFlags() {
+void clearAllFlags()
+{
     g_bCubeValueChanged = false;
     g_bCubeGuessValueChanged = false;
 }
 
-bool isValueFlagChanged() {
+bool isValueFlagChanged()
+{
     return g_bCubeValueChanged || g_bCubeGuessValueChanged;
 }
 
@@ -456,8 +459,10 @@ void CXYCube::MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVe
 
 int CXYCube::NextGuessValue(int guessValue)
 {
-    for (int i = guessValue; i < guessesCount; ++i) {
-        if (m_guess[i] > 0) {
+    for (int i = guessValue; i < guessesCount; ++i)
+    {
+        if (m_guess[i] > 0)
+        {
             return m_guess[i];
         }
     }
@@ -580,11 +585,11 @@ void CXYGroup::DeepCopy(CXYGroup *group)
         {
             if (group->m_pCubes[row][col])
             {
-                group->m_pCubes[row][col] = m_pCubes[row][col]->DeepCopy();
+                m_pCubes[row][col]->DeepCopy(group->m_pCubes[row][col]);
             }
             else
             {
-                m_pCubes[row][col]->DeepCopy(group->m_pCubes[row][col]);
+                group->m_pCubes[row][col] = m_pCubes[row][col]->DeepCopy();
             }
         }
     }
@@ -593,7 +598,7 @@ void CXYGroup::DeepCopy(CXYGroup *group)
 /////////////////////////////////////////
 // CNode
 #pragma mark - CNode Implement
-CNode::CNode() :
+CHistoryNode::CHistoryNode() :
 m_pCube(NULL),
 m_guessValue(0),
 m_pParentNode(NULL)
@@ -607,7 +612,7 @@ m_pParentNode(NULL)
     }
 }
 
-CNode::~CNode()
+CHistoryNode::~CHistoryNode()
 {
     for (int row = 0; row < eachCount; ++row)
     {
@@ -617,9 +622,14 @@ CNode::~CNode()
             m_pGroups[row][col] = NULL;
         }
     }
+    
+    if (m_pCube) {
+        delete m_pCube;
+        m_pCube = NULL;
+    }
 }
 
-void CNode::SetGroups(CXYGroup * groups[eachCount][eachCount])
+void CHistoryNode::SetGroups(CXYGroup * groups[eachCount][eachCount])
 {
     for (int row = 0; row < eachCount; ++row)
     {
@@ -637,12 +647,12 @@ void CNode::SetGroups(CXYGroup * groups[eachCount][eachCount])
     }
 }
 
-CXYGroup ** CNode::GetGroups()
+GROUP CHistoryNode::GetGroups()
 {
-    return &m_pGroups[0][0];
+    return &m_pGroups;
 }
 
-void CNode::SetCube(CXYCube *cube)
+void CHistoryNode::SetCube(CXYCube *cube)
 {
     if (m_pCube)
     {
@@ -654,27 +664,27 @@ void CNode::SetCube(CXYCube *cube)
     }
 }
 
-CXYCube * CNode::GetCube()
+CXYCube * CHistoryNode::GetCube()
 {
     return m_pCube;
 }
 
-void CNode::SetGuessValue(int guessValue)
+void CHistoryNode::SetGuessValue(int guessValue)
 {
     m_guessValue = guessValue;
 }
 
-int CNode::GetGuessValue()
+int CHistoryNode::GetGuessValue()
 {
     return m_guessValue;
 }
 
-void CNode::SetParentNode(CNode *parentNode)
+void CHistoryNode::SetParentNode(CHistoryNode *parentNode)
 {
     m_pParentNode = parentNode;
 }
 
-CNode * CNode::GetParentNode()
+CHistoryNode * CHistoryNode::GetParentNode()
 {
     return m_pParentNode;
 }
@@ -702,6 +712,8 @@ bool InitializeData()
     }
     
     clearAllFlags();
+    g_pHistoryHeadNode = new CHistoryNode();
+    g_pHistoryTailNode = g_pHistoryHeadNode;
     return true;
 };
 
@@ -715,10 +727,52 @@ int LocalRowMaxX(int row)
     return LocalRowMinX(row + 1) - 1;
 }
 
+/////////////////////////////////////////
+// One way linked list
+#pragma mark - History List
+bool AddHistoryNode(CHistoryNode *node)
+{
+    if (node == NULL)
+    {
+        return false;
+    }
+    
+    if (g_pHistoryTailNode->GetParentNode() == NULL)
+    {
+        node->SetParentNode(g_pHistoryHeadNode);
+        g_pHistoryTailNode = node;
+    }
+    else
+    {
+        node->SetParentNode(g_pHistoryTailNode);
+        g_pHistoryTailNode = node;
+    }
+    return true;
+}
+
+bool RemoveHistoryNode()
+{
+    if (g_pHistoryTailNode->GetParentNode())
+    {
+        CHistoryNode* tail = g_pHistoryTailNode;
+        g_pHistoryTailNode = g_pHistoryTailNode->GetParentNode();
+        delete tail;
+        tail = NULL;
+        return true;
+    }
+    
+    return false;
+}
+
+bool isHistoryEmpty()
+{
+    return g_pHistoryHeadNode == g_pHistoryTailNode;
+}
+
 
 /////////////////////////////////////////
 // Print function
-
+#pragma mark - Print Function
 string ConvertIntToString(int i)
 {
     const int cnt = 12;
@@ -811,7 +865,7 @@ void PrintFunc(PRINT_TYPE type)
     }
 }
 
-
+#pragma mark - Algorithms
 
 /////////////////////////////////////////
 // Algorithm Preperation
@@ -834,7 +888,8 @@ void AlgRandomGroup(int row, int col, bool initRandom = true)
         }
     }
     
-    if (initRandom) {
+    if (initRandom)
+    {
         AlgInitRandom();
     }
     
