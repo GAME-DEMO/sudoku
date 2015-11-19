@@ -118,6 +118,7 @@ public:
     
     void SetValue(int value);
     int GetValue();
+    bool HasValue();
     
     bool SetGuess(int index, int guessValue);
     int GetGuess(int index);
@@ -125,8 +126,9 @@ public:
     bool ClearGuessAt(int index);
     bool ClearGuessValue(int guessValue);
     void ClearGuess();
+    
     int NonZeroGuessCount();
-    int FirstNonZeroGuess();
+    int FirstNonZeroGuessValue();
     bool IsOnlyOneNoneZeroGuess();
     bool ApplyOnlyOneNoneZeroGuess();
     void SetOnlyOneNoneZeroGuess(int guessValue);
@@ -134,7 +136,7 @@ public:
     bool HasThisGuessValue(int guessValue);
     bool HasSameGuess(CXYCube *cube);
     void MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVector);
-    int NextGuessValue(int guessValue);
+    int NextGuessValue(int fromGuessValue);
     
     CXYCube * DeepCopy();
     void DeepCopy(CXYCube *cube);
@@ -292,6 +294,11 @@ int CXYCube::GetValue()
     return m_value;
 }
 
+bool CXYCube::HasValue()
+{
+    return m_value > 0;
+}
+
 bool CXYCube::SetGuess(int index, int guessValue)
 {
     if (index >= 0 && index < guessesCount)
@@ -357,7 +364,7 @@ int CXYCube::NonZeroGuessCount()
     return cnt;
 }
 
-int CXYCube::FirstNonZeroGuess()
+int CXYCube::FirstNonZeroGuessValue()
 {
     for (int i = 0; i < guessesCount; ++i)
     {
@@ -378,7 +385,7 @@ bool CXYCube::ApplyOnlyOneNoneZeroGuess()
 {
     if (IsOnlyOneNoneZeroGuess())
     {
-        SetValue(FirstNonZeroGuess());
+        SetValue(FirstNonZeroGuessValue());
         ClearGuess();
         return true;
     }
@@ -457,9 +464,9 @@ void CXYCube::MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVe
     }
 }
 
-int CXYCube::NextGuessValue(int guessValue)
+int CXYCube::NextGuessValue(int fromGuessValue)
 {
-    for (int i = guessValue; i < guessesCount; ++i)
+    for (int i = fromGuessValue; i < guessesCount; ++i)
     {
         if (m_guess[i] > 0)
         {
@@ -623,7 +630,8 @@ CHistoryNode::~CHistoryNode()
         }
     }
     
-    if (m_pCube) {
+    if (m_pCube)
+    {
         delete m_pCube;
         m_pCube = NULL;
     }
@@ -728,53 +736,6 @@ int LocalRowMaxX(int row)
 }
 
 /////////////////////////////////////////
-// One way linked list
-#pragma mark - History List
-bool AddHistoryNode(CHistoryNode *node)
-{
-    if (node == NULL)
-    {
-        return false;
-    }
-    
-    if (g_pHistoryTailNode->GetParentNode() == NULL)
-    {
-        node->SetParentNode(g_pHistoryHeadNode);
-        g_pHistoryTailNode = node;
-    }
-    else
-    {
-        node->SetParentNode(g_pHistoryTailNode);
-        g_pHistoryTailNode = node;
-    }
-    return true;
-}
-
-bool RemoveHistoryNode()
-{
-    if (g_pHistoryTailNode->GetParentNode())
-    {
-        CHistoryNode* tail = g_pHistoryTailNode;
-        g_pHistoryTailNode = g_pHistoryTailNode->GetParentNode();
-        delete tail;
-        tail = NULL;
-        return true;
-    }
-    
-    return false;
-}
-
-bool isHistoryEmpty()
-{
-    return g_pHistoryHeadNode == g_pHistoryTailNode;
-}
-
-CHistoryNode * NextHistoryNode()
-{
-    return NULL;
-}
-
-/////////////////////////////////////////
 // Print function
 #pragma mark - Print Function
 string ConvertIntToString(int i)
@@ -873,7 +834,7 @@ void PrintFunc(PRINT_TYPE type)
 
 /////////////////////////////////////////
 // Algorithm Preperation
-
+#pragma mark - Algorithm Preperation
 void AlgInitRandom()
 {
     srand((unsigned int)time(0)); // use current time as seed for random generator
@@ -927,6 +888,18 @@ CXYCube *AlgGetCubeByLinear(int cubeIndex)
     int cubeRow = cubeIndex / cubesCount;
     int cubeCol = cubeIndex % cubesCount;
     return g_pCubes[cubeRow][cubeCol];
+}
+
+CXYCube *AlgFirstGuessCube()
+{
+    for (int i = 0; i < cubesCount * cubesCount; i++)
+    {
+        CXYCube *cube = AlgGetCubeByLinear(i);
+        if (cube->HasValue() == false) {
+            return cube;
+        }
+    }
+    return NULL;
 }
 
 CXYGroup *AlgGetGroupByLinear(int groupIndex)
@@ -990,8 +963,76 @@ int AlgValueCount(CUBE_VECTOR cubeVector, int value)
 }
 
 /////////////////////////////////////////
-// Algorithm Cube Vector Functions
+// One way linked list
+#pragma mark - History List
+bool AddHistoryNode(CHistoryNode *node)
+{
+    if (node == NULL)
+    {
+        return false;
+    }
+    
+    if (g_pHistoryTailNode->GetParentNode() == NULL)
+    {
+        node->SetParentNode(g_pHistoryHeadNode);
+        g_pHistoryTailNode = node;
+    }
+    else
+    {
+        node->SetParentNode(g_pHistoryTailNode);
+        g_pHistoryTailNode = node;
+    }
+    return true;
+}
 
+bool AddNewHistoryNode()
+{
+    CHistoryNode *node = new CHistoryNode();
+    node->SetGroups(g_pGroups);
+    
+    CXYCube *firstGuessCube = AlgFirstGuessCube();
+    if (firstGuessCube == NULL) {
+        return false;
+    }
+    node->SetCube(firstGuessCube);
+    
+    int guessValue = firstGuessCube->FirstNonZeroGuessValue();
+    if (guessValue == 0) {
+        return false;
+    }
+    node->SetGuessValue(guessValue);
+    
+    return AddHistoryNode(node);
+}
+
+bool RemoveHistoryNode()
+{
+    if (g_pHistoryTailNode->GetParentNode())
+    {
+        CHistoryNode* tail = g_pHistoryTailNode;
+        g_pHistoryTailNode = g_pHistoryTailNode->GetParentNode();
+        delete tail;
+        tail = NULL;
+        return true;
+    }
+    
+    return false;
+}
+
+bool isHistoryEmpty()
+{
+    return g_pHistoryHeadNode == g_pHistoryTailNode;
+}
+
+CHistoryNode * NextHistoryNode()
+{
+    return NULL;
+}
+
+
+/////////////////////////////////////////
+// Algorithm Cube Vector Functions
+#pragma mark - Algorithm Cube Vector Functions
 CUBE_VECTOR AlgCubeVectorForCol(int col)
 {
     CUBE_VECTOR cubeVector;
@@ -1187,6 +1228,61 @@ void AlgCubeVectorTravelForOneGroup(CXYCube *cube, CUBE_VECTOR_FN func)
 }
 
 /////////////////////////////////////////
+// Algorithm Check Result
+#pragma mark - Algorithm Check Result
+CHECK_RESULT AlgCheckResultChip(CUBE_VECTOR checkResultCubeVector)
+{
+    bool unfinished = false;
+    for (int value = 1; value <= dimension; ++value)
+    {
+        int count = AlgValueCount(checkResultCubeVector, value);
+        if (count == 0) unfinished = true;
+        if (count > 1) return CHECK_RESULT_ERROR;
+    }
+    return unfinished ? CHECK_RESULT_UNFINISH : CHECK_RESULT_DONE;
+}
+
+bool IsCheckResultUnfinish(unsigned int checkResultNum)
+{
+    return (checkResultNum & (unsigned int) CHECK_RESULT_UNFINISH);
+}
+
+bool IsCheckResultFinish(unsigned int checkResultNum)
+{
+    return (checkResultNum & (unsigned int) CHECK_RESULT_DONE);
+}
+
+bool IsCheckResultUnright(unsigned int checkResultNum)
+{
+    return (checkResultNum & (unsigned int) CHECK_RESULT_ERROR);
+}
+
+CHECK_RESULT AlgCheckResult()
+{
+    unsigned int checkResultNum = 0;
+    
+    auto checkResultFn = [&checkResultNum](CUBE_VECTOR checkResultCubeVector)
+    {
+        if (IsCheckResultUnright(checkResultNum)) return;
+        checkResultNum = checkResultNum | (unsigned int) AlgCheckResultChip(checkResultCubeVector);
+    };
+    
+    AlgCubeVectorTravelForAllRow(checkResultFn);
+    if (IsCheckResultUnright(checkResultNum)) return CHECK_RESULT_ERROR;
+    AlgCubeVectorTravelForAllCol(checkResultFn);
+    if (IsCheckResultUnright(checkResultNum)) return CHECK_RESULT_ERROR;
+    AlgCubeVectorTravelForAllGroup(checkResultFn);
+    if (IsCheckResultUnright(checkResultNum)) return CHECK_RESULT_ERROR;
+    
+    if (IsCheckResultUnfinish(checkResultNum)) return CHECK_RESULT_UNFINISH;
+    return CHECK_RESULT_DONE;
+}
+
+/////////////////////////////////////////
+// Algorithms
+#pragma mark - Algorithms
+
+/////////////////////////////////////////
 // Algorithm update guess by value
 
 // Here is kind of skeleton in my opinion, through row, col, or group operation.
@@ -1371,7 +1467,7 @@ void AlgAdvancedLongRangerChip(CUBE_VECTOR longRangerCubeVector)
                     //                    printf("AlgAdvancedLongRangerChip, Cube (X: %d, Y: %d) V: %d\n",
                     //                           longRangerCube->GetGlobalX(),
                     //                           longRangerCube->GetGlobalY(),
-                    //                           longRangerCube->FirstNonZeroGuess());
+                    //                           longRangerCube->FirstNonZeroGuessValue());
                     AlgAdvancedCRMEChip(longRangerCube, PARM_TYPE_ALL);
                 }
             }
@@ -1694,57 +1790,6 @@ void AlgAdvancedTriples(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL
             break;
         }
     }
-}
-
-/////////////////////////////////////////
-// Algorithm Check Result
-#pragma mark - Algorithm Check Result
-CHECK_RESULT AlgCheckResultChip(CUBE_VECTOR checkResultCubeVector)
-{
-    bool unfinished = false;
-    for (int value = 1; value <= dimension; ++value)
-    {
-        int count = AlgValueCount(checkResultCubeVector, value);
-        if (count == 0) unfinished = true;
-        if (count > 1) return CHECK_RESULT_ERROR;
-    }
-    return unfinished ? CHECK_RESULT_UNFINISH : CHECK_RESULT_DONE;
-}
-
-bool IsCheckResultUnfinish(unsigned int checkResultNum)
-{
-    return (checkResultNum & (unsigned int) CHECK_RESULT_UNFINISH);
-}
-
-bool IsCheckResultFinish(unsigned int checkResultNum)
-{
-    return (checkResultNum & (unsigned int) CHECK_RESULT_DONE);
-}
-
-bool IsCheckResultUnright(unsigned int checkResultNum)
-{
-    return (checkResultNum & (unsigned int) CHECK_RESULT_ERROR);
-}
-
-CHECK_RESULT AlgCheckResult()
-{
-    unsigned int checkResultNum = 0;
-    
-    auto checkResultFn = [&checkResultNum](CUBE_VECTOR checkResultCubeVector)
-    {
-        if (IsCheckResultUnright(checkResultNum)) return;
-        checkResultNum = checkResultNum | (unsigned int) AlgCheckResultChip(checkResultCubeVector);
-    };
-    
-    AlgCubeVectorTravelForAllRow(checkResultFn);
-    if (IsCheckResultUnright(checkResultNum)) return CHECK_RESULT_ERROR;
-    AlgCubeVectorTravelForAllCol(checkResultFn);
-    if (IsCheckResultUnright(checkResultNum)) return CHECK_RESULT_ERROR;
-    AlgCubeVectorTravelForAllGroup(checkResultFn);
-    if (IsCheckResultUnright(checkResultNum)) return CHECK_RESULT_ERROR;
-    
-    if (IsCheckResultUnfinish(checkResultNum)) return CHECK_RESULT_UNFINISH;
-    return CHECK_RESULT_DONE;
 }
 
 CHECK_RESULT AlgBruteForce()
