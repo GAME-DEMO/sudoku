@@ -769,6 +769,10 @@ bool isHistoryEmpty()
     return g_pHistoryHeadNode == g_pHistoryTailNode;
 }
 
+CHistoryNode * NextHistoryNode()
+{
+    return NULL;
+}
 
 /////////////////////////////////////////
 // Print function
