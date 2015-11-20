@@ -191,6 +191,8 @@ public:
     void SetGuessValue(int guessValue);
     int GetGuessValue();
     
+    bool HasNextGuess();
+    
     void SetParentNode(CHistoryNode *parentNode);
     CHistoryNode * GetParentNode();
 };
@@ -687,6 +689,11 @@ int CHistoryNode::GetGuessValue()
     return m_guessValue;
 }
 
+bool CHistoryNode::HasNextGuess()
+{
+    return m_pCube->NextGuessValue(m_guessValue) > 0;
+}
+
 void CHistoryNode::SetParentNode(CHistoryNode *parentNode)
 {
     m_pParentNode = parentNode;
@@ -895,7 +902,8 @@ CXYCube *AlgFirstGuessCube()
     for (int i = 0; i < cubesCount * cubesCount; i++)
     {
         CXYCube *cube = AlgGetCubeByLinear(i);
-        if (cube->HasValue() == false) {
+        if (cube->HasValue() == false)
+        {
             return cube;
         }
     }
@@ -991,13 +999,15 @@ bool AddNewHistoryNode()
     node->SetGroups(g_pGroups);
     
     CXYCube *firstGuessCube = AlgFirstGuessCube();
-    if (firstGuessCube == NULL) {
+    if (firstGuessCube == NULL)
+    {
         return false;
     }
     node->SetCube(firstGuessCube);
     
     int guessValue = firstGuessCube->FirstNonZeroGuessValue();
-    if (guessValue == 0) {
+    if (guessValue == 0)
+    {
         return false;
     }
     node->SetGuessValue(guessValue);
@@ -1005,14 +1015,14 @@ bool AddNewHistoryNode()
     return AddHistoryNode(node);
 }
 
-bool RemoveHistoryNode()
+bool RemoveLastHistoryNode()
 {
     if (g_pHistoryTailNode->GetParentNode())
     {
-        CHistoryNode* tail = g_pHistoryTailNode;
+        CHistoryNode* tailNode = g_pHistoryTailNode;
         g_pHistoryTailNode = g_pHistoryTailNode->GetParentNode();
-        delete tail;
-        tail = NULL;
+        delete tailNode;
+        tailNode = NULL;
         return true;
     }
     
@@ -1024,9 +1034,22 @@ bool isHistoryEmpty()
     return g_pHistoryHeadNode == g_pHistoryTailNode;
 }
 
-CHistoryNode * NextHistoryNode()
+bool StepIn()
 {
-    return NULL;
+    return AddNewHistoryNode();
+}
+
+bool StepOut()
+{
+    if (isHistoryEmpty())
+    {
+        return false;
+    }
+    
+    CHistoryNode *tail = g_pHistoryTailNode;
+    
+    
+    return false;
 }
 
 
