@@ -138,8 +138,8 @@ public:
     void MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVector);
     int NextGuessValue(int fromGuessValue);
     
-    CXYCube * DeepCopy();
-    void DeepCopy(CXYCube *cube);
+    CXYCube * DeepCopyTo();
+    void DeepCopyTo(CXYCube *cube);
     
     virtual string Description();
 };
@@ -163,8 +163,8 @@ public:
     CXYCube * GetCube(int index);
     GROUP_CUBE GetCube();
     
-    CXYGroup * DeepCopy();
-    void DeepCopy(CXYGroup *group);
+    CXYGroup * DeepCopyTo();
+    void DeepCopyTo(CXYGroup *group);
 };
 
 /////////////////////////////////////////
@@ -184,6 +184,7 @@ public:
     
     void SetGroups(CXYGroup * groups[eachCount][eachCount]);
     GROUP GetGroups();
+    void RestoreGroups(CXYGroup * groups[eachCount][eachCount]);
     
     void SetCube(CXYCube *cube);
     CXYCube * GetCube();
@@ -191,6 +192,7 @@ public:
     void SetGuessValue(int guessValue);
     int GetGuessValue();
     
+    int GetNextGuessValue();
     bool HasNextGuess();
     
     void SetParentNode(CHistoryNode *parentNode);
@@ -478,14 +480,14 @@ int CXYCube::NextGuessValue(int fromGuessValue)
     return 0;
 }
 
-CXYCube * CXYCube::DeepCopy()
+CXYCube * CXYCube::DeepCopyTo()
 {
     CXYCube * cube = new CXYCube();
-    DeepCopy(cube);
+    DeepCopyTo(cube);
     return cube;
 }
 
-void CXYCube::DeepCopy(CXYCube *cube)
+void CXYCube::DeepCopyTo(CXYCube *cube)
 {
     cube->m_globalX = m_globalX;
     cube->m_globalY = m_globalY;
@@ -576,15 +578,15 @@ GROUP_CUBE CXYGroup::GetCube()
     return &m_pCubes;
 }
 
-CXYGroup * CXYGroup::DeepCopy()
+CXYGroup * CXYGroup::DeepCopyTo()
 {
     CXYGroup * group = new CXYGroup(m_X, m_Y);
-    DeepCopy(group);
+    DeepCopyTo(group);
     return group;
 }
 
 
-void CXYGroup::DeepCopy(CXYGroup *group)
+void CXYGroup::DeepCopyTo(CXYGroup *group)
 {
     group->m_X = m_X;
     group->m_Y = m_Y;
@@ -594,11 +596,11 @@ void CXYGroup::DeepCopy(CXYGroup *group)
         {
             if (group->m_pCubes[row][col])
             {
-                m_pCubes[row][col]->DeepCopy(group->m_pCubes[row][col]);
+                m_pCubes[row][col]->DeepCopyTo(group->m_pCubes[row][col]);
             }
             else
             {
-                group->m_pCubes[row][col] = m_pCubes[row][col]->DeepCopy();
+                group->m_pCubes[row][col] = m_pCubes[row][col]->DeepCopyTo();
             }
         }
     }
@@ -647,11 +649,11 @@ void CHistoryNode::SetGroups(CXYGroup * groups[eachCount][eachCount])
         {
             if (m_pGroups[row][col])
             {
-                groups[row][col]->DeepCopy(m_pGroups[row][col]);
+                groups[row][col]->DeepCopyTo(m_pGroups[row][col]);
             }
             else
             {
-                m_pGroups[row][col] = groups[row][col]->DeepCopy();
+                m_pGroups[row][col] = groups[row][col]->DeepCopyTo();
             }
         }
     }
@@ -662,15 +664,33 @@ GROUP CHistoryNode::GetGroups()
     return &m_pGroups;
 }
 
+void CHistoryNode::RestoreGroups(CXYGroup * groups[eachCount][eachCount])
+{
+    for (int row = 0; row < eachCount; ++row)
+    {
+        for (int col = 0; col < eachCount; ++col)
+        {
+            if (groups[row][col])
+            {
+                m_pGroups[row][col]->DeepCopyTo(groups[row][col]);
+            }
+            else
+            {
+                groups[row][col] = m_pGroups[row][col]->DeepCopyTo();
+            }
+        }
+    }
+}
+
 void CHistoryNode::SetCube(CXYCube *cube)
 {
     if (m_pCube)
     {
-        cube->DeepCopy(m_pCube);
+        cube->DeepCopyTo(m_pCube);
     }
     else
     {
-        m_pCube = cube->DeepCopy();
+        m_pCube = cube->DeepCopyTo();
     }
 }
 
@@ -689,9 +709,14 @@ int CHistoryNode::GetGuessValue()
     return m_guessValue;
 }
 
+int CHistoryNode::GetNextGuessValue()
+{
+    return m_pCube->NextGuessValue(m_guessValue);
+}
+
 bool CHistoryNode::HasNextGuess()
 {
-    return m_pCube->NextGuessValue(m_guessValue) > 0;
+    return GetNextGuessValue() > 0;
 }
 
 void CHistoryNode::SetParentNode(CHistoryNode *parentNode)
@@ -973,7 +998,7 @@ int AlgValueCount(CUBE_VECTOR cubeVector, int value)
 /////////////////////////////////////////
 // One way linked list
 #pragma mark - History List
-bool AddHistoryNode(CHistoryNode *node)
+bool AttachHistoryNode(CHistoryNode *node)
 {
     if (node == NULL)
     {
@@ -993,29 +1018,7 @@ bool AddHistoryNode(CHistoryNode *node)
     return true;
 }
 
-bool AddNewHistoryNode()
-{
-    CHistoryNode *node = new CHistoryNode();
-    node->SetGroups(g_pGroups);
-    
-    CXYCube *firstGuessCube = AlgFirstGuessCube();
-    if (firstGuessCube == NULL)
-    {
-        return false;
-    }
-    node->SetCube(firstGuessCube);
-    
-    int guessValue = firstGuessCube->FirstNonZeroGuessValue();
-    if (guessValue == 0)
-    {
-        return false;
-    }
-    node->SetGuessValue(guessValue);
-    
-    return AddHistoryNode(node);
-}
-
-bool RemoveLastHistoryNode()
+bool DetachHistoryNode()
 {
     if (g_pHistoryTailNode->GetParentNode())
     {
@@ -1036,7 +1039,26 @@ bool isHistoryEmpty()
 
 bool StepIn()
 {
-    return AddNewHistoryNode();
+    CHistoryNode *node = new CHistoryNode();
+    node->SetGroups(g_pGroups);
+    
+    CXYCube *firstGuessCube = AlgFirstGuessCube();
+    if (firstGuessCube == NULL)
+    {
+        return false;
+    }
+    node->SetCube(firstGuessCube);
+    
+    int guessValue = firstGuessCube->FirstNonZeroGuessValue();
+    if (guessValue == 0)
+    {
+        return false;
+    }
+    node->SetGuessValue(guessValue);
+    
+    firstGuessCube->SetValue(firstGuessCube->FirstNonZeroGuessValue());
+    
+    return AttachHistoryNode(node);
 }
 
 bool StepOut()
@@ -1047,7 +1069,23 @@ bool StepOut()
     }
     
     CHistoryNode *tail = g_pHistoryTailNode;
-    
+    if (!tail->HasNextGuess())
+    {
+        if (!DetachHistoryNode())
+        {
+            return false;
+        }
+        return StepOut();
+    }
+    else
+    {
+        tail->RestoreGroups(g_pGroups);
+        tail->SetGuessValue(tail->GetNextGuessValue());
+        CXYCube *cube = AlgGetCubeByLinear(AlgCubeLinearIndex(tail->GetCube()));
+
+        cube->SetValue(tail->GetNextGuessValue());
+        return true;
+    }
     
     return false;
 }
