@@ -24,6 +24,9 @@ CXYGroup * g_pGroups[eachCount][eachCount];
 CXYCube * g_pCubes[cubesCount][cubesCount]; // Global coordination
 bool g_bCubeValueChanged;
 bool g_bCubeGuessValueChanged;
+ALGORITHM_FUNCTION g_currentFunction;
+bool g_bCubeValueChangedInFunction[ALGORITHM_FUNCTIONS_ALL];
+bool g_bCubeGuessValueChangedInFunction[ALGORITHM_FUNCTIONS_ALL];
 CHistoryNode * g_pHistoryHeadNode;
 CHistoryNode * g_pHistoryTailNode;
 
@@ -31,16 +34,35 @@ CHistoryNode * g_pHistoryTailNode;
 /////////////////////////////////////////
 // Algorithm Helper
 #pragma mark - Algorithm Helper
-void clearAllFlags()
+void ClearValueChangedFlags()
 {
     g_bCubeValueChanged = false;
     g_bCubeGuessValueChanged = false;
 }
 
-bool isValueFlagChanged()
+bool IsValueChanged()
 {
     return g_bCubeValueChanged || g_bCubeGuessValueChanged;
 }
+
+void ClearValueChangedFlagsForFunction(ALGORITHM_FUNCTION function)
+{
+    g_bCubeValueChangedInFunction[function] = false;
+    g_bCubeGuessValueChangedInFunction[function] = false;
+}
+
+bool IsValueChangedForFunction(ALGORITHM_FUNCTION function)
+{
+    return g_bCubeValueChangedInFunction[function] || g_bCubeGuessValueChangedInFunction[function];
+}
+
+void ClearValueChangedFlagsForAllFunctions()
+{
+    for (int i = 0; i < ALGORITHM_FUNCTIONS_ALL; ++i) {
+        ClearValueChangedFlagsForFunction((ALGORITHM_FUNCTION)i);
+    }
+}
+
 
 /////////////////////////////////////////
 // Class Implements
@@ -578,7 +600,8 @@ bool InitializeData()
         }
     }
     
-    clearAllFlags();
+    ClearValueChangedFlags();
+    ClearValueChangedFlagsForAllFunctions();
     g_pHistoryHeadNode = new CHistoryNode();
     g_pHistoryTailNode = g_pHistoryHeadNode;
     return true;
@@ -1445,7 +1468,7 @@ void AlgAdvancedLongRanger(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_
 
 void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
 {
-    clearAllFlags();
+    ClearValueChangedFlags();
     for (CUBE_ITERATOR it = twinCubeVector.begin(); it != twinCubeVector.end(); ++it)
     {
         if ((*it)->NonZeroGuessCount() != 2) continue;
@@ -1476,7 +1499,7 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
         }
     }
     
-    if (isValueFlagChanged())
+    if (IsValueChanged())
     {
         // if twin made some change, do again.
         AlgAdvancedTwinsChip(twinCubeVector);
@@ -1559,7 +1582,7 @@ void AlgAdvancedTwins(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL)
 
 void AlgAdvancedTriplesChip(CUBE_VECTOR tripleCubeVector)
 {
-    clearAllFlags();
+    ClearValueChangedFlags();
     for (CUBE_ITERATOR it = tripleCubeVector.begin(); it != tripleCubeVector.end(); ++it)
     {
         int itGuessCount = (*it)->NonZeroGuessCount();
@@ -1604,7 +1627,7 @@ void AlgAdvancedTriplesChip(CUBE_VECTOR tripleCubeVector)
         }
     }
     
-    if (isValueFlagChanged())
+    if (IsValueChanged())
     {
         // if triple made some change, do again.
         AlgAdvancedTriplesChip(tripleCubeVector);
@@ -1683,6 +1706,20 @@ void AlgAdvancedTriples(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL
 CHECK_RESULT AlgBruteForce()
 {
     CHECK_RESULT result = CHECK_RESULT_NONE;
+    
+    do
+    {
+        AlgUpdateGuess();
+        AlgAdvancedCRME();
+        AlgAdvancedLongRanger();
+        AlgAdvancedTwins();
+        AlgAdvancedTriples();
+    }
+    while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
+           (result == CHECK_RESULT_ERROR && StepOut()));
+    
+    
+    
 //    CXYCube *cube = AlgMakeNextConjecture(NULL);
 //    result = AlgCheckResult();
     
