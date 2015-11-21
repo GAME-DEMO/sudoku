@@ -17,6 +17,24 @@
 
 #include "Algorithm.h"
 
+#define CHR()                                       \
+do {                                                \
+    CHECK_RESULT checkResult = AlgCheckResult();    \
+    if (checkResult == CHECK_RESULT_ERROR)          \
+    {                                               \
+        return;                                     \
+    }                                               \
+} while (0);
+
+#define CHRB()                                      \
+do {                                                \
+    CHECK_RESULT checkResult = AlgCheckResult();    \
+    if (checkResult == CHECK_RESULT_ERROR)          \
+    {                                               \
+        return false;                               \
+    }                                               \
+} while (0);
+
 /////////////////////////////////////////
 // Data
 #pragma mark - Data
@@ -51,14 +69,25 @@ void ClearValueChangedFlagsForFunction(ALGORITHM_FUNCTION function)
     g_bCubeGuessValueChangedInFunction[function] = false;
 }
 
+void ClearValueChangedFlagsForCurrentFunction()
+{
+    ClearValueChangedFlagsForFunction(g_currentFunction);
+}
+
 bool IsValueChangedForFunction(ALGORITHM_FUNCTION function)
 {
     return g_bCubeValueChangedInFunction[function] || g_bCubeGuessValueChangedInFunction[function];
 }
 
+bool IsValueChangedForCurrentFunction()
+{
+    return IsValueChangedForFunction(g_currentFunction);
+}
+
 void ClearValueChangedFlagsForAllFunctions()
 {
-    for (int i = 0; i < ALGORITHM_FUNCTIONS_ALL; ++i) {
+    for (int i = 0; i < ALGORITHM_FUNCTIONS_ALL; ++i)
+    {
         ClearValueChangedFlagsForFunction((ALGORITHM_FUNCTION)i);
     }
 }
@@ -1249,6 +1278,7 @@ void AlgUpdateGuessChip(CXYCube *cube, PARM_TYPE parmType)
 
 void AlgUpdateGuess()
 {
+    g_currentFunction = ALGORITHM_FUNCTIONS_UPDATE_GUESS;
     auto updateGuessFn = [](CXYCube *updateGuessCube)
     {
         AlgUpdateGuessChip(updateGuessCube, PARM_TYPE_ALL);
@@ -1320,6 +1350,8 @@ void AlgAdvancedCRMEChip(CXYCube *cube, PARM_TYPE parmType)
 // Advanced CRME is a algorithm that cube will apply the only guess immediately and apply to its related row, col and group
 void AlgAdvancedCRME()
 {
+    g_currentFunction = ALGORITHM_FUNCTIONS_CRME;
+    
     auto advancedCRMEFn = [](CXYCube *advancedCRMECube)
     {
         AlgAdvancedCRMEChip(advancedCRMECube, PARM_TYPE_ALL);
@@ -1391,7 +1423,7 @@ void AlgAdvancedLongRangerChip(CUBE_VECTOR longRangerCubeVector)
     }
 }
 
-void AlgAdvancedLongRangerForRow(CXYCube *cube = NULL)
+void AlgAdvancedLongRangerForRow(CXYCube *cube)
 {
     auto advancedLongRangerFnForRow = [](CUBE_VECTOR longRangerCubeVector)
     {
@@ -1401,7 +1433,7 @@ void AlgAdvancedLongRangerForRow(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneRow(cube, advancedLongRangerFnForRow);
 }
 
-void AlgAdvancedLongRangerForCol(CXYCube *cube = NULL)
+void AlgAdvancedLongRangerForCol(CXYCube *cube)
 {
     auto advancedLongRangerFnForCol = [](CUBE_VECTOR longRangerCubeVector)
     {
@@ -1411,7 +1443,7 @@ void AlgAdvancedLongRangerForCol(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneCol(cube, advancedLongRangerFnForCol);
 }
 
-void AlgAdvancedLongRangerForGroup(CXYCube *cube = NULL)
+void AlgAdvancedLongRangerForGroup(CXYCube *cube)
 {
     auto advancedLongRangerFnForGroup = [](CUBE_VECTOR longRangerCubeVector)
     {
@@ -1421,7 +1453,7 @@ void AlgAdvancedLongRangerForGroup(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneGroup(cube, advancedLongRangerFnForGroup);
 }
 
-void AlgAdvancedLongRanger(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL)
+void AlgAdvancedLongRanger(CXYCube *cube, PARM_TYPE parmType)
 {
     switch (parmType)
     {
@@ -1456,6 +1488,19 @@ void AlgAdvancedLongRanger(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_
         {
             break;
         }
+    }
+}
+
+void AlgAdvancedLongRanger()
+{
+    g_currentFunction = ALGORITHM_FUNCTIONS_LONG_RANGER;
+    ClearValueChangedFlagsForCurrentFunction();
+    
+    AlgAdvancedLongRanger(NULL, PARM_TYPE_ALL);
+    
+    if (IsValueChangedForCurrentFunction())
+    {
+        AlgAdvancedLongRanger();
     }
 }
 
@@ -1491,7 +1536,7 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
                                 AlgAdvancedCRMEChip((*mt), PARM_TYPE_ALL);
                             }
                             
-                            AlgAdvancedLongRanger(*mt);
+                            AlgAdvancedLongRanger(*mt, PARM_TYPE_ALL);
                         }
                     }
                 }
@@ -1506,7 +1551,7 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
     }
 }
 
-void AlgAdvancedTwinsForRow(CXYCube *cube = NULL)
+void AlgAdvancedTwinsForRow(CXYCube *cube)
 {
     auto advancedTwinFnForRow = [](CUBE_VECTOR advancedTwinCubeVector)
     {
@@ -1516,7 +1561,7 @@ void AlgAdvancedTwinsForRow(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneRow(cube, advancedTwinFnForRow);
 }
 
-void AlgAdvancedTwinsForCol(CXYCube *cube = NULL)
+void AlgAdvancedTwinsForCol(CXYCube *cube)
 {
     auto advancedTwinFnForCol = [](CUBE_VECTOR advancedTwinCubeVector)
     {
@@ -1526,7 +1571,7 @@ void AlgAdvancedTwinsForCol(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneCol(cube, advancedTwinFnForCol);
 }
 
-void AlgAdvancedTwinsForGroup(CXYCube *cube = NULL)
+void AlgAdvancedTwinsForGroup(CXYCube *cube)
 {
     auto advancedTwinFnForGroup = [](CUBE_VECTOR advancedTwinCubeVector)
     {
@@ -1536,7 +1581,7 @@ void AlgAdvancedTwinsForGroup(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneGroup(cube, advancedTwinFnForGroup);
 }
 
-void AlgAdvancedTwins(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL)
+void AlgAdvancedTwins(CXYCube *cube, PARM_TYPE parmType)
 {
     switch (parmType)
     {
@@ -1571,6 +1616,19 @@ void AlgAdvancedTwins(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL)
         {
             break;
         }
+    }
+}
+
+void AlgAdvancedTwins()
+{
+    g_currentFunction = ALGORITHM_FUNCTIONS_TWINS;
+    ClearValueChangedFlagsForCurrentFunction();
+
+    AlgAdvancedTwins(NULL, PARM_TYPE_ALL);
+    
+    if (IsValueChangedForCurrentFunction())
+    {
+        AlgAdvancedTwins();
     }
 }
 
@@ -1617,7 +1675,7 @@ void AlgAdvancedTriplesChip(CUBE_VECTOR tripleCubeVector)
                                     AlgAdvancedCRMEChip((*qt), PARM_TYPE_ALL);
                                 }
                                 
-                                AlgAdvancedLongRanger(*qt);
+                                AlgAdvancedLongRanger(*qt, PARM_TYPE_ALL);
                                 //AlgAdvancedTwins(*qt);
                             }
                         }
@@ -1635,7 +1693,7 @@ void AlgAdvancedTriplesChip(CUBE_VECTOR tripleCubeVector)
     }
 }
 
-void AlgAdvancedTriplesForRow(CXYCube *cube = NULL)
+void AlgAdvancedTriplesForRow(CXYCube *cube)
 {
     auto advancedTripleFnForRow = [](CUBE_VECTOR advancedTripleCubeVector)
     {
@@ -1645,7 +1703,7 @@ void AlgAdvancedTriplesForRow(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneRow(cube, advancedTripleFnForRow);
 }
 
-void AlgAdvancedTriplesForCol(CXYCube *cube = NULL)
+void AlgAdvancedTriplesForCol(CXYCube *cube)
 {
     auto advancedTripleFnForRow = [](CUBE_VECTOR advancedTripleCubeVector)
     {
@@ -1655,7 +1713,7 @@ void AlgAdvancedTriplesForCol(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneCol(cube, advancedTripleFnForRow);
 }
 
-void AlgAdvancedTriplesForGroup(CXYCube *cube = NULL)
+void AlgAdvancedTriplesForGroup(CXYCube *cube)
 {
     auto advancedTripleFnForGroup = [](CUBE_VECTOR advancedTripleCubeVector)
     {
@@ -1665,7 +1723,7 @@ void AlgAdvancedTriplesForGroup(CXYCube *cube = NULL)
     else AlgCubeVectorTravelForOneGroup(cube, advancedTripleFnForGroup);
 }
 
-void AlgAdvancedTriples(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL)
+void AlgAdvancedTriples(CXYCube *cube, PARM_TYPE parmType)
 {
     switch (parmType)
     {
@@ -1703,6 +1761,19 @@ void AlgAdvancedTriples(CXYCube *cube = NULL, PARM_TYPE parmType = PARM_TYPE_ALL
     }
 }
 
+void AlgAdvancedTriples()
+{
+    g_currentFunction = ALGORITHM_FUNCTIONS_TRIPLES;
+    ClearValueChangedFlagsForCurrentFunction();
+    
+    AlgAdvancedTriples(NULL, PARM_TYPE_ALL);
+    
+    if (IsValueChangedForCurrentFunction())
+    {
+        AlgAdvancedTriples();
+    }
+}
+
 CHECK_RESULT AlgBruteForce()
 {
     CHECK_RESULT result = CHECK_RESULT_NONE;
@@ -1714,6 +1785,8 @@ CHECK_RESULT AlgBruteForce()
         AlgAdvancedLongRanger();
         AlgAdvancedTwins();
         AlgAdvancedTriples();
+        
+        result = AlgCheckResult();
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
            (result == CHECK_RESULT_ERROR && StepOut()));
