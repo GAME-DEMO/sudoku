@@ -17,10 +17,71 @@
 
 #include "Algorithm.h"
 
+using namespace std;
+
+static const int eachCount = 3;
+static const int dimension = eachCount * eachCount;
+static const int groupsCount = dimension;
+static const int cubesCount = dimension;
+static const int guessesCount = dimension;
+
+typedef enum _PRINT_TYPE
+{
+    PRINT_NONE,
+    PRINT_CUBE_VALUE,
+    PRINT_CUBE_GUESS,
+    PRINT_CUBE_LOCAL_XY,
+    PRINT_CUBE_GLOABAL_XY
+} PRINT_TYPE;
+
+typedef enum _PARM_TYPE
+{
+    PARM_TYPE_NONE,
+    PARM_TYPE_ROW,
+    PARM_TYPE_COL,
+    PARM_TYPE_GROUP,
+    PARM_TYPE_ALL
+} PARM_TYPE;
+
+typedef enum _CHECK_RESULT
+{
+    CHECK_RESULT_NONE       = 0x0,
+    CHECK_RESULT_ERROR      = 0x1 << 0,
+    CHECK_RESULT_UNFINISH   = 0x1 << 1,
+    CHECK_RESULT_DONE       = 0x1 << 2
+} CHECK_RESULT;
+
+typedef enum _ALGORITHM_FUNCTION
+{
+    ALGORITHM_FUNCTIONS_UPDATE_GUESS,
+    ALGORITHM_FUNCTIONS_CRME,
+    ALGORITHM_FUNCTIONS_LONG_RANGER,
+    ALGORITHM_FUNCTIONS_TWINS,
+    ALGORITHM_FUNCTIONS_TRIPLES,
+    ALGORITHM_FUNCTIONS_BRUTE_FORCE,
+    ALGORITHM_FUNCTIONS_ALL
+} ALGORITHM_FUNCTION;
+
+class CXYCube;
+class CXYGroup;
+class CHistoryNode;
+
+typedef CXYGroup * (*GROUP)[eachCount][eachCount];
+typedef CXYCube * (*GROUP_CUBE)[eachCount][eachCount];
+typedef vector<CXYCube *> CUBE_VECTOR;
+typedef CUBE_VECTOR::iterator CUBE_ITERATOR;
+typedef vector<int> GUESS_VALUE_VECTOR;
+typedef GUESS_VALUE_VECTOR::iterator GUESS_VALUE_ITERATOR;
+typedef function<void (CXYCube *)> CUBE_FN;
+typedef function<void (CXYCube *, int)> CUBE_VALUE_FN;
+typedef function<void (CUBE_VECTOR)> CUBE_VECTOR_FN;
+typedef function<void (void)> VOID_FN;
+typedef vector<int> INDEX_VECTOR;
+typedef INDEX_VECTOR::iterator INDEX_ITERATOR;
+
 #define CHR()                                       \
 do {                                                \
-    CHECK_RESULT checkResult = AlgCheckResult();    \
-    if (checkResult == CHECK_RESULT_ERROR)          \
+    if (result == CHECK_RESULT_ERROR)               \
     {                                               \
         return;                                     \
     }                                               \
@@ -28,21 +89,158 @@ do {                                                \
 
 #define CHRB()                                      \
 do {                                                \
-    CHECK_RESULT checkResult = AlgCheckResult();    \
-    if (checkResult == CHECK_RESULT_ERROR)          \
+    if (result == CHECK_RESULT_ERROR)               \
     {                                               \
         return false;                               \
     }                                               \
 } while (0);
 
+#define CHRD()                                      \
+do {                                                \
+    if (result == CHECK_RESULT_DONE)                \
+    {                                               \
+        break;                                      \
+    }                                               \
+    else if (result == CHECK_RESULT_ERROR)          \
+    {                                               \
+        continue;                                   \
+    }                                               \
+} while (0);
+
+
+
 #define CHRBL(block)                                \
 do {                                                \
-    CHECK_RESULT checkResult = AlgCheckResult();    \
-    if (checkResult == CHECK_RESULT_ERROR)          \
+    if (result == CHECK_RESULT_ERROR)               \
     {                                               \
         block();                                    \
     }                                               \
 } while (0);
+
+
+
+void PrintFunc(PRINT_TYPE type);
+
+/////////////////////////////////////////
+// Class Headers
+#pragma mark - CXYNode Class
+/////////////////////////////////////////
+// Compose coordinate system
+/// Y, ROW
+/// |-------------------
+/// |----6----7----8----
+/// |----3----4----5----
+/// |----0----1----2----
+/// |------------------- X, COL
+/////////////////////////////////////////
+// CXYCube Class Headers
+class CXYCube
+{
+private:
+    int m_localX;
+    int m_localY;
+    int m_globalX;
+    int m_globalY;
+    int m_value;
+    int m_guess[guessesCount];
+public:
+    CXYCube();
+    
+    void SetLocalX(int localX);
+    void SetLocalY(int localY);
+    void SetGlobalX(int globalX);
+    void SetGlobalY(int globalY);
+    
+    int GetLocalX();
+    int GetLocalY();
+    int GetGlobalX();
+    int GetGlobalY();
+    
+    int GetGroupX();
+    int GetGroupY();
+    
+    void SetValue(int value);
+    int GetValue();
+    bool HasValue();
+    
+    bool SetGuess(int index, int guessValue);
+    int GetGuess(int index);
+    int * GetGuess();
+    bool ClearGuessAt(int index);
+    bool ClearGuessValue(int guessValue);
+    void ClearGuess();
+    
+    int NonZeroGuessCount();
+    int FirstNonZeroGuessValue();
+    bool IsOnlyOneNoneZeroGuess();
+    bool ApplyOnlyOneNoneZeroGuess();
+    void SetOnlyOneNoneZeroGuess(int guessValue);
+    GUESS_VALUE_VECTOR NonZeroGuessVector();
+    bool HasThisGuessValue(int guessValue);
+    bool HasSameGuess(CXYCube *cube);
+    void MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVector);
+    int NextGuessValue(int fromGuessValue);
+    
+    CXYCube * DeepCopyTo();
+    void DeepCopyTo(CXYCube *cube);
+    
+    virtual string Description();
+};
+
+/////////////////////////////////////////
+// CXYGroup Class Headers
+#pragma mark - CXYGroup Class
+class CXYGroup
+{
+private:
+    int m_X;
+    int m_Y;
+    CXYCube * m_pCubes[eachCount][eachCount]; // Local coordination
+public:
+    CXYGroup(int x, int y);
+    ~CXYGroup();
+    
+    int GetX();
+    int GetY();
+    CXYCube * GetCube(int row, int col); // Local coordination
+    CXYCube * GetCube(int index);
+    GROUP_CUBE GetCube();
+    
+    CXYGroup * DeepCopyTo();
+    void DeepCopyTo(CXYGroup *group);
+};
+
+/////////////////////////////////////////
+// CHistoryNode Class Headers
+class CHistoryNode
+{
+private:
+    CXYGroup *m_pGroups[eachCount][eachCount]; // All data cache
+    CXYCube *m_pCube; // Set guess from this node
+    int m_guessValue;
+    
+    CHistoryNode * m_pParentNode; // One direction tree
+    
+public:
+    CHistoryNode();
+    ~CHistoryNode();
+    
+    void SetGroups(CXYGroup * groups[eachCount][eachCount]);
+    GROUP GetGroups();
+    void RestoreGroups(CXYGroup * groups[eachCount][eachCount]);
+    
+    void SetCube(CXYCube *cube);
+    CXYCube * GetCube();
+    
+    void SetGuessValue(int guessValue);
+    int GetGuessValue();
+    
+    int GetNextGuessValue();
+    bool HasNextGuess();
+    
+    void SetParentNode(CHistoryNode *parentNode);
+    CHistoryNode * GetParentNode();
+};
 
 /////////////////////////////////////////
 // Data
@@ -1823,87 +2021,34 @@ CHECK_RESULT AlgBruteForce()
     {
         AlgUpdateGuess();
         AlgAdvancedCRME();
-        AlgAdvancedLongRanger();
-        AlgAdvancedTwins();
-        AlgAdvancedTriples();
-        
         result = AlgCheckResult();
+        CHRD();
+        
+        AlgAdvancedLongRanger();
+        result = AlgCheckResult();
+        CHRD();
+        
+        AlgAdvancedTwins();
+        result = AlgCheckResult();
+        CHRD();
+        
+        AlgAdvancedTriples();
+        result = AlgCheckResult();
+        CHRD();
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
            (result == CHECK_RESULT_ERROR && StepOut()));
-    
-    
-    
-//    CXYCube *cube = AlgMakeNextConjecture(NULL);
-//    result = AlgCheckResult();
-    
-//    // TODO: Update performance here:
-//    while(cube != NULL && result != CHECK_RESULT_DONE)
-//    {
-//        printf("AlgBruteForce continue %s, %d\n", cube->Description().c_str(), result);
-//        AlgUpdateGuess();
-//        AlgAdvancedCRME();
-//        int preHistoryCount = 0;
-//        int posHistoryCount = 0;
-//        do
-//        {
-//            preHistoryCount = GetHistoryCount();
-//            AlgAdvancedLongRanger();
-//            posHistoryCount = GetHistoryCount();
-//        }
-//        while (preHistoryCount != posHistoryCount);
-//        preHistoryCount = 0;
-//        posHistoryCount = 0;
-//        do
-//        {
-//            preHistoryCount = GetHistoryCount();
-//            AlgAdvancedTwins();
-//            AlgAdvancedTriples();
-//            posHistoryCount = GetHistoryCount();
-//        }
-//        while (preHistoryCount != posHistoryCount);
-//        
-//        result = AlgCheckResult();
-//        if (result == CHECK_RESULT_DONE) break;
-//        if (result == CHECK_RESULT_UNFINISH)
-//        {
-//            printf("CHECK_RESULT_UNFINISH: BEFORE: %s \n", cube->Description().c_str());
-//            cube = AlgMakeNextConjecture(NULL);
-//            if (cube)
-//            {
-//                printf("CHECK_RESULT_UNFINISH: AFTER: %s \n", cube->Description().c_str());
-//            }
-//        }
-//        
-//        while (result == CHECK_RESULT_ERROR || cube == NULL)
-//        {
-//            printf("AlgBruteForce cube continue\n");
-//            CCubeValueHistory *history = (CCubeValueHistory *)AlgFindPreviousConjecture();
-//            if (history == NULL) return CHECK_RESULT_ERROR;
-//            printf("Find History: %s\n", history->Description().c_str());
-//            CXYCube *historyCube = history->GetCube();
-//            int historyValue = history->GetValue();
-//            history->Backtrack();
-//            PopHistory();
-//            cube = AlgMakeNextConjecture(historyCube, historyValue);
-//            result = CHECK_RESULT_NONE;
-//            if (cube)
-//            {
-//                printf("Next Cube: %s \n", cube->Description().c_str());
-//            }
-//        }
-//    }
-    
+
     return result;
 }
 
 /////////////////////////////////////////
 // Main
-//int main (int argc, char **argv)
-//{
-//    InitializeData();
-//    AlgInitRandom();
-//    AlgRandomGroup(0, 0);
+void MainTest()
+{
+    InitializeData();
+    AlgInitRandom();
+    AlgRandomGroup(0, 0);
 
     // TODO: write a command line input init data.
     /*
@@ -1988,7 +2133,7 @@ CHECK_RESULT AlgBruteForce()
      g_pCubes[8][6]->SetValue(9);
      g_pCubes[8][7]->SetValue(0);
      g_pCubes[8][8]->SetValue(5);
-     */
+    */
     
     // Long Ranger
     /*
@@ -2074,40 +2219,8 @@ CHECK_RESULT AlgBruteForce()
      g_pCubes[8][7]->SetValue(0);
      g_pCubes[8][8]->SetValue(0);
      */
-//    
-//    AlgUpdateGuess();
-//    AlgAdvancedCRME();
-//    
-//    
-//    int preHistoryCount = 0;
-//    int posHistoryCount = 0;
-//    do
-//    {
-//        preHistoryCount = GetHistoryCount();
-//        AlgAdvancedLongRanger();
-//        posHistoryCount = GetHistoryCount();
-//    }
-//    while (preHistoryCount != posHistoryCount);
-//    
-//    preHistoryCount = 0;
-//    posHistoryCount = 0;
-//    do
-//    {
-//        preHistoryCount = GetHistoryCount();
-//        AlgAdvancedTwins();
-//        AlgAdvancedTriples();
-//        posHistoryCount = GetHistoryCount();
-//    }
-//    while (preHistoryCount != posHistoryCount);
-//    
-//    PrintFunc(PRINT_CUBE_VALUE);
-//    PrintFunc(PRINT_CUBE_GUESS);
-//    
-//    CHECK_RESULT result = AlgBruteForce();
-//    printf("%d\n", result);
-//    
-//    // PrintFunc(PRINT_CUBE_GUESS);
-//    // PrintFunc(PRINT_CUBE_VALUE);
-//    
-//    //PrintFunc(PRINT_HISTORY_VALUE);
-//}
+
+    AlgBruteForce();
+   
+    PrintFunc(PRINT_CUBE_VALUE);
+}
