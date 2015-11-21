@@ -35,6 +35,15 @@ do {                                                \
     }                                               \
 } while (0);
 
+#define CHRBL(block)                                \
+do {                                                \
+    CHECK_RESULT checkResult = AlgCheckResult();    \
+    if (checkResult == CHECK_RESULT_ERROR)          \
+    {                                               \
+        block();                                    \
+    }                                               \
+} while (0);
+
 /////////////////////////////////////////
 // Data
 #pragma mark - Data
