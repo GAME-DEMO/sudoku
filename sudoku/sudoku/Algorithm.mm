@@ -240,6 +240,8 @@ public:
     
     void SetParentNode(CHistoryNode *parentNode);
     CHistoryNode * GetParentNode();
+    
+    virtual string Description();
 };
 
 /////////////////////////////////////////
@@ -846,6 +848,18 @@ CHistoryNode * CHistoryNode::GetParentNode()
     return m_pParentNode;
 }
 
+string CHistoryNode::Description()
+{
+    const int cnt = 1024;
+    static char buf[cnt];
+    
+    memset(buf, 0, cnt * sizeof(char));
+    sprintf(buf, "CHistoryNode: Node:(%d, %d): %d, guessValue: %d",
+            m_pCube->GetGlobalX(), m_pCube->GetGlobalY(), m_pCube->GetValue(), m_guessValue);
+    
+    return buf;
+}
+
 /////////////////////////////////////////
 // Initialize
 #pragma mark - Initialize
@@ -1157,12 +1171,14 @@ bool isHistoryEmpty()
 
 bool StepIn()
 {
+    printf("StepIn Enter \n");
     CHistoryNode *node = new CHistoryNode();
     node->SetGroups(g_pGroups);
     
     CXYCube *firstGuessCube = AlgFirstGuessCube();
     if (firstGuessCube == NULL)
     {
+        printf("StepIn firstGuessCube NULL, return false \n");
         return false;
     }
     node->SetCube(firstGuessCube);
@@ -1170,19 +1186,23 @@ bool StepIn()
     int guessValue = firstGuessCube->FirstNonZeroGuessValue();
     if (guessValue == 0)
     {
+        printf("StepIn no guess value, return false \n");
         return false;
     }
     node->SetGuessValue(guessValue);
     
     firstGuessCube->SetValue(firstGuessCube->FirstNonZeroGuessValue());
     
+    printf("StepIn Leave with Node: %s \n", node->Description().c_str());
     return AttachHistoryNode(node);
 }
 
 bool StepOut()
 {
+    printf("StepOut Enter \n");
     if (isHistoryEmpty())
     {
+        printf("StepOut isHistoryEmpty, return false \n");
         return false;
     }
     
@@ -1191,6 +1211,7 @@ bool StepOut()
     {
         if (!DetachHistoryNode())
         {
+            printf("StepOut DetachHistoryNode, return false \n");
             return false;
         }
         return StepOut();
@@ -1198,10 +1219,11 @@ bool StepOut()
     else
     {
         tail->RestoreGroups(g_pGroups);
-        tail->SetGuessValue(tail->GetNextGuessValue());
+        int nextGuessValue = tail->GetNextGuessValue();
+        tail->SetGuessValue(nextGuessValue);
         CXYCube *cube = AlgGetCubeByLinear(AlgCubeLinearIndex(tail->GetCube()));
-
-        cube->SetValue(tail->GetNextGuessValue());
+        cube->SetValue(nextGuessValue);
+        printf("StepOut Leave with Node: %s \n", tail->Description().c_str());
         return true;
     }
     
@@ -1755,21 +1777,28 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
     ClearValueChangedFlags();
     for (CUBE_ITERATOR it = twinCubeVector.begin(); it != twinCubeVector.end(); ++it)
     {
+        printf("IT: %s, %d \n", (*it)->Description().c_str(), (*it)->NonZeroGuessCount());
         if ((*it)->NonZeroGuessCount() != 2) continue;
         for (CUBE_ITERATOR kt = it + 1; kt != twinCubeVector.end(); ++kt)
         {
+            printf("KT: %s, %d \n", (*kt)->Description().c_str(), (*kt)->NonZeroGuessCount());
             if ((*kt)->NonZeroGuessCount() != 2) continue;
             if ((*it)->HasSameGuess(*kt))
             {
+                printf("IT: %s Equals to KT: %s \n", (*it)->Description().c_str(), (*kt)->Description().c_str());
                 for (int i = 0; i < guessesCount; ++i)
                 {
                     int guessValue = (*it)->GetGuess()[i];
+                    printf("GuessValue: %d \n", guessValue);
                     if (guessValue == 0) continue;
                     for (CUBE_ITERATOR mt = twinCubeVector.begin(); mt != twinCubeVector.end(); ++mt)
                     {
+                        printf("IT: %s %s \n", (*mt)->Description().c_str(), ((*mt) == (*it) || (*mt) == (*kt)) ? "skip" : "not skip");
+                        
                         if ((*mt) == (*it) || (*mt) == (*kt)) continue;
                         if ((*mt)->ClearGuessValue(guessValue))
                         {
+                            printf("MT: %s", (*mt)->Description().c_str());
                             if ((*mt)->IsOnlyOneNoneZeroGuess())
                             {
                                 AlgAdvancedCRMEChip((*mt), PARM_TYPE_ALL);
@@ -2019,21 +2048,33 @@ CHECK_RESULT AlgBruteForce()
     
     do
     {
+        printf("CRME B: \n");
         AlgUpdateGuess();
         AlgAdvancedCRME();
+        PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
+        printf("CRME E: %d \n", result);
         CHRD();
         
+        printf("LongRanger B: \n");
         AlgAdvancedLongRanger();
+        PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
+        printf("LongRanger E: %d \n", result);
         CHRD();
         
+        printf("Twins B: \n");
         AlgAdvancedTwins();
+        PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
+        printf("Twins E: %d \n", result);
         CHRD();
         
+        printf("Triples B: \n");
         AlgAdvancedTriples();
+        PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
+        printf("Triples E: %d \n", result);
         CHRD();
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
@@ -2050,175 +2091,6 @@ void MainTest()
     AlgInitRandom();
     AlgRandomGroup(0, 0);
 
-    // TODO: write a command line input init data.
-    /*
-     g_pCubes[0][0]->SetValue(8);
-     g_pCubes[0][1]->SetValue(0);
-     g_pCubes[0][2]->SetValue(5);
-     g_pCubes[0][3]->SetValue(0);
-     g_pCubes[0][4]->SetValue(0);
-     g_pCubes[0][5]->SetValue(1);
-     g_pCubes[0][6]->SetValue(0);
-     g_pCubes[0][7]->SetValue(0);
-     g_pCubes[0][8]->SetValue(0);
-     g_pCubes[1][0]->SetValue(0);
-     g_pCubes[1][1]->SetValue(7);
-     g_pCubes[1][2]->SetValue(0);
-     g_pCubes[1][3]->SetValue(0);
-     g_pCubes[1][4]->SetValue(8);
-     g_pCubes[1][5]->SetValue(0);
-     g_pCubes[1][6]->SetValue(0);
-     g_pCubes[1][7]->SetValue(6);
-     g_pCubes[1][8]->SetValue(0);
-     g_pCubes[2][0]->SetValue(0);
-     g_pCubes[2][1]->SetValue(3);
-     g_pCubes[2][2]->SetValue(0);
-     g_pCubes[2][3]->SetValue(0);
-     g_pCubes[2][4]->SetValue(0);
-     g_pCubes[2][5]->SetValue(0);
-     g_pCubes[2][6]->SetValue(0);
-     g_pCubes[2][7]->SetValue(0);
-     g_pCubes[2][8]->SetValue(0);
-     g_pCubes[3][0]->SetValue(6);
-     g_pCubes[3][1]->SetValue(8);
-     g_pCubes[3][2]->SetValue(0);
-     g_pCubes[3][3]->SetValue(2);
-     g_pCubes[3][4]->SetValue(0);
-     g_pCubes[3][5]->SetValue(0);
-     g_pCubes[3][6]->SetValue(0);
-     g_pCubes[3][7]->SetValue(7);
-     g_pCubes[3][8]->SetValue(0);
-     g_pCubes[4][0]->SetValue(0);
-     g_pCubes[4][1]->SetValue(0);
-     g_pCubes[4][2]->SetValue(3);
-     g_pCubes[4][3]->SetValue(0);
-     g_pCubes[4][4]->SetValue(0);
-     g_pCubes[4][5]->SetValue(0);
-     g_pCubes[4][6]->SetValue(1);
-     g_pCubes[4][7]->SetValue(0);
-     g_pCubes[4][8]->SetValue(0);
-     g_pCubes[5][0]->SetValue(0);
-     g_pCubes[5][1]->SetValue(1);
-     g_pCubes[5][2]->SetValue(0);
-     g_pCubes[5][3]->SetValue(0);
-     g_pCubes[5][4]->SetValue(0);
-     g_pCubes[5][5]->SetValue(6);
-     g_pCubes[5][6]->SetValue(0);
-     g_pCubes[5][7]->SetValue(3);
-     g_pCubes[5][8]->SetValue(4);
-     g_pCubes[6][0]->SetValue(0);
-     g_pCubes[6][1]->SetValue(0);
-     g_pCubes[6][2]->SetValue(0);
-     g_pCubes[6][3]->SetValue(0);
-     g_pCubes[6][4]->SetValue(0);
-     g_pCubes[6][5]->SetValue(0);
-     g_pCubes[6][6]->SetValue(0);
-     g_pCubes[6][7]->SetValue(8);
-     g_pCubes[6][8]->SetValue(0);
-     g_pCubes[7][0]->SetValue(0);
-     g_pCubes[7][1]->SetValue(6);
-     g_pCubes[7][2]->SetValue(0);
-     g_pCubes[7][3]->SetValue(0);
-     g_pCubes[7][4]->SetValue(7);
-     g_pCubes[7][5]->SetValue(0);
-     g_pCubes[7][6]->SetValue(0);
-     g_pCubes[7][7]->SetValue(1);
-     g_pCubes[7][8]->SetValue(0);
-     g_pCubes[8][0]->SetValue(0);
-     g_pCubes[8][1]->SetValue(0);
-     g_pCubes[8][2]->SetValue(0);
-     g_pCubes[8][3]->SetValue(3);
-     g_pCubes[8][4]->SetValue(0);
-     g_pCubes[8][5]->SetValue(0);
-     g_pCubes[8][6]->SetValue(9);
-     g_pCubes[8][7]->SetValue(0);
-     g_pCubes[8][8]->SetValue(5);
-    */
-    
-    // Long Ranger
-    /*
-     g_pCubes[0][0]->SetValue(2);
-     g_pCubes[0][1]->SetValue(0);
-     g_pCubes[0][2]->SetValue(0);
-     g_pCubes[0][3]->SetValue(0);
-     g_pCubes[0][4]->SetValue(0);
-     g_pCubes[0][5]->SetValue(0);
-     g_pCubes[0][6]->SetValue(0);
-     g_pCubes[0][7]->SetValue(0);
-     g_pCubes[0][8]->SetValue(8);
-     g_pCubes[1][0]->SetValue(9);
-     g_pCubes[1][1]->SetValue(0);
-     g_pCubes[1][2]->SetValue(0);
-     g_pCubes[1][3]->SetValue(0);
-     g_pCubes[1][4]->SetValue(2);
-     g_pCubes[1][5]->SetValue(8);
-     g_pCubes[1][6]->SetValue(0);
-     g_pCubes[1][7]->SetValue(5);
-     g_pCubes[1][8]->SetValue(0);
-     g_pCubes[2][0]->SetValue(0);
-     g_pCubes[2][1]->SetValue(5);
-     g_pCubes[2][2]->SetValue(6);
-     g_pCubes[2][3]->SetValue(9);
-     g_pCubes[2][4]->SetValue(4);
-     g_pCubes[2][5]->SetValue(1);
-     g_pCubes[2][6]->SetValue(0);
-     g_pCubes[2][7]->SetValue(0);
-     g_pCubes[2][8]->SetValue(0);
-     g_pCubes[3][0]->SetValue(3);
-     g_pCubes[3][1]->SetValue(8);
-     g_pCubes[3][2]->SetValue(0);
-     g_pCubes[3][3]->SetValue(0);
-     g_pCubes[3][4]->SetValue(7);
-     g_pCubes[3][5]->SetValue(0);
-     g_pCubes[3][6]->SetValue(0);
-     g_pCubes[3][7]->SetValue(0);
-     g_pCubes[3][8]->SetValue(6);
-     g_pCubes[4][0]->SetValue(6);
-     g_pCubes[4][1]->SetValue(0);
-     g_pCubes[4][2]->SetValue(4);
-     g_pCubes[4][3]->SetValue(2);
-     g_pCubes[4][4]->SetValue(0);
-     g_pCubes[4][5]->SetValue(3);
-     g_pCubes[4][6]->SetValue(5);
-     g_pCubes[4][7]->SetValue(0);
-     g_pCubes[4][8]->SetValue(0);
-     g_pCubes[5][0]->SetValue(7);
-     g_pCubes[5][1]->SetValue(0);
-     g_pCubes[5][2]->SetValue(5);
-     g_pCubes[5][3]->SetValue(0);
-     g_pCubes[5][4]->SetValue(6);
-     g_pCubes[5][5]->SetValue(0);
-     g_pCubes[5][6]->SetValue(0);
-     g_pCubes[5][7]->SetValue(0);
-     g_pCubes[5][8]->SetValue(0);
-     g_pCubes[6][0]->SetValue(5);
-     g_pCubes[6][1]->SetValue(0);
-     g_pCubes[6][2]->SetValue(8);
-     g_pCubes[6][3]->SetValue(0);
-     g_pCubes[6][4]->SetValue(0);
-     g_pCubes[6][5]->SetValue(7);
-     g_pCubes[6][6]->SetValue(0);
-     g_pCubes[6][7]->SetValue(0);
-     g_pCubes[6][8]->SetValue(4);
-     g_pCubes[7][0]->SetValue(0);
-     g_pCubes[7][1]->SetValue(0);
-     g_pCubes[7][2]->SetValue(7);
-     g_pCubes[7][3]->SetValue(4);
-     g_pCubes[7][4]->SetValue(0);
-     g_pCubes[7][5]->SetValue(2);
-     g_pCubes[7][6]->SetValue(6);
-     g_pCubes[7][7]->SetValue(8);
-     g_pCubes[7][8]->SetValue(0);
-     g_pCubes[8][0]->SetValue(4);
-     g_pCubes[8][1]->SetValue(0);
-     g_pCubes[8][2]->SetValue(9);
-     g_pCubes[8][3]->SetValue(8);
-     g_pCubes[8][4]->SetValue(5);
-     g_pCubes[8][5]->SetValue(6);
-     g_pCubes[8][6]->SetValue(7);
-     g_pCubes[8][7]->SetValue(0);
-     g_pCubes[8][8]->SetValue(0);
-     */
 
     AlgBruteForce();
    

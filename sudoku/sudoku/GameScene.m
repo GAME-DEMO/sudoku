@@ -7,6 +7,7 @@
 //
 
 #import "GameScene.h"
+#import "Presenter.h"
 
 @implementation GameScene
 
@@ -20,6 +21,11 @@
                                    CGRectGetMidY(self.frame));
     
     [self addChild:myLabel];
+    
+    for (int i = 0; i < 500; ++i) {
+        NSLog(@"MainTest: %d", i);
+        [[Presenter sharedInstance] mainTest];
+    }
 }
 
 -(void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {

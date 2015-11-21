@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AA5B41D61C0090A1002B6730 /* Presenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA5B41D51C0090A1002B6730 /* Presenter.mm */; };
 		AA6924BA1BFA3EE8006CED46 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6924B91BFA3EE8006CED46 /* main.m */; };
 		AA6924BD1BFA3EE8006CED46 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6924BC1BFA3EE8006CED46 /* AppDelegate.m */; };
 		AA6924C01BFA3EE8006CED46 /* GameScene.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6924BF1BFA3EE8006CED46 /* GameScene.m */; };
@@ -19,6 +20,9 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA5B41D41C0090A1002B6730 /* Presenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Presenter.h; sourceTree = "<group>"; };
+		AA5B41D51C0090A1002B6730 /* Presenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Presenter.mm; sourceTree = "<group>"; };
+		AA5B41D71C0093D4002B6730 /* readme.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = readme.h; sourceTree = "<group>"; };
 		AA6924B51BFA3EE8006CED46 /* sudoku.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = sudoku.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AA6924B91BFA3EE8006CED46 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		AA6924BB1BFA3EE8006CED46 /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
@@ -68,6 +72,8 @@
 			children = (
 				AAE4548E1BFFAE630089D442 /* Algorithm.h */,
 				AA6924D61BFA40BC006CED46 /* Algorithm.mm */,
+				AA5B41D41C0090A1002B6730 /* Presenter.h */,
+				AA5B41D51C0090A1002B6730 /* Presenter.mm */,
 				AA6924BB1BFA3EE8006CED46 /* AppDelegate.h */,
 				AA6924BC1BFA3EE8006CED46 /* AppDelegate.m */,
 				AA6924BE1BFA3EE8006CED46 /* GameScene.h */,
@@ -87,6 +93,7 @@
 		AA6924B81BFA3EE8006CED46 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AA5B41D71C0093D4002B6730 /* readme.h */,
 				AA6924B91BFA3EE8006CED46 /* main.m */,
 			);
 			name = "Supporting Files";
@@ -165,6 +172,7 @@
 			files = (
 				AA6924C51BFA3EE8006CED46 /* GameViewController.m in Sources */,
 				AA6924BD1BFA3EE8006CED46 /* AppDelegate.m in Sources */,
+				AA5B41D61C0090A1002B6730 /* Presenter.mm in Sources */,
 				AA6924D71BFA40BC006CED46 /* Algorithm.mm in Sources */,
 				AA6924C01BFA3EE8006CED46 /* GameScene.m in Sources */,
 				AA6924BA1BFA3EE8006CED46 /* main.m in Sources */,
