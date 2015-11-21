@@ -52,6 +52,16 @@ CHistoryNode * g_pHistoryTailNode;
 /////////////////////////////////////////
 // Algorithm Helper
 #pragma mark - Algorithm Helper
+void SetValueChanged()
+{
+    g_bCubeValueChanged = true;
+}
+
+void SetGuessValueChanged()
+{
+    g_bCubeGuessValueChanged = true;
+}
+
 void ClearValueChangedFlags()
 {
     g_bCubeValueChanged = false;
@@ -61,6 +71,26 @@ void ClearValueChangedFlags()
 bool IsValueChanged()
 {
     return g_bCubeValueChanged || g_bCubeGuessValueChanged;
+}
+
+void SetValueChangedForFunction(ALGORITHM_FUNCTION function)
+{
+    g_bCubeValueChangedInFunction[function] = true;
+}
+
+void SetValueChangedForCurrentFunction()
+{
+    SetValueChangedForFunction(g_currentFunction);
+}
+
+void SetGuessValueChangedForFunction(ALGORITHM_FUNCTION function)
+{
+    g_bCubeGuessValueChangedInFunction[function] = true;
+}
+
+void SetGuessValueChangedForCurrentFunction()
+{
+    SetGuessValueChangedForFunction(g_currentFunction);
 }
 
 void ClearValueChangedFlagsForFunction(ALGORITHM_FUNCTION function)
@@ -167,7 +197,8 @@ void CXYCube::SetValue(int value)
     if (m_value != value)
     {
         m_value = value;
-        g_bCubeValueChanged = true;
+        SetValueChanged();
+        SetValueChangedForCurrentFunction();
     }
 }
 
@@ -188,7 +219,8 @@ bool CXYCube::SetGuess(int index, int guessValue)
         if (m_guess[index] != guessValue)
         {
             m_guess[index] = guessValue;
-            g_bCubeGuessValueChanged = true;
+            SetGuessValueChanged();
+            SetGuessValueChangedForCurrentFunction();
             return true;
         }
     }
