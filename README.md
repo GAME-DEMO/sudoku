@@ -1,6 +1,7 @@
 # sudoku
 
 Algorithm:
+
 implements with C++ (backup/algorithm.cpp).
 
 compile:
