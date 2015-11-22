@@ -1830,8 +1830,6 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
                     if (guessValue == 0) continue;
                     for (CUBE_ITERATOR mt = twinCubeVector.begin(); mt != twinCubeVector.end(); ++mt)
                     {
-                        printf("IT: %s %s \n", (*mt)->Description().c_str(), ((*mt) == (*it) || (*mt) == (*kt)) ? "skip" : "not skip");
-                        
                         if ((*mt) == (*it) || (*mt) == (*kt)) continue;
                         if ((*mt)->ClearGuessValue(guessValue))
                         {
