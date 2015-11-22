@@ -21,7 +21,7 @@ static const int groupsCount = dimension;
 static const int cubesCount = dimension;
 static const int guessesCount = dimension;
 
-static const int testsCount = 1000;
+static const int testsCount = 1;
 
 typedef enum _PRINT_TYPE
 {
