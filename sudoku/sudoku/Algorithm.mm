@@ -80,23 +80,23 @@ typedef vector<int> INDEX_VECTOR;
 typedef INDEX_VECTOR::iterator INDEX_ITERATOR;
 
 #define CHR()                                       \
-do {                                                \
+{                                                   \
     if (result == CHECK_RESULT_ERROR)               \
     {                                               \
         return;                                     \
     }                                               \
-} while (0);
+}
 
 #define CHRB()                                      \
-do {                                                \
+{                                                   \
     if (result == CHECK_RESULT_ERROR)               \
     {                                               \
         return false;                               \
     }                                               \
-} while (0);
+}
 
 #define CHRD()                                      \
-do {                                                \
+{                                                   \
     if (result == CHECK_RESULT_DONE)                \
     {                                               \
         break;                                      \
@@ -105,17 +105,17 @@ do {                                                \
     {                                               \
         continue;                                   \
     }                                               \
-} while (0);
+}
 
 
 
 #define CHRBL(block)                                \
-do {                                                \
+{                                                   \
     if (result == CHECK_RESULT_ERROR)               \
     {                                               \
         block();                                    \
     }                                               \
-} while (0);
+}
 
 
 
@@ -625,8 +625,8 @@ string CXYCube::Description()
     static char buf[cnt];
     
     memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CXYCube: (%d, %d):%d",
-            GetGlobalX(), GetGlobalY(), GetValue());
+    sprintf(buf, "CXYCube: (%d, %d):%d, guess count: %d",
+            GetGlobalX(), GetGlobalY(), GetValue(), NonZeroGuessCount());
     
     return buf;
 }
@@ -863,13 +863,50 @@ string CHistoryNode::Description()
 /////////////////////////////////////////
 // Initialize
 #pragma mark - Initialize
-bool InitializeData()
+bool ClearData()
 {
     for (int row = 0; row < eachCount; ++row)
     {
         for (int col = 0; col < eachCount; ++col)
         {
-            g_pGroups[row][col] = new CXYGroup(col, row);
+            delete g_pGroups[row][col];
+            g_pGroups[row][col] = NULL;
+        }
+    }
+    
+    ClearValueChangedFlags();
+    ClearValueChangedFlagsForAllFunctions();
+    
+    if (g_pHistoryHeadNode != NULL && g_pHistoryTailNode != NULL) {
+        while (g_pHistoryTailNode && g_pHistoryTailNode != g_pHistoryHeadNode) {
+            CHistoryNode *tailNode = g_pHistoryTailNode;
+            g_pHistoryTailNode = tailNode->GetParentNode();
+            delete tailNode;
+            tailNode = NULL;
+        }
+    }
+    
+    if (g_pHistoryHeadNode) {
+        delete g_pHistoryHeadNode;
+        g_pHistoryHeadNode = NULL;
+    }
+    
+    g_pHistoryTailNode = NULL;
+    
+    return true;
+}
+
+bool InitializeData()
+{
+    ClearData();
+
+    for (int row = 0; row < eachCount; ++row)
+    {
+        for (int col = 0; col < eachCount; ++col)
+        {
+            if (g_pGroups[row][col] == NULL) {
+                g_pGroups[row][col] = new CXYGroup(col, row);
+            }
             
             for (int cubeRow = 0; cubeRow < eachCount; ++cubeRow)
             {
@@ -884,8 +921,10 @@ bool InitializeData()
     
     ClearValueChangedFlags();
     ClearValueChangedFlagsForAllFunctions();
+    
     g_pHistoryHeadNode = new CHistoryNode();
     g_pHistoryTailNode = g_pHistoryHeadNode;
+    
     return true;
 };
 
@@ -1777,11 +1816,9 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
     ClearValueChangedFlags();
     for (CUBE_ITERATOR it = twinCubeVector.begin(); it != twinCubeVector.end(); ++it)
     {
-        printf("IT: %s, %d \n", (*it)->Description().c_str(), (*it)->NonZeroGuessCount());
         if ((*it)->NonZeroGuessCount() != 2) continue;
         for (CUBE_ITERATOR kt = it + 1; kt != twinCubeVector.end(); ++kt)
         {
-            printf("KT: %s, %d \n", (*kt)->Description().c_str(), (*kt)->NonZeroGuessCount());
             if ((*kt)->NonZeroGuessCount() != 2) continue;
             if ((*it)->HasSameGuess(*kt))
             {
@@ -2080,6 +2117,9 @@ CHECK_RESULT AlgBruteForce()
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
            (result == CHECK_RESULT_ERROR && StepOut()));
 
+    
+    printf("Result E: %d \n", result);
+    
     return result;
 }
 
