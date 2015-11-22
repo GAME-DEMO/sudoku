@@ -21,6 +21,8 @@ static const int groupsCount = dimension;
 static const int cubesCount = dimension;
 static const int guessesCount = dimension;
 
+static const int testsCount = 1000;
+
 typedef enum _PRINT_TYPE
 {
     PRINT_NONE,
@@ -2126,14 +2128,12 @@ CHECK_RESULT AlgBruteForce()
 // Main
 int main(int argc, char * argv[])
 {
-    InitializeData();
-    AlgInitRandom();
-    AlgRandomGroup(0, 0);
+    for (int i = 0; i < testsCount; ++i) {
+        InitializeData();
+        AlgInitRandom();
+        AlgRandomGroup(0, 0);
+        AlgBruteForce();
+    }
 
-
-    AlgBruteForce();
-   
-
-    
     return 0;
 }

@@ -17,8 +17,6 @@
 
 #include "Algorithm.h"
 
-using namespace std;
-
 static const int eachCount = 3;
 static const int dimension = eachCount * eachCount;
 static const int groupsCount = dimension;
@@ -65,6 +63,8 @@ typedef enum _ALGORITHM_FUNCTION
 class CXYCube;
 class CXYGroup;
 class CHistoryNode;
+
+using namespace std;
 
 typedef CXYGroup * (*GROUP)[eachCount][eachCount];
 typedef CXYCube * (*GROUP_CUBE)[eachCount][eachCount];
@@ -2119,6 +2119,7 @@ CHECK_RESULT AlgBruteForce()
 
     
     printf("Result E: %d \n", result);
+    PrintFunc(PRINT_CUBE_VALUE);
     
     return result;
 }
@@ -2130,9 +2131,5 @@ void MainTest()
     InitializeData();
     AlgInitRandom();
     AlgRandomGroup(0, 0);
-
-
     AlgBruteForce();
-   
-    PrintFunc(PRINT_CUBE_VALUE);
 }
