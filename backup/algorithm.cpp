@@ -15,8 +15,6 @@
 #include <cstdarg>
 #include <functional>
 
-using namespace std;
-
 static const int eachCount = 3;
 static const int dimension = eachCount * eachCount;
 static const int groupsCount = dimension;
@@ -63,6 +61,8 @@ typedef enum _ALGORITHM_FUNCTION
 class CXYCube;
 class CXYGroup;
 class CHistoryNode;
+
+using namespace std;
 
 typedef CXYGroup * (*GROUP)[eachCount][eachCount];
 typedef CXYCube * (*GROUP_CUBE)[eachCount][eachCount];
