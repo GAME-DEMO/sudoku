@@ -95,6 +95,18 @@ typedef INDEX_VECTOR::iterator INDEX_ITERATOR;
     }                                               \
 }
 
+#define CHRC()                                      \
+{                                                   \
+    if (result == CHECK_RESULT_DONE)                \
+    {                                               \
+        continue;                                   \
+    }                                               \
+    else if (result == CHECK_RESULT_ERROR)          \
+    {                                               \
+        continue;                                   \
+    }                                               \
+}
+
 #define CHRD()                                      \
 {                                                   \
     if (result == CHECK_RESULT_DONE)                \
@@ -107,6 +119,17 @@ typedef INDEX_VECTOR::iterator INDEX_ITERATOR;
     }                                               \
 }
 
+#define CHRCD()                                     \
+{                                                   \
+    if (allResult)                                  \
+    {                                               \
+        CHRC();                                     \
+    }                                               \
+    else                                            \
+    {                                               \
+        CHRD();                                     \
+    }                                               \
+}
 
 
 #define CHRBL(block)                                \
@@ -2125,9 +2148,13 @@ void AlgAdvancedTriples()
     }
 }
 
-CHECK_RESULT AlgBruteForce()
+CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
 {
     CHECK_RESULT result = CHECK_RESULT_NONE;
+    
+    if (resultCount) {
+        *resultCount = 0;
+    }
     
     printf("Algorithm B: \n");
     PrintFunc(PRINT_CUBE_VALUE);
@@ -2140,31 +2167,32 @@ CHECK_RESULT AlgBruteForce()
         //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
         //printf("CRME E: %d \n", result);
-        CHRD();
+        CHRCD();
         
         //printf("LongRanger B: \n");
         AlgAdvancedLongRanger();
         //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
         //printf("LongRanger E: %d \n", result);
-        CHRD();
+        CHRCD();
         
         //printf("Twins B: \n");
         AlgAdvancedTwins();
         //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
         //printf("Twins E: %d \n", result);
-        CHRD();
+        CHRCD();
         
         //printf("Triples B: \n");
         AlgAdvancedTriples();
         //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
         //printf("Triples E: %d \n", result);
-        CHRD();
+        CHRCD();
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
-           (result == CHECK_RESULT_ERROR && StepOut()));
+           (result == CHECK_RESULT_ERROR && StepOut()) ||
+           (result == CHECK_RESULT_DONE && (allResult && (++*resultCount) && StepOut())));
 
     
     printf("Result E: %d \n", result);
@@ -2180,5 +2208,5 @@ void MainTest()
     AlgInitRandom();
     InitializeData();
     AlgRandomGroup(0, 0);
-    AlgBruteForce();
+    AlgBruteForce(false, NULL);
 }
