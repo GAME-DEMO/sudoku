@@ -659,8 +659,8 @@ string CXYCube::Description()
     static char buf[cnt];
     
     memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CXYCube: (%d, %d):%d, guess count: %d",
-            GetGlobalX(), GetGlobalY(), GetValue(), NonZeroGuessCount());
+    sprintf(buf, "CXYCube: (%d, %d):%d, guess count: %d, guess random: %d",
+            GetGlobalX(), GetGlobalY(), GetValue(), NonZeroGuessCount(), m_randomGuessIndex);
     
     return buf;
 }
@@ -898,8 +898,8 @@ string CHistoryNode::Description()
     static char buf[cnt];
     
     memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CHistoryNode: Node:(%d, %d): %d, guessValue: %d",
-            m_pCube->GetGlobalX(), m_pCube->GetGlobalY(), m_pCube->GetValue(), m_guessValue);
+    sprintf(buf, "CHistoryNode: Cube:(%s), historyGuessValue: %d",
+            m_pCube->Description().c_str(), m_guessValue);
     
     return buf;
 }
@@ -1870,18 +1870,18 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
             if ((*kt)->NonZeroGuessCount() != 2) continue;
             if ((*it)->HasSameGuess(*kt))
             {
-                printf("IT: %s Equals to KT: %s \n", (*it)->Description().c_str(), (*kt)->Description().c_str());
+                //printf("IT: %s Equals to KT: %s \n", (*it)->Description().c_str(), (*kt)->Description().c_str());
                 for (int i = 0; i < guessesCount; ++i)
                 {
                     int guessValue = (*it)->GetGuess()[i];
-                    printf("GuessValue: %d \n", guessValue);
+                    //printf("GuessValue: %d \n", guessValue);
                     if (guessValue == 0) continue;
                     for (CUBE_ITERATOR mt = twinCubeVector.begin(); mt != twinCubeVector.end(); ++mt)
                     {
                         if ((*mt) == (*it) || (*mt) == (*kt)) continue;
                         if ((*mt)->ClearGuessValue(guessValue))
                         {
-                            printf("MT: %s", (*mt)->Description().c_str());
+                            //printf("MT: %s", (*mt)->Description().c_str());
                             if ((*mt)->IsOnlyOneNoneZeroGuess())
                             {
                                 AlgAdvancedCRMEChip((*mt), PARM_TYPE_ALL);
@@ -2129,35 +2129,38 @@ CHECK_RESULT AlgBruteForce()
 {
     CHECK_RESULT result = CHECK_RESULT_NONE;
     
+    printf("Algorithm B: \n");
+    PrintFunc(PRINT_CUBE_VALUE);
+    
     do
     {
-        printf("CRME B: \n");
+        //printf("CRME B: \n");
         AlgUpdateGuess();
         AlgAdvancedCRME();
-        PrintFunc(PRINT_CUBE_VALUE);
+        //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
-        printf("CRME E: %d \n", result);
+        //printf("CRME E: %d \n", result);
         CHRD();
         
-        printf("LongRanger B: \n");
+        //printf("LongRanger B: \n");
         AlgAdvancedLongRanger();
-        PrintFunc(PRINT_CUBE_VALUE);
+        //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
-        printf("LongRanger E: %d \n", result);
+        //printf("LongRanger E: %d \n", result);
         CHRD();
         
-        printf("Twins B: \n");
+        //printf("Twins B: \n");
         AlgAdvancedTwins();
-        PrintFunc(PRINT_CUBE_VALUE);
+        //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
-        printf("Twins E: %d \n", result);
+        //printf("Twins E: %d \n", result);
         CHRD();
         
-        printf("Triples B: \n");
+        //printf("Triples B: \n");
         AlgAdvancedTriples();
-        PrintFunc(PRINT_CUBE_VALUE);
+        //PrintFunc(PRINT_CUBE_VALUE);
         result = AlgCheckResult();
-        printf("Triples E: %d \n", result);
+        //printf("Triples E: %d \n", result);
         CHRD();
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
@@ -2174,8 +2177,8 @@ CHECK_RESULT AlgBruteForce()
 // Main
 void MainTest()
 {
-    InitializeData();
     AlgInitRandom();
+    InitializeData();
     AlgRandomGroup(0, 0);
     AlgBruteForce();
 }
