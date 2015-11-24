@@ -143,6 +143,7 @@ private:
     int m_globalY;
     int m_value;
     int m_guess[guessesCount];
+    int m_randomGuessIndex;
 public:
     CXYCube();
     
@@ -171,15 +172,19 @@ public:
     void ClearGuess();
     
     int NonZeroGuessCount();
-    int FirstNonZeroGuessValue();
     bool IsOnlyOneNoneZeroGuess();
+    
+    int FirstNonZeroGuessValue();
+    int NextGuessValue(int fromGuessValue);
+    int FirstNonZeroGuessValueFromRandomGuessIndex();
+    int NextGuessValueFromRandomGuessIndex(int fromGuessValue);
+    
     bool ApplyOnlyOneNoneZeroGuess();
     void SetOnlyOneNoneZeroGuess(int guessValue);
     GUESS_VALUE_VECTOR NonZeroGuessVector();
     bool HasThisGuessValue(int guessValue);
     bool HasSameGuess(CXYCube *cube);
     void MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVector);
-    int NextGuessValue(int fromGuessValue);
     
     CXYCube * DeepCopyTo();
     void DeepCopyTo(CXYCube *cube);
@@ -237,6 +242,9 @@ public:
     
     int GetNextGuessValue();
     bool HasNextGuess();
+    
+    int GetNextGuessValueFromRandomGuessIndex();
+    bool HasNextGuessFromRandomGuessIndex();
     
     void SetParentNode(CHistoryNode *parentNode);
     CHistoryNode * GetParentNode();
@@ -349,6 +357,7 @@ m_value(0)
     {
         m_guess[i] = i + 1;
     }
+    m_randomGuessIndex = rand() % guessesCount;
 }
 
 void CXYCube::SetLocalX(int localX)
@@ -487,6 +496,11 @@ int CXYCube::NonZeroGuessCount()
     return cnt;
 }
 
+bool CXYCube::IsOnlyOneNoneZeroGuess()
+{
+    return NonZeroGuessCount() == 1;
+}
+
 int CXYCube::FirstNonZeroGuessValue()
 {
     for (int i = 0; i < guessesCount; ++i)
@@ -499,9 +513,40 @@ int CXYCube::FirstNonZeroGuessValue()
     return 0;
 }
 
-bool CXYCube::IsOnlyOneNoneZeroGuess()
+int CXYCube::NextGuessValue(int fromGuessValue)
 {
-    return NonZeroGuessCount() == 1;
+    for (int i = fromGuessValue; i < guessesCount; ++i)
+    {
+        if (m_guess[i] > 0)
+        {
+            return m_guess[i];
+        }
+    }
+    return 0;
+}
+
+int CXYCube::FirstNonZeroGuessValueFromRandomGuessIndex()
+{
+    for (int i = m_randomGuessIndex; i < m_randomGuessIndex + guessesCount; ++i)
+    {
+        if (m_guess[i % guessesCount] > 0)
+        {
+            return m_guess[i % guessesCount];
+        }
+    }
+    return 0;
+}
+
+int CXYCube::NextGuessValueFromRandomGuessIndex(int fromGuessValue)
+{
+    for (int i = fromGuessValue; i < m_randomGuessIndex + guessesCount; ++i)
+    {
+        if (m_guess[i % guessesCount] > 0)
+        {
+            return m_guess[i % guessesCount];
+        }
+    }
+    return 0;
 }
 
 bool CXYCube::ApplyOnlyOneNoneZeroGuess()
@@ -587,18 +632,6 @@ void CXYCube::MergeNoneZeroGuessIntoGuessVector(GUESS_VALUE_VECTOR *guessValueVe
     }
 }
 
-int CXYCube::NextGuessValue(int fromGuessValue)
-{
-    for (int i = fromGuessValue; i < guessesCount; ++i)
-    {
-        if (m_guess[i] > 0)
-        {
-            return m_guess[i];
-        }
-    }
-    return 0;
-}
-
 CXYCube * CXYCube::DeepCopyTo()
 {
     CXYCube * cube = new CXYCube();
@@ -617,6 +650,7 @@ void CXYCube::DeepCopyTo(CXYCube *cube)
     {
         cube->m_guess[i] = m_guess[i];
     }
+    cube->m_randomGuessIndex = m_randomGuessIndex;
 }
 
 string CXYCube::Description()
@@ -838,6 +872,16 @@ bool CHistoryNode::HasNextGuess()
     return GetNextGuessValue() > 0;
 }
 
+int CHistoryNode::GetNextGuessValueFromRandomGuessIndex()
+{
+    return m_pCube->NextGuessValueFromRandomGuessIndex(m_guessValue);
+}
+
+bool CHistoryNode::HasNextGuessFromRandomGuessIndex()
+{
+    return GetNextGuessValueFromRandomGuessIndex() > 0;
+}
+
 void CHistoryNode::SetParentNode(CHistoryNode *parentNode)
 {
     m_pParentNode = parentNode;
@@ -877,8 +921,10 @@ bool ClearData()
     ClearValueChangedFlags();
     ClearValueChangedFlagsForAllFunctions();
     
-    if (g_pHistoryHeadNode != NULL && g_pHistoryTailNode != NULL) {
-        while (g_pHistoryTailNode && g_pHistoryTailNode != g_pHistoryHeadNode) {
+    if (g_pHistoryHeadNode != NULL && g_pHistoryTailNode != NULL)
+    {
+        while (g_pHistoryTailNode && g_pHistoryTailNode != g_pHistoryHeadNode)
+        {
             CHistoryNode *tailNode = g_pHistoryTailNode;
             g_pHistoryTailNode = tailNode->GetParentNode();
             delete tailNode;
@@ -886,7 +932,8 @@ bool ClearData()
         }
     }
     
-    if (g_pHistoryHeadNode) {
+    if (g_pHistoryHeadNode)
+    {
         delete g_pHistoryHeadNode;
         g_pHistoryHeadNode = NULL;
     }
@@ -904,7 +951,8 @@ bool InitializeData()
     {
         for (int col = 0; col < eachCount; ++col)
         {
-            if (g_pGroups[row][col] == NULL) {
+            if (g_pGroups[row][col] == NULL)
+            {
                 g_pGroups[row][col] = new CXYGroup(col, row);
             }
             
@@ -1222,7 +1270,7 @@ bool StepIn()
     }
     node->SetCube(firstGuessCube);
     
-    int guessValue = firstGuessCube->FirstNonZeroGuessValue();
+    int guessValue = firstGuessCube->FirstNonZeroGuessValueFromRandomGuessIndex();
     if (guessValue == 0)
     {
         printf("StepIn no guess value, return false \n");
@@ -1230,7 +1278,7 @@ bool StepIn()
     }
     node->SetGuessValue(guessValue);
     
-    firstGuessCube->SetValue(firstGuessCube->FirstNonZeroGuessValue());
+    firstGuessCube->SetValue(firstGuessCube->FirstNonZeroGuessValueFromRandomGuessIndex());
     
     printf("StepIn Leave with Node: %s \n", node->Description().c_str());
     return AttachHistoryNode(node);
@@ -1246,7 +1294,7 @@ bool StepOut()
     }
     
     CHistoryNode *tail = g_pHistoryTailNode;
-    if (!tail->HasNextGuess())
+    if (!tail->HasNextGuessFromRandomGuessIndex())
     {
         if (!DetachHistoryNode())
         {
@@ -1258,7 +1306,7 @@ bool StepOut()
     else
     {
         tail->RestoreGroups(g_pGroups);
-        int nextGuessValue = tail->GetNextGuessValue();
+        int nextGuessValue = tail->GetNextGuessValueFromRandomGuessIndex();
         tail->SetGuessValue(nextGuessValue);
         CXYCube *cube = AlgGetCubeByLinear(AlgCubeLinearIndex(tail->GetCube()));
         cube->SetValue(nextGuessValue);
