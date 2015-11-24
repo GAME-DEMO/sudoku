@@ -166,7 +166,6 @@ private:
     int m_globalY;
     int m_value;
     int m_guess[guessesCount];
-    int m_randomGuessIndex;
 public:
     CXYCube();
     
@@ -199,8 +198,6 @@ public:
     
     int FirstNonZeroGuessValue();
     int NextGuessValue(int fromGuessValue);
-    int FirstNonZeroGuessValueFromRandomGuessIndex();
-    int NextGuessValueFromRandomGuessIndex(int fromGuessValue);
     
     bool ApplyOnlyOneNoneZeroGuess();
     void SetOnlyOneNoneZeroGuess(int guessValue);
@@ -245,9 +242,14 @@ class CHistoryNode
 private:
     CXYGroup *m_pGroups[eachCount][eachCount]; // All data cache
     CXYCube *m_pCube; // Set guess from this node
-    int m_guessValue;
+    CHistoryNode * m_pParentNode; // One direction link list
     
-    CHistoryNode * m_pParentNode; // One direction tree
+protected:
+    int m_randomGuessIndex;
+    int m_currentRandomGuessIndex;
+    
+protected:
+    int GetNextRandomGuessIndex();
     
 public:
     CHistoryNode();
@@ -260,17 +262,12 @@ public:
     void SetCube(CXYCube *cube);
     CXYCube * GetCube();
     
-    void SetGuessValue(int guessValue);
-    int GetGuessValue();
-    
-    int GetNextGuessValue();
-    bool HasNextGuess();
-    
-    int GetNextGuessValueFromRandomGuessIndex();
-    bool HasNextGuessFromRandomGuessIndex();
-    
     void SetParentNode(CHistoryNode *parentNode);
     CHistoryNode * GetParentNode();
+
+    bool HasNextRandomGuessValue();
+    int GetNextRandomGuessValue();
+    void SetNextRandomGuessIndex();
     
     virtual string Description();
 };
@@ -380,7 +377,6 @@ m_value(0)
     {
         m_guess[i] = i + 1;
     }
-    m_randomGuessIndex = rand() % guessesCount;
 }
 
 void CXYCube::SetLocalX(int localX)
@@ -548,30 +544,6 @@ int CXYCube::NextGuessValue(int fromGuessValue)
     return 0;
 }
 
-int CXYCube::FirstNonZeroGuessValueFromRandomGuessIndex()
-{
-    for (int i = m_randomGuessIndex; i < m_randomGuessIndex + guessesCount; ++i)
-    {
-        if (m_guess[i % guessesCount] > 0)
-        {
-            return m_guess[i % guessesCount];
-        }
-    }
-    return 0;
-}
-
-int CXYCube::NextGuessValueFromRandomGuessIndex(int fromGuessValue)
-{
-    for (int i = fromGuessValue; i < m_randomGuessIndex + guessesCount; ++i)
-    {
-        if (m_guess[i % guessesCount] > 0)
-        {
-            return m_guess[i % guessesCount];
-        }
-    }
-    return 0;
-}
-
 bool CXYCube::ApplyOnlyOneNoneZeroGuess()
 {
     if (IsOnlyOneNoneZeroGuess())
@@ -673,7 +645,6 @@ void CXYCube::DeepCopyTo(CXYCube *cube)
     {
         cube->m_guess[i] = m_guess[i];
     }
-    cube->m_randomGuessIndex = m_randomGuessIndex;
 }
 
 string CXYCube::Description()
@@ -682,8 +653,8 @@ string CXYCube::Description()
     static char buf[cnt];
     
     memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CXYCube: (%d, %d):%d, guess count: %d, guess random: %d",
-            GetGlobalX(), GetGlobalY(), GetValue(), NonZeroGuessCount(), m_randomGuessIndex);
+    sprintf(buf, "CXYCube: (%d, %d):%d, guess count: %d \n",
+            GetGlobalX(), GetGlobalY(), GetValue(), NonZeroGuessCount());
     
     return buf;
 }
@@ -787,7 +758,6 @@ void CXYGroup::DeepCopyTo(CXYGroup *group)
 #pragma mark - CNode Implement
 CHistoryNode::CHistoryNode() :
 m_pCube(NULL),
-m_guessValue(0),
 m_pParentNode(NULL)
 {
     for (int row = 0; row < eachCount; ++row)
@@ -797,6 +767,8 @@ m_pParentNode(NULL)
             m_pGroups[row][col] = new CXYGroup(col, row);
         }
     }
+    m_randomGuessIndex = rand() % guessesCount;
+    m_currentRandomGuessIndex = m_randomGuessIndex;
 }
 
 CHistoryNode::~CHistoryNode()
@@ -875,36 +847,6 @@ CXYCube * CHistoryNode::GetCube()
     return m_pCube;
 }
 
-void CHistoryNode::SetGuessValue(int guessValue)
-{
-    m_guessValue = guessValue;
-}
-
-int CHistoryNode::GetGuessValue()
-{
-    return m_guessValue;
-}
-
-int CHistoryNode::GetNextGuessValue()
-{
-    return m_pCube->NextGuessValue(m_guessValue);
-}
-
-bool CHistoryNode::HasNextGuess()
-{
-    return GetNextGuessValue() > 0;
-}
-
-int CHistoryNode::GetNextGuessValueFromRandomGuessIndex()
-{
-    return m_pCube->NextGuessValueFromRandomGuessIndex(m_guessValue);
-}
-
-bool CHistoryNode::HasNextGuessFromRandomGuessIndex()
-{
-    return GetNextGuessValueFromRandomGuessIndex() > 0;
-}
-
 void CHistoryNode::SetParentNode(CHistoryNode *parentNode)
 {
     m_pParentNode = parentNode;
@@ -915,14 +857,52 @@ CHistoryNode * CHistoryNode::GetParentNode()
     return m_pParentNode;
 }
 
+bool CHistoryNode::HasNextRandomGuessValue()
+{
+    return GetNextRandomGuessValue() > 0;
+}
+
+int CHistoryNode::GetNextRandomGuessValue()
+{
+    for (int i = m_currentRandomGuessIndex + 1; i <= m_randomGuessIndex + guessesCount; ++i)
+    {
+        if (m_pCube->GetGuess(i % guessesCount) > 0)
+        {
+            return m_pCube->GetGuess(i % guessesCount);
+        }
+    }
+    return 0;
+}
+
+int CHistoryNode::GetNextRandomGuessIndex()
+{
+    for (int i = m_currentRandomGuessIndex + 1; i <= m_randomGuessIndex + guessesCount; ++i)
+    {
+        if (m_pCube->GetGuess(i % guessesCount) > 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void CHistoryNode::SetNextRandomGuessIndex()
+{
+    int index = GetNextRandomGuessIndex();
+    if (index > 0)
+    {
+        m_currentRandomGuessIndex = index;
+    }
+}
+
 string CHistoryNode::Description()
 {
     const int cnt = 1024;
     static char buf[cnt];
     
     memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CHistoryNode: Cube:(%s), historyGuessValue: %d",
-            m_pCube->Description().c_str(), m_guessValue);
+    sprintf(buf, "CHistoryNode: Cube:(%s), randomGuessIndex: %d, currentRandomGuessIndex: %d",
+            m_pCube->Description().c_str(), m_randomGuessIndex, m_currentRandomGuessIndex);
     
     return buf;
 }
@@ -1293,15 +1273,16 @@ bool StepIn()
     }
     node->SetCube(firstGuessCube);
     
-    int guessValue = firstGuessCube->FirstNonZeroGuessValueFromRandomGuessIndex();
+    int guessValue = node->GetNextRandomGuessValue();
     if (guessValue == 0)
     {
         printf("StepIn no guess value, return false \n");
         return false;
     }
-    node->SetGuessValue(guessValue);
     
-    firstGuessCube->SetValue(firstGuessCube->FirstNonZeroGuessValueFromRandomGuessIndex());
+    // Set Guess Value In.
+    firstGuessCube->SetValue(guessValue);
+    node->SetNextRandomGuessIndex();
     
     printf("StepIn Leave with Node: %s \n", node->Description().c_str());
     return AttachHistoryNode(node);
@@ -1317,7 +1298,7 @@ bool StepOut()
     }
     
     CHistoryNode *tail = g_pHistoryTailNode;
-    if (!tail->HasNextGuessFromRandomGuessIndex())
+    if (!tail->HasNextRandomGuessValue())
     {
         if (!DetachHistoryNode())
         {
@@ -1329,10 +1310,10 @@ bool StepOut()
     else
     {
         tail->RestoreGroups(g_pGroups);
-        int nextGuessValue = tail->GetNextGuessValueFromRandomGuessIndex();
-        tail->SetGuessValue(nextGuessValue);
         CXYCube *cube = AlgGetCubeByLinear(AlgCubeLinearIndex(tail->GetCube()));
+        int nextGuessValue = tail->GetNextRandomGuessValue();
         cube->SetValue(nextGuessValue);
+        tail->SetNextRandomGuessIndex();
         printf("StepOut Leave with Node: %s \n", tail->Description().c_str());
         return true;
     }
@@ -2152,7 +2133,8 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
 {
     CHECK_RESULT result = CHECK_RESULT_NONE;
     
-    if (resultCount) {
+    if (resultCount)
+    {
         *resultCount = 0;
     }
     
@@ -2192,8 +2174,7 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
            (result == CHECK_RESULT_ERROR && StepOut()) ||
-           (result == CHECK_RESULT_DONE && (allResult && (++*resultCount) && StepOut())));
-
+           (result == CHECK_RESULT_DONE && allResult && (resultCount != NULL ? ++*resultCount : true) && StepOut()));
     
     printf("Result E: %d \n", result);
     PrintFunc(PRINT_CUBE_VALUE);
@@ -2208,5 +2189,7 @@ void MainTest()
     AlgInitRandom();
     InitializeData();
     AlgRandomGroup(0, 0);
-    AlgBruteForce(false, NULL);
+    int resultCount = 0;
+    AlgBruteForce(false, &resultCount);
+    printf("result count: %d", resultCount);
 }
