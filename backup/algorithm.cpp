@@ -2194,6 +2194,7 @@ int main(int argc, char * argv[])
         AlgRandomGroup(0, 0);
         int resultCount = 0;
         AlgBruteForce(true, &resultCount);
+        printf("result count: %d \n", resultCount);
     }
 
     return 0;

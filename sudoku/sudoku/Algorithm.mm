@@ -2191,5 +2191,5 @@ void MainTest()
     AlgRandomGroup(0, 0);
     int resultCount = 0;
     AlgBruteForce(false, &resultCount);
-    printf("result count: %d", resultCount);
+    printf("result count: %d \n", resultCount);
 }
