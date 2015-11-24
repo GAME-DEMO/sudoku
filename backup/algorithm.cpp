@@ -14,6 +14,7 @@
 #include <vector>
 #include <cstdarg>
 #include <functional>
+#include <ctime>
 
 static const int eachCount = 3;
 static const int dimension = eachCount * eachCount;
@@ -1261,14 +1262,14 @@ bool isHistoryEmpty()
 
 bool StepIn()
 {
-    printf("StepIn Enter \n");
+    //printf("StepIn Enter \n");
     CHistoryNode *node = new CHistoryNode();
     node->SetGroups(g_pGroups);
     
     CXYCube *firstGuessCube = AlgFirstGuessCube();
     if (firstGuessCube == NULL)
     {
-        printf("StepIn firstGuessCube NULL, return false \n");
+        //printf("StepIn firstGuessCube NULL, return false \n");
         return false;
     }
     node->SetCube(firstGuessCube);
@@ -1276,7 +1277,7 @@ bool StepIn()
     int guessValue = node->GetNextRandomGuessValue();
     if (guessValue == 0)
     {
-        printf("StepIn no guess value, return false \n");
+        //printf("StepIn no guess value, return false \n");
         return false;
     }
     
@@ -1284,16 +1285,16 @@ bool StepIn()
     firstGuessCube->SetValue(guessValue);
     node->SetNextRandomGuessIndex();
     
-    printf("StepIn Leave with Node: %s \n", node->Description().c_str());
+    //printf("StepIn Leave with Node: %s \n", node->Description().c_str());
     return AttachHistoryNode(node);
 }
 
 bool StepOut()
 {
-    printf("StepOut Enter \n");
+    //printf("StepOut Enter \n");
     if (isHistoryEmpty())
     {
-        printf("StepOut isHistoryEmpty, return false \n");
+        //printf("StepOut isHistoryEmpty, return false \n");
         return false;
     }
     
@@ -1302,7 +1303,7 @@ bool StepOut()
     {
         if (!DetachHistoryNode())
         {
-            printf("StepOut DetachHistoryNode, return false \n");
+            //printf("StepOut DetachHistoryNode, return false \n");
             return false;
         }
         return StepOut();
@@ -1314,7 +1315,7 @@ bool StepOut()
         int nextGuessValue = tail->GetNextRandomGuessValue();
         cube->SetValue(nextGuessValue);
         tail->SetNextRandomGuessIndex();
-        printf("StepOut Leave with Node: %s \n", tail->Description().c_str());
+        //printf("StepOut Leave with Node: %s \n", tail->Description().c_str());
         return true;
     }
     
@@ -2138,7 +2139,7 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
         *resultCount = 0;
     }
     
-    printf("Algorithm B: \n");
+    printf("\n Algorithm B: \n");
     PrintFunc(PRINT_CUBE_VALUE);
     
     do
@@ -2176,7 +2177,7 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
            (result == CHECK_RESULT_ERROR && StepOut()) ||
            (result == CHECK_RESULT_DONE && allResult && (resultCount != NULL ? ++*resultCount : true) && StepOut()));
     
-    printf("Result E: %d \n", result);
+    printf("\n -=-=>Result E: %d \n", result);
     PrintFunc(PRINT_CUBE_VALUE);
     
     return result;
@@ -2193,8 +2194,10 @@ int main(int argc, char * argv[])
         InitializeData();
         AlgRandomGroup(0, 0);
         int resultCount = 0;
+        time_t now_time = time(NULL);
         AlgBruteForce(true, &resultCount);
-        printf("result count: %d \n", resultCount);
+        time_t bruce_time = time(NULL);
+        printf("result count: %d, time consumed: %ld \n", resultCount, bruce_time - now_time);
     }
 
     return 0;
