@@ -195,7 +195,7 @@ public:
     void ClearGuess();
     
     int NonZeroGuessCount();
-    bool IsOnlyOneNoneZeroGuess();
+    bool HasOnlyOneNoneZeroGuess();
     
     int FirstNonZeroGuessValue();
     int NextGuessValue(int fromGuessValue);
@@ -250,6 +250,7 @@ protected:
     int m_currentRandomGuessIndex;
     
 protected:
+    int GetFirstRandomGuessIndex();
     int GetNextRandomGuessIndex();
     
 public:
@@ -265,6 +266,9 @@ public:
     
     void SetParentNode(CHistoryNode *parentNode);
     CHistoryNode * GetParentNode();
+
+    int GetFirstRandomGuessValue();
+    void SetFirstRandomGuessIndex();
 
     bool HasNextRandomGuessValue();
     int GetNextRandomGuessValue();
@@ -435,6 +439,9 @@ void CXYCube::SetValue(int value)
     if (m_value != value)
     {
         m_value = value;
+        if (m_value > 0) {
+            ClearGuess();
+        }
         SetValueChanged();
         SetValueChangedForCurrentFunction();
     }
@@ -516,7 +523,7 @@ int CXYCube::NonZeroGuessCount()
     return cnt;
 }
 
-bool CXYCube::IsOnlyOneNoneZeroGuess()
+bool CXYCube::HasOnlyOneNoneZeroGuess()
 {
     return NonZeroGuessCount() == 1;
 }
@@ -547,10 +554,9 @@ int CXYCube::NextGuessValue(int fromGuessValue)
 
 bool CXYCube::ApplyOnlyOneNoneZeroGuess()
 {
-    if (IsOnlyOneNoneZeroGuess())
+    if (HasOnlyOneNoneZeroGuess())
     {
         SetValue(FirstNonZeroGuessValue());
-        ClearGuess();
         return true;
     }
     return false;
@@ -858,6 +864,38 @@ CHistoryNode * CHistoryNode::GetParentNode()
     return m_pParentNode;
 }
 
+int CHistoryNode::GetFirstRandomGuessValue()
+{
+    for (int i = m_currentRandomGuessIndex; i < m_randomGuessIndex + guessesCount; ++i) {
+        if (m_pCube->GetGuess(i % guessesCount) > 0)
+        {
+            return m_pCube->GetGuess(i % guessesCount);
+        }
+    }
+    return 0;
+}
+
+int CHistoryNode::GetFirstRandomGuessIndex()
+{
+    for (int i = m_currentRandomGuessIndex; i < m_randomGuessIndex + guessesCount; ++i) {
+        if (m_pCube->GetGuess(i % guessesCount) > 0)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void CHistoryNode::SetFirstRandomGuessIndex()
+{
+    int index = GetFirstRandomGuessIndex();
+    if (index > 0)
+    {
+        m_currentRandomGuessIndex = index;
+    }
+}
+
+
 bool CHistoryNode::HasNextRandomGuessValue()
 {
     return GetNextRandomGuessValue() > 0;
@@ -865,7 +903,7 @@ bool CHistoryNode::HasNextRandomGuessValue()
 
 int CHistoryNode::GetNextRandomGuessValue()
 {
-    for (int i = m_currentRandomGuessIndex + 1; i <= m_randomGuessIndex + guessesCount; ++i)
+    for (int i = m_currentRandomGuessIndex + 1; i < m_randomGuessIndex + guessesCount; ++i)
     {
         if (m_pCube->GetGuess(i % guessesCount) > 0)
         {
@@ -877,7 +915,7 @@ int CHistoryNode::GetNextRandomGuessValue()
 
 int CHistoryNode::GetNextRandomGuessIndex()
 {
-    for (int i = m_currentRandomGuessIndex + 1; i <= m_randomGuessIndex + guessesCount; ++i)
+    for (int i = m_currentRandomGuessIndex + 1; i < m_randomGuessIndex + guessesCount; ++i)
     {
         if (m_pCube->GetGuess(i % guessesCount) > 0)
         {
@@ -902,8 +940,8 @@ string CHistoryNode::Description()
     static char buf[cnt];
     
     memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CHistoryNode: Cube:(%s), randomGuessIndex: %d, currentRandomGuessIndex: %d",
-            m_pCube->Description().c_str(), m_randomGuessIndex, m_currentRandomGuessIndex);
+    sprintf(buf, "CHistoryNode:randomGuessIndex: %d, currentRandomGuessIndex: %d, Cube:(%s)",
+            m_randomGuessIndex, m_currentRandomGuessIndex, m_pCube->Description().c_str());
     
     return buf;
 }
@@ -1262,30 +1300,31 @@ bool isHistoryEmpty()
 
 bool StepIn()
 {
-    //printf("StepIn Enter \n");
+    printf("StepIn Enter \n");
     CHistoryNode *node = new CHistoryNode();
     node->SetGroups(g_pGroups);
     
     CXYCube *firstGuessCube = AlgFirstGuessCube();
     if (firstGuessCube == NULL)
     {
-        //printf("StepIn firstGuessCube NULL, return false \n");
+        printf("StepIn firstGuessCube NULL, return false \n");
         return false;
     }
+    printf("StepIn get cube: %s", firstGuessCube->Description().c_str());
     node->SetCube(firstGuessCube);
     
-    int guessValue = node->GetNextRandomGuessValue();
+    int guessValue = node->GetFirstRandomGuessValue();
     if (guessValue == 0)
     {
-        //printf("StepIn no guess value, return false \n");
+        printf("StepIn no guess value, return false \n");
         return false;
     }
     
     // Set Guess Value In.
     firstGuessCube->SetValue(guessValue);
-    node->SetNextRandomGuessIndex();
+    node->SetFirstRandomGuessIndex();
     
-    //printf("StepIn Leave with Node: %s \n", node->Description().c_str());
+    printf("StepIn Leave with Node: %s \n", node->Description().c_str());
     return AttachHistoryNode(node);
 }
 
@@ -1654,7 +1693,7 @@ void AlgAdvancedCRMEChip(CXYCube *cube, PARM_TYPE parmType)
         auto AdvancedCRMEFn = [&cubeValue](CXYCube *cube)
         {
             cube->ClearGuessValue(cubeValue);
-            if (cube->IsOnlyOneNoneZeroGuess())
+            if (cube->HasOnlyOneNoneZeroGuess())
             {
                 AlgAdvancedCRMEChip(cube, PARM_TYPE_ALL);
             }
@@ -1887,7 +1926,7 @@ void AlgAdvancedTwinsChip(CUBE_VECTOR twinCubeVector)
                         if ((*mt)->ClearGuessValue(guessValue))
                         {
                             //printf("MT: %s", (*mt)->Description().c_str());
-                            if ((*mt)->IsOnlyOneNoneZeroGuess())
+                            if ((*mt)->HasOnlyOneNoneZeroGuess())
                             {
                                 AlgAdvancedCRMEChip((*mt), PARM_TYPE_ALL);
                             }
@@ -2026,7 +2065,7 @@ void AlgAdvancedTriplesChip(CUBE_VECTOR tripleCubeVector)
                             if ((*qt) == (*it) || (*qt) == (*kt) || (*qt) == (*mt)) continue;
                             if ((*qt)->ClearGuessValue(guessValue))
                             {
-                                if ((*qt)->IsOnlyOneNoneZeroGuess())
+                                if ((*qt)->HasOnlyOneNoneZeroGuess())
                                 {
                                     AlgAdvancedCRMEChip((*qt), PARM_TYPE_ALL);
                                 }
@@ -2192,7 +2231,7 @@ void MainTest()
     AlgRandomGroup(0, 0);
     int resultCount = 0;
     time_t now_time = time(NULL);
-    AlgBruteForce(false, &resultCount);
+    AlgBruteForce(true, &resultCount);
     time_t bruce_time = time(NULL);
     printf("result count: %d, time consumed: %ld \n", resultCount, bruce_time - now_time);
 }
