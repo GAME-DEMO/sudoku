@@ -1701,6 +1701,15 @@ void AlgCubeVectorTravelForOneGroup(CXYCube *cube, CUBE_VECTOR_FN func)
 #pragma mark - Algorithm Check Result
 CHECK_RESULT AlgCheckResultChip(CUBE_VECTOR checkResultCubeVector)
 {
+    for (int i = 0; i < checkResultCubeVector.size(); ++i)
+    {
+        CXYCube *cube = checkResultCubeVector[i];
+        if (cube->GetValue() == 0 && cube->NonZeroGuessCount() == 0)
+        {
+            return CHECK_RESULT_ERROR;
+        }
+    }
+    
     bool unfinished = false;
     for (int value = 1; value <= dimension; ++value)
     {
