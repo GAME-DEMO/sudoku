@@ -311,6 +311,8 @@ bool g_bCubeGuessValueChangedInFunction[ALGORITHM_FUNCTIONS_ALL];
 CHistoryNode * g_pHistoryHeadNode;
 CHistoryNode * g_pHistoryTailNode;
 
+LOG_ALGORITHM_FUNCTION g_logForFunc;
+
 
 /////////////////////////////////////////
 // Algorithm Helper
@@ -383,6 +385,80 @@ void ClearValueChangedFlagsForAllFunctions()
     {
         ClearValueChangedFlagsForFunction((ALGORITHM_FUNCTION)i);
     }
+}
+
+string CurrentFunctionDescription()
+{
+    const int cnt = 128;
+    static char buf[cnt];
+    
+    memset(buf, 0, cnt * sizeof(char));
+    switch (g_currentFunction) {
+        case ALGORITHM_FUNCTIONS_UPDATE_GUESS:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_UPDATE_GUESS");
+            break;
+            
+        case ALGORITHM_FUNCTIONS_CRME:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_CRME");
+            break;
+            
+        case ALGORITHM_FUNCTIONS_LONG_RANGER:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_LONG_RANGER");
+            break;
+            
+        case ALGORITHM_FUNCTIONS_TWINS:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_TWINS");
+            break;
+            
+        case ALGORITHM_FUNCTIONS_TRIPLES:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_TRIPLES");
+            break;
+            
+        case ALGORITHM_FUNCTIONS_BRUTE_FORCE:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_BRUTE_FORCE");
+            break;
+            
+        case ALGORITHM_FUNCTIONS_ALL:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_ALL");
+            break;
+            
+        default:
+            sprintf(buf, "ALGORITHM_FUNCTIONS_UNKNOWN");
+            break;
+    }
+    
+    return buf;
+}
+
+bool LogForFunction(ALGORITHM_FUNCTION function)
+{
+    switch (function) {
+        case ALGORITHM_FUNCTIONS_UPDATE_GUESS:
+            return (g_logForFunc & LOG_ALGORITHM_FUNCTIONS_UPDATE_GUESS) == LOG_ALGORITHM_FUNCTIONS_UPDATE_GUESS;
+            
+        case ALGORITHM_FUNCTIONS_CRME:
+            return (g_logForFunc & LOG_ALGORITHM_FUNCTIONS_CRME) == LOG_ALGORITHM_FUNCTIONS_CRME;
+            
+        case ALGORITHM_FUNCTIONS_LONG_RANGER:
+            return (g_logForFunc & LOG_ALGORITHM_FUNCTIONS_LONG_RANGER) == LOG_ALGORITHM_FUNCTIONS_LONG_RANGER;
+            
+        case ALGORITHM_FUNCTIONS_TWINS:
+            return (g_logForFunc & LOG_ALGORITHM_FUNCTIONS_TWINS) == LOG_ALGORITHM_FUNCTIONS_TWINS;
+            
+        case ALGORITHM_FUNCTIONS_TRIPLES:
+            return (g_logForFunc & LOG_ALGORITHM_FUNCTIONS_TRIPLES) == LOG_ALGORITHM_FUNCTIONS_TRIPLES;
+            
+        case ALGORITHM_FUNCTIONS_BRUTE_FORCE:
+            return (g_logForFunc & LOG_ALGORITHM_FUNCTIONS_BRUTE_FORCE) == LOG_ALGORITHM_FUNCTIONS_BRUTE_FORCE;
+            
+        case ALGORITHM_FUNCTIONS_ALL:
+            return (g_logForFunc & ALGORITHM_FUNCTIONS_ALL) == ALGORITHM_FUNCTIONS_ALL;
+            
+        default:
+            break;
+    }
+    
+    return false;
 }
 
 
