@@ -755,7 +755,7 @@ string CXYCube::Description()
     static char buf[cnt];
     
     memset(buf, 0, cnt * sizeof(char));
-    sprintf(buf, "CXYCube: (%d, %d):%d, guess count: %d \n",
+    sprintf(buf, "CXYCube: (%d, %d) value: %d, guess count: %d \n",
             GetGlobalX(), GetGlobalY(), GetValue(), NonZeroGuessCount());
     
     return buf;
