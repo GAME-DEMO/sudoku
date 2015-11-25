@@ -30,7 +30,8 @@ typedef enum _PRINT_TYPE
     PRINT_CUBE_VALUE,
     PRINT_CUBE_GUESS,
     PRINT_CUBE_LOCAL_XY,
-    PRINT_CUBE_GLOABAL_XY
+    PRINT_CUBE_GLOABAL_XY,
+    PRINT_CUBE_VALUE_GUESS
 } PRINT_TYPE;
 
 typedef enum _PARM_TYPE
@@ -1110,6 +1111,8 @@ bool InitializeData()
     g_pHistoryHeadNode = new CHistoryNode();
     g_pHistoryTailNode = g_pHistoryHeadNode;
     
+    g_logForFunc = LOG_ALGORITHM_FUNCTIONS_ALL;
+    
     return true;
 };
 
@@ -1141,7 +1144,8 @@ bool isPrintForCube(PRINT_TYPE type)
     type == PRINT_CUBE_VALUE ||
     type == PRINT_CUBE_GUESS ||
     type == PRINT_CUBE_LOCAL_XY ||
-    type == PRINT_CUBE_GLOABAL_XY;
+    type == PRINT_CUBE_GLOABAL_XY ||
+    type == PRINT_CUBE_VALUE_GUESS;
 }
 
 void PrintFunc(PRINT_TYPE type)
@@ -1165,7 +1169,7 @@ void PrintFunc(PRINT_TYPE type)
                     }
                     case PRINT_CUBE_GUESS:
                     {
-                        int * guess = cube->GetGuess();
+                        int *guess = cube->GetGuess();
                         for (int i = 0; i < dimension; ++i)
                         {
                             lines[cube->GetGlobalY()] += ConvertIntToString(guess[i]);
@@ -1175,6 +1179,23 @@ void PrintFunc(PRINT_TYPE type)
                             }
                         }
                         lines[cube->GetGlobalY()] += "  ";
+                        break;
+                    }
+                    case PRINT_CUBE_VALUE_GUESS:
+                    {
+                        lines[cube->GetGlobalY()] += ConvertIntToString(cube->GetValue());
+                        lines[cube->GetGlobalY()] += "(";
+                        int *guess = cube->GetGuess();
+                        for (int i = 0; i < dimension; ++i)
+                        {
+                            lines[cube->GetGlobalY()] += ConvertIntToString(guess[i]);
+                            if (i != dimension - 1)
+                            {
+                                lines[cube->GetGlobalY()] += ",";
+                            }
+                        }
+                        lines[cube->GetGlobalY()] += ")";
+                        lines[cube->GetGlobalY()] += " ";
                         break;
                     }
                     case PRINT_CUBE_LOCAL_XY:
@@ -1415,21 +1436,30 @@ bool StepIn()
         return false;
     }
     
+    printf("Before Step In Groups B: \n");
+    PrintFunc(PRINT_CUBE_VALUE_GUESS);
+    printf("Before Step In Groups E: \n");
+    
     // Set Guess Value In.
     firstGuessCube->SetValue(guessValue);
     firstGuessCube->ClearGuess();
     node->SetFirstRandomGuessIndex();
     
     printf("StepIn Leave with Node: %s \n", node->Description().c_str());
+    
+    printf("After Step In Groups B: \n");
+    PrintFunc(PRINT_CUBE_VALUE_GUESS);
+    printf("After Step In Groups E: \n");
+    
     return AttachHistoryNode(node);
 }
 
 bool StepOut()
 {
-    //printf("StepOut Enter \n");
+    printf("StepOut Enter \n");
     if (isHistoryEmpty())
     {
-        //printf("StepOut isHistoryEmpty, return false \n");
+        printf("StepOut isHistoryEmpty, return false \n");
         return false;
     }
     
@@ -1438,7 +1468,7 @@ bool StepOut()
     {
         if (!DetachHistoryNode())
         {
-            //printf("StepOut DetachHistoryNode, return false \n");
+            printf("StepOut DetachHistoryNode, return false \n");
             return false;
         }
         return StepOut();
@@ -1446,12 +1476,22 @@ bool StepOut()
     else
     {
         tail->RestoreGroups(g_pGroups);
+        
+        printf("Restore Groups B: \n");
+        PrintFunc(PRINT_CUBE_VALUE_GUESS);
+        printf("Restore Groups E: \n");
+        
         CXYCube *cube = AlgGetCubeByLinear(AlgCubeLinearIndex(tail->GetCube()));
         int nextGuessValue = tail->GetNextRandomGuessValue();
         cube->SetValue(nextGuessValue);
         cube->ClearGuess();
         tail->SetNextRandomGuessIndex();
-        //printf("StepOut Leave with Node: %s \n", tail->Description().c_str());
+        printf("StepOut Leave with Node: %s, nextGuessValue: %d \n", tail->Description().c_str(), nextGuessValue);
+        
+        printf("After Step Out Groups B: \n");
+        PrintFunc(PRINT_CUBE_VALUE_GUESS);
+        printf("After Step Out Groups E: \n");
+        
         return true;
     }
     
@@ -2280,33 +2320,38 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
     
     do
     {
-        //printf("CRME B: \n");
+        printf("UpdateGuess B: \n");
         AlgUpdateGuess();
+        PrintFunc(PRINT_CUBE_VALUE_GUESS);
+        result = AlgCheckResult();
+        printf("UpdateGuess E: %d \n", result);
+        
+        printf("CRME B: \n");
         AlgAdvancedCRME();
-        //PrintFunc(PRINT_CUBE_VALUE);
+        PrintFunc(PRINT_CUBE_VALUE_GUESS);
         result = AlgCheckResult();
-        //printf("CRME E: %d \n", result);
+        printf("CRME E: %d \n", result);
         CHRCD();
         
-        //printf("LongRanger B: \n");
+        printf("LongRanger B: \n");
         AlgAdvancedLongRanger();
-        //PrintFunc(PRINT_CUBE_VALUE);
+        PrintFunc(PRINT_CUBE_VALUE_GUESS);
         result = AlgCheckResult();
-        //printf("LongRanger E: %d \n", result);
+        printf("LongRanger E: %d \n", result);
         CHRCD();
         
-        //printf("Twins B: \n");
+        printf("Twins B: \n");
         AlgAdvancedTwins();
-        //PrintFunc(PRINT_CUBE_VALUE);
+        PrintFunc(PRINT_CUBE_VALUE_GUESS);
         result = AlgCheckResult();
-        //printf("Twins E: %d \n", result);
+        printf("Twins E: %d \n", result);
         CHRCD();
         
-        //printf("Triples B: \n");
+        printf("Triples B: \n");
         AlgAdvancedTriples();
-        //PrintFunc(PRINT_CUBE_VALUE);
+        PrintFunc(PRINT_CUBE_VALUE_GUESS);
         result = AlgCheckResult();
-        //printf("Triples E: %d \n", result);
+        printf("Triples E: %d \n", result);
         CHRCD();
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
