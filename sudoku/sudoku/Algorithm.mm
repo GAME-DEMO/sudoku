@@ -536,9 +536,6 @@ void CXYCube::SetValue(int value)
     if (m_value != value)
     {
         m_value = value;
-        if (m_value > 0) {
-            ClearGuess();
-        }
         SetValueChanged();
         SetValueChangedForCurrentFunction();
     }
@@ -654,6 +651,7 @@ bool CXYCube::ApplyOnlyOneNoneZeroGuess()
     if (HasOnlyOneNoneZeroGuess())
     {
         SetValue(FirstNonZeroGuessValue());
+        ClearGuess();
         return true;
     }
     return false;
@@ -1419,6 +1417,7 @@ bool StepIn()
     
     // Set Guess Value In.
     firstGuessCube->SetValue(guessValue);
+    firstGuessCube->ClearGuess();
     node->SetFirstRandomGuessIndex();
     
     printf("StepIn Leave with Node: %s \n", node->Description().c_str());
@@ -1450,6 +1449,7 @@ bool StepOut()
         CXYCube *cube = AlgGetCubeByLinear(AlgCubeLinearIndex(tail->GetCube()));
         int nextGuessValue = tail->GetNextRandomGuessValue();
         cube->SetValue(nextGuessValue);
+        cube->ClearGuess();
         tail->SetNextRandomGuessIndex();
         //printf("StepOut Leave with Node: %s \n", tail->Description().c_str());
         return true;
