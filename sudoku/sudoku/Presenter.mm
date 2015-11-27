@@ -9,6 +9,10 @@
 #import "Presenter.h"
 #import "Algorithm.h"
 
+@interface Presenter ()
+
+@end
+
 @implementation Presenter
 
 + (instancetype)sharedInstance {
@@ -18,6 +22,14 @@
         instance = [[Presenter alloc] init];
     });
     return instance;
+}
+
+- (int)eachCount {
+    return GetEachCount();
+}
+
+- (int)dimension {
+    return GetDimension();
 }
 
 - (void)mainTest {

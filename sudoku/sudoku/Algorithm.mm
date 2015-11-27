@@ -2382,6 +2382,17 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
 
 /////////////////////////////////////////
 // Main
+
+int GetEachCount()
+{
+    return eachCount;
+}
+
+int GetDimension()
+{
+    return dimension;
+}
+
 void MainTest()
 {
     AlgInitRandom();

@@ -9,6 +9,9 @@
 #ifndef Algorithm_h
 #define Algorithm_h
 
+int GetEachCount();
+int GetDimension();
+
 void MainTest();
 
 

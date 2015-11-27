@@ -12,6 +12,13 @@
 
 + (instancetype)sharedInstance;
 
+@property (nonatomic, assign) int eachCount;
+@property (nonatomic, assign) int dimension;
+
+
+@property (nonatomic, readonly) NSArray *resultArray;
+
+
 - (void)mainTest;
 
 @end
