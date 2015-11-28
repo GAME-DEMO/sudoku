@@ -11,6 +11,7 @@
 
 @interface Presenter ()
 
+
 @end
 
 @implementation Presenter
@@ -30,6 +31,14 @@
 
 - (int)dimension {
     return GetDimension();
+}
+
+- (CGFloat)sudokuWidth {
+    return self.viewWidth - self.viewEdgeInsets.left - self.viewEdgeInsets.right;
+}
+
+- (CGFloat)cubeWidth {
+    return (self.sudokuWidth - (self.dimension + 1) * self.lineWidth) / self.dimension;
 }
 
 - (void)mainTest {

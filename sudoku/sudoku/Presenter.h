@@ -7,16 +7,35 @@
 //
 
 #import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
+#import <SpriteKit/SpriteKit.h>
 
 @interface Presenter : NSObject
 
 + (instancetype)sharedInstance;
 
-@property (nonatomic, assign) int eachCount;
-@property (nonatomic, assign) int dimension;
-
+@property (nonatomic, readonly) int eachCount;
+@property (nonatomic, readonly) int dimension;
 
 @property (nonatomic, readonly) NSArray *resultArray;
+
+
+#pragma mark - View related
+/////////////////////////////////////////
+/// Y, ROW
+/// |-------------------|
+/// |----6----7----8----|
+/// |----3----4----5----|
+/// |----0----1----2----|
+/// |-------------------| X, COL
+@property (nonatomic, assign) CGFloat viewWidth;
+@property (nonatomic, assign) UIEdgeInsets viewEdgeInsets;
+
+// Sudoku Square, width == height
+@property (nonatomic, readonly) CGFloat sudokuWidth;
+@property (nonatomic, assign) CGFloat lineWidth;
+@property (nonatomic, readonly) CGFloat cubeWidth;
+
 
 
 - (void)mainTest;
