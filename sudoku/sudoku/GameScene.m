@@ -36,7 +36,11 @@
     for (UITouch *touch in touches) {
         CGPoint location = [touch locationInNode:self];
         
-        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
+//        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
+
+        SKTextureAtlas *atlas = [SKTextureAtlas atlasNamed:@"Game"];
+        SKTexture *b1 = [atlas textureNamed:@"background@2x.png"];
+        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithTexture:b1];
         
         sprite.xScale = 0.5;
         sprite.yScale = 0.5;
@@ -48,6 +52,8 @@
         
         [self addChild:sprite];
     }
+
+
 }
 
 - (void)update:(CFTimeInterval)currentTime {
