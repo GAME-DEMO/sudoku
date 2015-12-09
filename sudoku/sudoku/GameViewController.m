@@ -9,6 +9,12 @@
 #import "GameViewController.h"
 #import "GameScene.h"
 
+@interface GameViewController ()
+
+@property (nonatomic, strong) GameScene *gameScene;
+
+@end
+
 @implementation SKScene (Unarchive)
 
 + (instancetype)unarchiveFromFile:(NSString *)file {
@@ -42,11 +48,11 @@
     skView.ignoresSiblingOrder = YES;
     
     // Create and configure the scene.
-    GameScene *scene = [GameScene unarchiveFromFile:@"GameScene"];
-    scene.scaleMode = SKSceneScaleModeAspectFill;
+    self.gameScene = [GameScene unarchiveFromFile:@"GameScene"];
+//    scene.scaleMode = SKSceneScaleModeAspectFill;
     
     // Present the scene.
-    [skView presentScene:scene];
+    [skView presentScene:self.gameScene];
 }
 
 - (BOOL)shouldAutorotate
@@ -61,6 +67,16 @@
     } else {
         return UIInterfaceOrientationMaskAll;
     }
+}
+
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [self.gameScene viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+}
+
+- (void)viewDidLayoutSubviews {
+    [super viewDidLayoutSubviews];
+    [self.gameScene viewDidLayoutSubviews];
 }
 
 - (void)didReceiveMemoryWarning

@@ -45,4 +45,28 @@
     MainTest();
 }
 
+#pragma mark - UI related
+
++ (UIInterfaceOrientation) appOrientation {
+    return [[UIApplication sharedApplication] statusBarOrientation];
+}
+
++ (BOOL)isPortrait {
+    UIInterfaceOrientation orientation = [self appOrientation];
+    return orientation == UIInterfaceOrientationPortrait || orientation == UIInterfaceOrientationPortraitUpsideDown;
+}
+
++ (BOOL)isLandscape {
+    UIInterfaceOrientation orientation = [self appOrientation];
+    return orientation == UIInterfaceOrientationLandscapeLeft || orientation == UIInterfaceOrientationLandscapeRight;
+}
+
++ (BOOL)isPortraitForSize:(CGSize)size {
+    return size.width <= size.height;
+}
+
++ (BOOL)isLandscapeForSize:(CGSize)size {
+    return size.width > size.height;
+}
+
 @end

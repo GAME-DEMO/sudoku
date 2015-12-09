@@ -10,4 +10,9 @@
 
 @interface GameScene : SKScene
 
+- (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator;
+
+// TODO: remove this line
+- (void)viewDidLayoutSubviews;
+
 @end

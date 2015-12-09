@@ -40,4 +40,14 @@
 
 - (void)mainTest;
 
+#pragma mark - UI related
+
++ (BOOL)isPortrait;
++ (BOOL)isLandscape;
+
++ (BOOL)isPortraitForSize:(CGSize)size;
++ (BOOL)isLandscapeForSize:(CGSize)size;
+
+
+
 @end
