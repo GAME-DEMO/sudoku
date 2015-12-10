@@ -1,0 +1,9 @@
+/* 
+  Localizable.strings
+  sudoku
+
+  Created by Peng Wang on 12/10/15.
+  Copyright © 2015 Peng Wang. All rights reserved.
+*/
+
+"Sudoku" = "数独";

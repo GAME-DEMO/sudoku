@@ -18,6 +18,7 @@
 		AA6924CA1BFA3EE8006CED46 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA6924C91BFA3EE8006CED46 /* Assets.xcassets */; };
 		AA6924CD1BFA3EE8006CED46 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA6924CB1BFA3EE8006CED46 /* LaunchScreen.storyboard */; };
 		AA6924D71BFA40BC006CED46 /* Algorithm.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA6924D61BFA40BC006CED46 /* Algorithm.mm */; };
+		AAE3C3861C192E9900FF500F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AAE3C3881C192E9900FF500F /* Localizable.strings */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,13 @@
 		AA6924CC1BFA3EE8006CED46 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AA6924CE1BFA3EE8006CED46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA6924D61BFA40BC006CED46 /* Algorithm.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Algorithm.mm; sourceTree = "<group>"; };
+		AAE3C37E1C192C6E00FF500F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
+		AAE3C37F1C192C6E00FF500F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
+		AAE3C3811C192C8D00FF500F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
+		AAE3C3831C192C9C00FF500F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Main.strings; sourceTree = "<group>"; };
+		AAE3C3871C192E9900FF500F /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = Base; path = Base.lproj/Localizable.strings; sourceTree = "<group>"; };
+		AAE3C3891C192E9A00FF500F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		AAE3C38A1C192E9B00FF500F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		AAE4548E1BFFAE630089D442 /* Algorithm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Algorithm.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -83,11 +91,13 @@
 				AA6924C11BFA3EE8006CED46 /* GameScene.sks */,
 				AA6924C31BFA3EE8006CED46 /* GameViewController.h */,
 				AA6924C41BFA3EE8006CED46 /* GameViewController.m */,
+				AAE3C3881C192E9900FF500F /* Localizable.strings */,
 				AA6924C61BFA3EE8006CED46 /* Main.storyboard */,
 				AA6924C91BFA3EE8006CED46 /* Assets.xcassets */,
 				AA6924CB1BFA3EE8006CED46 /* LaunchScreen.storyboard */,
 				AA6924CE1BFA3EE8006CED46 /* Info.plist */,
 				AA3663D81C0E86AC00F9513C /* Game.atlas */,
+				AAE3C38B1C192EAD00FF500F /* Resources */,
 				AA6924B81BFA3EE8006CED46 /* Supporting Files */,
 			);
 			path = sudoku;
@@ -100,6 +110,13 @@
 				AA6924B91BFA3EE8006CED46 /* main.m */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		AAE3C38B1C192EAD00FF500F /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -143,6 +160,7 @@
 			knownRegions = (
 				en,
 				Base,
+				"zh-Hans",
 			);
 			mainGroup = AA6924AC1BFA3EE8006CED46;
 			productRefGroup = AA6924B61BFA3EE8006CED46 /* Products */;
@@ -160,6 +178,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				AA6924C21BFA3EE8006CED46 /* GameScene.sks in Resources */,
+				AAE3C3861C192E9900FF500F /* Localizable.strings in Resources */,
 				AA3663D91C0E86AC00F9513C /* Game.atlas in Resources */,
 				AA6924CD1BFA3EE8006CED46 /* LaunchScreen.storyboard in Resources */,
 				AA6924CA1BFA3EE8006CED46 /* Assets.xcassets in Resources */,
@@ -190,6 +209,8 @@
 			isa = PBXVariantGroup;
 			children = (
 				AA6924C71BFA3EE8006CED46 /* Base */,
+				AAE3C37E1C192C6E00FF500F /* zh-Hans */,
+				AAE3C3831C192C9C00FF500F /* en */,
 			);
 			name = Main.storyboard;
 			sourceTree = "<group>";
@@ -198,8 +219,20 @@
 			isa = PBXVariantGroup;
 			children = (
 				AA6924CC1BFA3EE8006CED46 /* Base */,
+				AAE3C37F1C192C6E00FF500F /* zh-Hans */,
+				AAE3C3811C192C8D00FF500F /* en */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		AAE3C3881C192E9900FF500F /* Localizable.strings */ = {
+			isa = PBXVariantGroup;
+			children = (
+				AAE3C3871C192E9900FF500F /* Base */,
+				AAE3C3891C192E9A00FF500F /* en */,
+				AAE3C38A1C192E9B00FF500F /* zh-Hans */,
+			);
+			name = Localizable.strings;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
