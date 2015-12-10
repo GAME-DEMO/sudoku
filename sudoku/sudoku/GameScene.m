@@ -58,12 +58,23 @@
     SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
     
     myLabel.text = NSLocalizedString(@"Sudoku", nil);
-    myLabel.fontSize = 45;
+    myLabel.fontSize = 90;
     myLabel.position = CGPointMake(CGRectGetMidX(self.frame),
                                    CGRectGetMidY(self.frame));
-    
+
+
+    SKLabelNode *myLabel2 = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    myLabel2.text = NSLocalizedString(@"Sudoku", nil);
+    myLabel2.fontSize = 90;
+    myLabel2.fontColor = [UIColor blackColor];
+    myLabel2.position = CGPointMake(CGRectGetMidX(self.frame) + 4,
+                                   CGRectGetMidY(self.frame) - 4);
+
     [self addChild:myLabel];
-    
+    myLabel.zPosition = 1;
+    [self addChild:myLabel2];
+    myLabel2.zPosition = 0;
+
     if (view) {
         if (!self.gameTextureAtlas) {
             self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game"];
@@ -115,7 +126,7 @@
     [self addChild:self.backgroundShapeNode];
     
     SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
-    backgroundShapeShader.uniforms = @[[SKUniform uniformWithName:@"size" floatVector3:GLKVector3Make(self.size.width, self.size.height, 0)]];
+    self.backgroundShapeNode.fillShader.uniforms = @[[SKUniform uniformWithName:@"sceneSize" floatVector2:GLKVector2Make(self.size.width, self.size.height)]];
     self.backgroundShapeNode.fillShader = backgroundShapeShader;
     
 //    self.backgroundShapeNode.xScale = self.backgroundNode.yScale = MIN(self.backgroundSpriteNode.xScale, self.backgroundSpriteNode.yScale);
