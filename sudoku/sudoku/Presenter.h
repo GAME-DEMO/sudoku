@@ -48,6 +48,4 @@
 + (BOOL)isPortraitForSize:(CGSize)size;
 + (BOOL)isLandscapeForSize:(CGSize)size;
 
-
-
 @end

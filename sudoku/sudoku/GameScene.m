@@ -42,6 +42,8 @@
 @property (nonatomic, strong) SKSpriteNode *backgroundSpriteNode;
 @property (nonatomic, strong) SKTexture *backgroundTexture;
 
+@property (nonatomic, strong) SKShapeNode *backgroundShapeNode;
+
 @property (nonatomic, strong) SKSpriteNode *headNode;
 @property (nonatomic, strong) SKSpriteNode *bodyNode;
 @property (nonatomic, strong) SKSpriteNode *tailNode;
@@ -71,10 +73,10 @@
             self.backgroundTexture = [self.gameTextureAtlas textureNamed:@"background@2x.png"];
         }
         
-        if (!self.backgroundSpriteNode) {
-            self.backgroundSpriteNode = [SKSpriteNode spriteNodeWithTexture:self.backgroundTexture];
-            [self addChild:self.backgroundSpriteNode];
-        }
+//        if (!self.backgroundSpriteNode) {
+//            self.backgroundSpriteNode = [SKSpriteNode spriteNodeWithTexture:self.backgroundTexture];
+//            [self addChild:self.backgroundSpriteNode];
+//        }
         
         if (!self.headNode) {
             self.headNode = [SKSpriteNode node];
@@ -96,12 +98,28 @@
 }
 
 - (void)reloadLayout {
-    self.backgroundSpriteNode.anchorPoint = CGPointMake(0.5, 0.5);
-    self.backgroundSpriteNode.position = CGPointMake(self.size.width / 2.0, self.size.height / 2.0);
-    self.backgroundSpriteNode.blendMode = SKBlendModeReplace;
+//    self.backgroundSpriteNode.anchorPoint = CGPointMake(0.5, 0.5);
+//    self.backgroundSpriteNode.position = CGPointMake(self.size.width / 2.0, self.size.height / 2.0);
+//    self.backgroundSpriteNode.blendMode = SKBlendModeReplace;
     
-    self.backgroundSpriteNode.xScale = self.size.width / self.backgroundTexture.size.width;
-    self.backgroundSpriteNode.yScale = self.size.height / self.backgroundTexture.size.height;
+//    self.backgroundSpriteNode.xScale = self.size.width / self.backgroundTexture.size.width;
+//    self.backgroundSpriteNode.yScale = self.size.height / self.backgroundTexture.size.height;
+    
+    if (self.backgroundShapeNode) {
+        [self.backgroundShapeNode removeFromParent];
+        self.backgroundShapeNode = nil;
+    }
+    
+    self.backgroundShapeNode = [SKShapeNode shapeNodeWithRectOfSize:self.size];
+    self.backgroundShapeNode.position = CGPointMake(self.size.width / 2.0, self.size.height / 2.0);
+    [self addChild:self.backgroundShapeNode];
+    
+    SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
+    backgroundShapeShader.uniforms = @[[SKUniform uniformWithName:@"size" floatVector3:GLKVector3Make(self.size.width, self.size.height, 0)]];
+    self.backgroundShapeNode.fillShader = backgroundShapeShader;
+    
+//    self.backgroundShapeNode.xScale = self.backgroundNode.yScale = MIN(self.backgroundSpriteNode.xScale, self.backgroundSpriteNode.yScale);
+    
     
     if ([Presenter isPortrait]) {
         
