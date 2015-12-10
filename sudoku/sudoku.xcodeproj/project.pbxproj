@@ -97,7 +97,6 @@
 				AA6924CB1BFA3EE8006CED46 /* LaunchScreen.storyboard */,
 				AA6924CE1BFA3EE8006CED46 /* Info.plist */,
 				AA3663D81C0E86AC00F9513C /* Game.atlas */,
-				AAE3C38B1C192EAD00FF500F /* Resources */,
 				AA6924B81BFA3EE8006CED46 /* Supporting Files */,
 			);
 			path = sudoku;
@@ -110,13 +109,6 @@
 				AA6924B91BFA3EE8006CED46 /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		AAE3C38B1C192EAD00FF500F /* Resources */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Resources;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */

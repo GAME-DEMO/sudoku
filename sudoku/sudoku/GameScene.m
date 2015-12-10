@@ -53,14 +53,14 @@
 
 - (void)didMoveToView:(SKView *)view {
     /* Setup your scene here */
-//    SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
-//    
-//    myLabel.text = @"Hello, World!";
-//    myLabel.fontSize = 45;
-//    myLabel.position = CGPointMake(CGRectGetMidX(self.frame),
-//                                   CGRectGetMidY(self.frame));
-//    
-//    [self addChild:myLabel];
+    SKLabelNode *myLabel = [SKLabelNode labelNodeWithFontNamed:@"Chalkduster"];
+    
+    myLabel.text = NSLocalizedString(@"Sudoku", nil);
+    myLabel.fontSize = 45;
+    myLabel.position = CGPointMake(CGRectGetMidX(self.frame),
+                                   CGRectGetMidY(self.frame));
+    
+    [self addChild:myLabel];
     
     if (view) {
         if (!self.gameTextureAtlas) {
