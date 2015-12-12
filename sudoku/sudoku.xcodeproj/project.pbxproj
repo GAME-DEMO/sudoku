@@ -23,6 +23,8 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		AA1DA8681C1BB5C200638151 /* SudokuPrefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SudokuPrefix.pch; sourceTree = "<group>"; };
+		AA1DA8691C1C25CD00638151 /* sample.jpg */ = {isa = PBXFileReference; lastKnownFileType = image.jpeg; path = sample.jpg; sourceTree = "<group>"; };
 		AA3663D81C0E86AC00F9513C /* Game.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = Game.atlas; sourceTree = "<group>"; };
 		AA5B41D41C0090A1002B6730 /* Presenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Presenter.h; sourceTree = "<group>"; };
 		AA5B41D51C0090A1002B6730 /* Presenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Presenter.mm; sourceTree = "<group>"; };
@@ -86,8 +88,6 @@
 				AA6924D61BFA40BC006CED46 /* Algorithm.mm */,
 				AA5B41D41C0090A1002B6730 /* Presenter.h */,
 				AA5B41D51C0090A1002B6730 /* Presenter.mm */,
-				AA6924BB1BFA3EE8006CED46 /* AppDelegate.h */,
-				AA6924BC1BFA3EE8006CED46 /* AppDelegate.m */,
 				AA6924BE1BFA3EE8006CED46 /* GameScene.h */,
 				AA6924BF1BFA3EE8006CED46 /* GameScene.m */,
 				AA6924C11BFA3EE8006CED46 /* GameScene.sks */,
@@ -98,7 +98,10 @@
 				AA6924C61BFA3EE8006CED46 /* Main.storyboard */,
 				AA6924C91BFA3EE8006CED46 /* Assets.xcassets */,
 				AA6924CB1BFA3EE8006CED46 /* LaunchScreen.storyboard */,
+				AA1DA8681C1BB5C200638151 /* SudokuPrefix.pch */,
 				AA6924CE1BFA3EE8006CED46 /* Info.plist */,
+				AA6924BB1BFA3EE8006CED46 /* AppDelegate.h */,
+				AA6924BC1BFA3EE8006CED46 /* AppDelegate.m */,
 				AA3663D81C0E86AC00F9513C /* Game.atlas */,
 				AA6924B81BFA3EE8006CED46 /* Supporting Files */,
 			);
@@ -108,6 +111,7 @@
 		AA6924B81BFA3EE8006CED46 /* Supporting Files */ = {
 			isa = PBXGroup;
 			children = (
+				AA1DA8691C1C25CD00638151 /* sample.jpg */,
 				AA5B41D71C0093D4002B6730 /* readme.h */,
 				AA6924B91BFA3EE8006CED46 /* main.m */,
 			);
@@ -320,6 +324,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = sudoku/SudokuPrefix.pch;
 				INFOPLIST_FILE = sudoku/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hspjsoft.sudoku;
@@ -331,6 +336,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				GCC_PREFIX_HEADER = sudoku/SudokuPrefix.pch;
 				INFOPLIST_FILE = sudoku/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = com.hspjsoft.sudoku;
