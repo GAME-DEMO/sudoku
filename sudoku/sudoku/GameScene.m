@@ -11,8 +11,9 @@
 
 //
 //  |---------------------------------------|
-//  |                Head View              |
-//  |                                       |
+//  |                Head View          |   |
+//  |                                  064  |
+//  |                                   |   |
 //  |---------------------------------------|
 //  |                                       |
 //  |                                       |
@@ -27,27 +28,28 @@
 //  |                                       |
 //  |                                       |
 //  |---------------------------------------|
-//  |                                       |
-//  |                                       |
-//  |                                       |
-//  |                Tail View              |
-//  |                                       |
-//  |                                       |
-//  |                                       |
-//  |                                       |
+//  |                                    |  |
+//  |                                   128 |
+//  |                                    |  |
+//  |                Tail View           |  |
+//  |                                    |  |
+//  |                                    |  |
+//  |                                    |  |
+//  |                                    |  |
 //  |---------------------------------------|
+
+static const NSInteger HeaderNodeHeight = 64;
+static const NSInteger TailNodeHeight = 128;
+
 @interface GameScene ()
 
 @property (nonatomic, strong) SKTextureAtlas *gameTextureAtlas;
-@property (nonatomic, strong) SKSpriteNode *backgroundSpriteNode;
-@property (nonatomic, strong) SKTexture *backgroundTexture;
 
 @property (nonatomic, strong) SKShapeNode *backgroundShapeNode;
 
-@property (nonatomic, strong) SKSpriteNode *headNode;
-@property (nonatomic, strong) SKSpriteNode *bodyNode;
-@property (nonatomic, strong) SKSpriteNode *tailNode;
-
+@property (nonatomic, strong) SKShapeNode *headNode;
+@property (nonatomic, strong) SKShapeNode *bodyNode;
+@property (nonatomic, strong) SKShapeNode *tailNode;
 
 @end
 
@@ -80,28 +82,22 @@
             self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game"];
         }
         
-        if (!self.backgroundTexture) {
-            self.backgroundTexture = [self.gameTextureAtlas textureNamed:@"background@2x.png"];
-        }
-        
-//        if (!self.backgroundSpriteNode) {
-//            self.backgroundSpriteNode = [SKSpriteNode spriteNodeWithTexture:self.backgroundTexture];
-//            [self addChild:self.backgroundSpriteNode];
-//        }
-        
         if (!self.headNode) {
-            self.headNode = [SKSpriteNode node];
+            self.headNode = [SKShapeNode node];
             [self addChild:self.headNode];
+            self.headNode.zPosition = 3;
         }
         
         if (!self.bodyNode) {
-            self.bodyNode = [SKSpriteNode node];
+            self.bodyNode = [SKShapeNode node];
             [self addChild:self.bodyNode];
+            self.bodyNode.zPosition = 4;
         }
         
         if (!self.tailNode) {
-            self.tailNode = [SKSpriteNode node];
+            self.tailNode = [SKShapeNode node];
             [self addChild:self.tailNode];
+            self.tailNode.zPosition = 5;
         }
         
         [self reloadLayout];
@@ -109,13 +105,6 @@
 }
 
 - (void)reloadLayout {
-//    self.backgroundSpriteNode.anchorPoint = CGPointMake(0.5, 0.5);
-//    self.backgroundSpriteNode.position = CGPointMake(self.size.width / 2.0, self.size.height / 2.0);
-//    self.backgroundSpriteNode.blendMode = SKBlendModeReplace;
-    
-//    self.backgroundSpriteNode.xScale = self.size.width / self.backgroundTexture.size.width;
-//    self.backgroundSpriteNode.yScale = self.size.height / self.backgroundTexture.size.height;
-    
     if (self.backgroundShapeNode) {
         [self.backgroundShapeNode removeFromParent];
         self.backgroundShapeNode = nil;
@@ -129,11 +118,14 @@
     self.backgroundShapeNode.fillShader.uniforms = @[[SKUniform uniformWithName:@"sceneSize" floatVector2:GLKVector2Make(self.size.width, self.size.height)]];
     self.backgroundShapeNode.fillShader = backgroundShapeShader;
     
-//    self.backgroundShapeNode.xScale = self.backgroundNode.yScale = MIN(self.backgroundSpriteNode.xScale, self.backgroundSpriteNode.yScale);
-    
-    
     if ([Presenter isPortrait]) {
+        self.headNode.position = CGPointMake(0, MAIN_SCREEN_HEIGHT - HeaderNodeHeight);
+        self.headNode.path = CGPathCreateWithRect(CGRectMake(0, 0, MAIN_SCREEN_WIDTH, HeaderNodeHeight), nil);
+        self.headNode.fillColor = [UIColor greenColor];
         
+        self.tailNode.position = CGPointMake(0, 0);
+        self.tailNode.path = CGPathCreateWithRect(CGRectMake(0, 0, MAIN_SCREEN_WIDTH, TailNodeHeight), nil);
+        self.tailNode.fillColor = [UIColor grayColor];
     }
 }
 
@@ -153,26 +145,6 @@
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
-    
-//    for (UITouch *touch in touches) {
-//        CGPoint location = [touch locationInNode:self];
-//        
-////        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithImageNamed:@"Spaceship"];
-//
-//        SKTextureAtlas *atlas = [SKTextureAtlas atlasNamed:@"Game"];
-//        SKTexture *b1 = [atlas textureNamed:@"background@2x.png"];
-//        SKSpriteNode *sprite = [SKSpriteNode spriteNodeWithTexture:b1];
-//        
-//        sprite.xScale = 0.5;
-//        sprite.yScale = 0.5;
-//        sprite.position = location;
-//        
-//        SKAction *action = [SKAction rotateByAngle:M_PI duration:1];
-//        
-//        [sprite runAction:[SKAction repeatActionForever:action]];
-//        
-//        [self addChild:sprite];
-//    }
 
 
 }
