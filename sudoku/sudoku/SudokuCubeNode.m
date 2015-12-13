@@ -10,6 +10,25 @@
 
 @interface SudokuCubeShapeNode ()
 
+/*
+ |-----------------------------|
+ |         |         |         |
+ |        11        12         |
+ |         |         |         |
+ |----4----|----5----|----6----|
+ |         |         |         |
+ |         9        10         |
+ |         |         |         |
+ |----1----|----2----|----3----|
+ |         |         |         |
+ |         7         8         |
+ |         |         |         |
+ |-----------------------------|
+*/
+
+@property (nonatomic, strong) NSArray<SKShapeNode *>* lines;
+
+
 @end
 
 @implementation SudokuCubeShapeNode
