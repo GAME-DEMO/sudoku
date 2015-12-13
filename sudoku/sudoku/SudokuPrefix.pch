@@ -1,0 +1,41 @@
+//
+//  SudokuPrefix.pch
+//  sudoku
+//
+//  Created by Peng Wang on 12/12/15.
+//  Copyright © 2015 Peng Wang. All rights reserved.
+//
+
+#ifndef SudokuPrefix_pch
+#define SudokuPrefix_pch
+
+// Include any system framework and library headers here that should be included in all compilation units.
+// You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+
+#ifdef DEBUG
+    #define DebugLog(format, ...) NSLog(format, ## __VA_ARGS__)
+    #define DebugLogFunc(format, ...) NSLog((@"%s, %d, " format), __func__, __LINE__, ##__VA_ARGS__)
+#else
+    #define DebugLog(format, ...)
+    #define DebugLogFunc(format, ...)
+#endif
+
+
+
+#ifdef __OBJC__
+    #import <UIKit/UIKit.h>
+    #import <Foundation/Foundation.h>
+    #define MAIN_SCREEN_WIDTH ([UIScreen mainScreen].bounds.size.width)
+    #define MAIN_SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
+    #define MIN_SCREEN_WIDTH_HEIGHT (min(MAIN_SCREEN_WIDTH, MAIN_SCREEN_HEIGHT))
+    #define MAX_SCREEN_WIDTH_HEIGHT (max(MAIN_SCREEN_WIDTH, MAIN_SCREEN_HEIGHT))
+#endif
+
+
+#ifndef RGBA
+    #define RGBA(R, G, B, A) ([UIColor colorWithRed:(R)/255.0 green:(G)/255.0 blue:(B)/255.0 alpha:(A)])
+#endif
+
+
+
+#endif /* SudokuPrefix_pch */
