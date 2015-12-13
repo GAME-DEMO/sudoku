@@ -117,15 +117,18 @@ static const NSInteger TailNodeHeight = 128;
     SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
     self.backgroundShapeNode.fillShader.uniforms = @[[SKUniform uniformWithName:@"sceneSize" floatVector2:GLKVector2Make(self.size.width, self.size.height)]];
     self.backgroundShapeNode.fillShader = backgroundShapeShader;
+    self.backgroundShapeNode.lineWidth = 0;
     
     if ([Presenter isPortrait]) {
-        self.headNode.position = CGPointMake(0, MAIN_SCREEN_HEIGHT - HeaderNodeHeight);
-        self.headNode.path = CGPathCreateWithRect(CGRectMake(0, 0, MAIN_SCREEN_WIDTH, HeaderNodeHeight), nil);
-        self.headNode.fillColor = [UIColor greenColor];
+        self.headNode.position = CGPointMake(0, self.size.height - HeaderNodeHeight);
+        self.headNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, HeaderNodeHeight), nil);
+        self.headNode.fillColor = [UIColor clearColor];
+        self.headNode.lineWidth = 0;
         
         self.tailNode.position = CGPointMake(0, 0);
-        self.tailNode.path = CGPathCreateWithRect(CGRectMake(0, 0, MAIN_SCREEN_WIDTH, TailNodeHeight), nil);
-        self.tailNode.fillColor = [UIColor grayColor];
+        self.tailNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, TailNodeHeight), nil);
+        self.tailNode.fillColor = [UIColor clearColor];
+        self.tailNode.lineWidth = 0;
     }
 }
 
