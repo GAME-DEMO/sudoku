@@ -119,17 +119,20 @@ static const NSInteger TailNodeHeight = 128;
     self.backgroundShapeNode.fillShader = backgroundShapeShader;
     self.backgroundShapeNode.lineWidth = 0;
     
-    if ([Presenter isPortrait]) {
-        self.headNode.position = CGPointMake(0, self.size.height - HeaderNodeHeight);
-        self.headNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, HeaderNodeHeight), nil);
-        self.headNode.fillColor = [UIColor clearColor];
-        self.headNode.lineWidth = 0;
-        
-        self.tailNode.position = CGPointMake(0, 0);
-        self.tailNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, TailNodeHeight), nil);
-        self.tailNode.fillColor = [UIColor clearColor];
-        self.tailNode.lineWidth = 0;
-    }
+    self.headNode.position = CGPointMake(0, self.size.height - HeaderNodeHeight);
+    self.headNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, HeaderNodeHeight), nil);
+    self.headNode.fillColor = [UIColor clearColor];
+    self.headNode.lineWidth = 0;
+    
+    self.tailNode.position = CGPointMake(0, 0);
+    self.tailNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, TailNodeHeight), nil);
+    self.tailNode.fillColor = [UIColor clearColor];
+    self.tailNode.lineWidth = 0;
+    
+    self.bodyNode.position = CGPointMake(0, TailNodeHeight);
+    self.bodyNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height - HeaderNodeHeight - TailNodeHeight), nil);
+    self.bodyNode.fillColor = [UIColor clearColor];
+    self.bodyNode.lineWidth = 0;
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
