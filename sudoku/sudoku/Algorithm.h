@@ -15,7 +15,9 @@ int GetGroupsCount();
 int GetCubesCountForDimension();
 int GetCubesCountForAll();
 
-void MainTest();
+int GetCubeValue(int index);
+
+void RandomResult();
 
 
 #endif /* Algorithm_h */

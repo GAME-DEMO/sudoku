@@ -2408,7 +2408,12 @@ int GetCubesCountForAll()
     return cubesCount * cubesCount;
 }
 
-void MainTest()
+int GetCubeValue(int index)
+{
+    return AlgGetCubeByLinear(index)->GetValue();
+}
+
+void RandomResult()
 {
     AlgInitRandom();
     InitializeData();

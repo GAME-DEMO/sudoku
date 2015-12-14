@@ -19,9 +19,9 @@
 @property (nonatomic, readonly) int groupsCount;
 @property (nonatomic, readonly) int cubesCountForDimension;
 @property (nonatomic, readonly) int cubesCountForAll;
-
 @property (nonatomic, readonly) NSArray *resultArray;
 
+- (void)randomResult;
 
 #pragma mark - View related
 /////////////////////////////////////////
@@ -39,9 +39,6 @@
 @property (nonatomic, assign) CGFloat lineWidth;
 @property (nonatomic, readonly) CGFloat cubeWidth;
 
-
-
-- (void)mainTest;
 
 #pragma mark - UI related
 

@@ -53,8 +53,13 @@
     return (self.sudokuWidth - (self.dimension + 1) * self.lineWidth) / self.dimension;
 }
 
-- (void)mainTest {
-    MainTest();
+- (void)randomResult {
+    RandomResult();
+    NSMutableArray *results = [NSMutableArray arrayWithCapacity:GetCubesCountForAll()];
+    for (int i = 0; i < GetCubesCountForAll(); ++i) {
+        [results addObject:@(GetCubeValue(i))];
+    }
+    _resultArray = [NSArray arrayWithArray:results];
 }
 
 #pragma mark - UI related
