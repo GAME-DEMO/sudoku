@@ -1,14 +1,10 @@
 //
-//  SudokuCubeShapeNode.m
+//  SudokuCubeNode.m
 //  sudoku
 //
 //  Created by Peng Wang on 12/13/15.
 //  Copyright © 2015 Peng Wang. All rights reserved.
 //
-
-#import "SudokuCubeShapeNode.h"
-
-@interface SudokuCubeShapeNode ()
 
 /*
  |-----------------------------|
@@ -24,22 +20,26 @@
  |         7         8         |
  |         |         |         |
  |-----------------------------|
-*/
+ */
 
-@property (nonatomic, strong) NSArray<SKShapeNode *>* lines;
 
+#import "SudokuCubeNode.h"
+
+@interface SudokuCubeNode ()
 
 @end
 
-@implementation SudokuCubeShapeNode
+@implementation SudokuCubeNode
 
--(void)setPath:(CGPathRef)path {
+- (void)setPath:(CGPathRef)path {
     [super setPath:path];
+    
     [self reloadLayout];
 }
 
 - (void)reloadLayout {
-    
+    SKShader *backgroundShader = [SKShader shaderWithFileNamed:@"shader_game_cube_background.fsh"];
+    self.fillShader = backgroundShader;
 }
 
 @end

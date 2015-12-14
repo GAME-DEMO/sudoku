@@ -1,5 +1,5 @@
 //
-//  SudokuCubeShapeNode.h
+//  SudokuCubeNode.h
 //  sudoku
 //
 //  Created by Peng Wang on 12/13/15.
@@ -8,6 +8,6 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-@interface SudokuCubeShapeNode : SKShapeNode
+@interface SudokuCubeNode : SKShapeNode
 
 @end

@@ -6,38 +6,41 @@
 //  Copyright (c) 2015 Peng Wang. All rights reserved.
 //
 
+/*
+ |---------------------------------------|
+ |                Head View          |   |
+ |                                  064  |
+ |                                   |   |
+ |---------------------------------------|
+ |                                       |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                Body View              |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                                       |
+ |                                       |
+ |---------------------------------------|
+ |                                    |  |
+ |                                   128 |
+ |                                    |  |
+ |                Tail View           |  |
+ |                                    |  |
+ |                                    |  |
+ |                                    |  |
+ |                                    |  |
+ |---------------------------------------|
+ */
+
+
 #import "GameScene.h"
 #import "Presenter.h"
-
-/*
-  |---------------------------------------|
-  |                Head View          |   |
-  |                                  064  |
-  |                                   |   |
-  |---------------------------------------|
-  |                                       |
-  |                                       |
-  |                                       |
-  |                                       |
-  |                Body View              |
-  |                                       |
-  |                                       |
-  |                                       |
-  |                                       |
-  |                                       |
-  |                                       |
-  |                                       |
-  |---------------------------------------|
-  |                                    |  |
-  |                                   128 |
-  |                                    |  |
-  |                Tail View           |  |
-  |                                    |  |
-  |                                    |  |
-  |                                    |  |
-  |                                    |  |
-  |---------------------------------------|
-*/
+#import "SudokuCubeNode.h"
+#import "SudokuGroupNode.h"
 
 static const NSInteger HeaderNodeHeight = 64;
 static const NSInteger TailNodeHeight = 128;
@@ -45,11 +48,13 @@ static const NSInteger TailNodeHeight = 128;
 @interface GameScene ()
 
 @property (nonatomic, strong) SKTextureAtlas *gameTextureAtlas;
-@property (nonatomic, strong) SKShapeNode *backgroundShapeNode;
+@property (nonatomic, strong) SKShapeNode *backgroundNode;
 
-@property (nonatomic, strong) SKShapeNode *headShapeNode;
-@property (nonatomic, strong) SKShapeNode *bodyShapeNode;
-@property (nonatomic, strong) SKShapeNode *tailShapeNode;
+@property (nonatomic, strong) SKShapeNode *headNode;
+@property (nonatomic, strong) SKShapeNode *bodyNode;
+@property (nonatomic, strong) SKShapeNode *tailNode;
+@property (nonatomic, strong) NSArray<SudokuGroupNode *> *bodyGroupNodeArray;
+
 
 @end
 
@@ -67,50 +72,56 @@ static const NSInteger TailNodeHeight = 128;
         self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game"];
     }
     
-    if (!self.headShapeNode) {
-        self.headShapeNode = [SKShapeNode node];
-        [self addChild:self.headShapeNode];
-        self.headShapeNode.zPosition = 3;
+    if (!self.headNode) {
+        self.headNode = [SKShapeNode node];
+        [self addChild:self.headNode];
+        self.headNode.zPosition = 3;
     }
     
-    if (!self.bodyShapeNode) {
-        self.bodyShapeNode = [SKShapeNode node];
-        [self addChild:self.bodyShapeNode];
-        self.bodyShapeNode.zPosition = 4;
+    if (!self.bodyNode) {
+        self.bodyNode = [SKShapeNode node];
+        [self addChild:self.bodyNode];
+        self.bodyNode.zPosition = 4;
     }
     
-    if (!self.tailShapeNode) {
-        self.tailShapeNode = [SKShapeNode node];
-        [self addChild:self.tailShapeNode];
-        self.tailShapeNode.zPosition = 5;
+    if (!self.tailNode) {
+        self.tailNode = [SKShapeNode node];
+        [self addChild:self.tailNode];
+        self.tailNode.zPosition = 5;
     }
     
-    if (!self.backgroundShapeNode) {
-        self.backgroundShapeNode = [SKShapeNode node];
-        [self addChild:self.backgroundShapeNode];
+    if (!self.backgroundNode) {
+        self.backgroundNode = [SKShapeNode node];
+        [self addChild:self.backgroundNode];
     }
     
-    self.backgroundShapeNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height), nil);
+    self.backgroundNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height), nil);
 
     SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
-    self.backgroundShapeNode.fillShader.uniforms = @[[SKUniform uniformWithName:@"sceneSize" floatVector2:GLKVector2Make(self.size.width, self.size.height)]];
-    self.backgroundShapeNode.fillShader = backgroundShapeShader;
-    self.backgroundShapeNode.lineWidth = 0;
+    self.backgroundNode.fillShader.uniforms = @[[SKUniform uniformWithName:@"sceneSize" floatVector2:GLKVector2Make(self.size.width, self.size.height)]];
+    self.backgroundNode.fillShader = backgroundShapeShader;
+    self.backgroundNode.lineWidth = 0;
     
-    self.headShapeNode.position = CGPointMake(0, self.size.height - HeaderNodeHeight);
-    self.headShapeNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, HeaderNodeHeight), nil);
-    self.headShapeNode.fillColor = [UIColor clearColor];
-    self.headShapeNode.lineWidth = 0;
+    self.headNode.position = CGPointMake(0, self.size.height - HeaderNodeHeight);
+    self.headNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, HeaderNodeHeight), nil);
+    self.headNode.fillColor = [UIColor clearColor];
+    self.headNode.lineWidth = 0;
     
-    self.tailShapeNode.position = CGPointMake(0, 0);
-    self.tailShapeNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, TailNodeHeight), nil);
-    self.tailShapeNode.fillColor = [UIColor clearColor];
-    self.tailShapeNode.lineWidth = 0;
+    self.tailNode.position = CGPointMake(0, 0);
+    self.tailNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, TailNodeHeight), nil);
+    self.tailNode.fillColor = [UIColor clearColor];
+    self.tailNode.lineWidth = 0;
     
-    self.bodyShapeNode.position = CGPointMake(0, TailNodeHeight);
-    self.bodyShapeNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height - HeaderNodeHeight - TailNodeHeight), nil);
-    self.bodyShapeNode.fillColor = [UIColor clearColor];
-    self.bodyShapeNode.lineWidth = 0;
+    self.bodyNode.position = CGPointMake(0, TailNodeHeight);
+    self.bodyNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height - HeaderNodeHeight - TailNodeHeight), nil);
+    self.bodyNode.fillColor = [UIColor clearColor];
+    self.bodyNode.lineWidth = 0;
+    
+    if (!self.bodyGroupNodeArray) {
+        NSMutableArray *groups = [NSMutableArray array];
+        
+        self.bodyGroupNodeArray = [NSArray arrayWithArray:groups];
+    }
 }
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {

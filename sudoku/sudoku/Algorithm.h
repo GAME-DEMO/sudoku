@@ -11,6 +11,7 @@
 
 int GetEachCount();
 int GetDimension();
+int GetGroupsCount();
 
 void MainTest();
 

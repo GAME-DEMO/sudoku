@@ -2393,6 +2393,11 @@ int GetDimension()
     return dimension;
 }
 
+int GetGroupsCount()
+{
+    return groupsCount;
+}
+
 void MainTest()
 {
     AlgInitRandom();

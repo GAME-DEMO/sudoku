@@ -18,9 +18,11 @@
 		AA6924CA1BFA3EE8006CED46 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = AA6924C91BFA3EE8006CED46 /* Assets.xcassets */; };
 		AA6924CD1BFA3EE8006CED46 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = AA6924CB1BFA3EE8006CED46 /* LaunchScreen.storyboard */; };
 		AA6924D71BFA40BC006CED46 /* Algorithm.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA6924D61BFA40BC006CED46 /* Algorithm.mm */; };
-		AACE95701C1DCB6200DC15E8 /* SudokuCubeShapeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AACE956F1C1DCB6200DC15E8 /* SudokuCubeShapeNode.m */; };
+		AACE95701C1DCB6200DC15E8 /* SudokuCubeNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AACE956F1C1DCB6200DC15E8 /* SudokuCubeNode.m */; };
 		AAE3C3861C192E9900FF500F /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = AAE3C3881C192E9900FF500F /* Localizable.strings */; };
 		AAE3C3941C198B2100FF500F /* shader_game_scene_background.fsh in Resources */ = {isa = PBXBuildFile; fileRef = AAE3C3931C198B2100FF500F /* shader_game_scene_background.fsh */; };
+		AAFDBA381C1E847300E96044 /* shader_game_cube_background.fsh in Resources */ = {isa = PBXBuildFile; fileRef = AAFDBA371C1E847300E96044 /* shader_game_cube_background.fsh */; };
+		AAFDBA3B1C1E8B1200E96044 /* SudokuGroupNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AAFDBA3A1C1E8B1200E96044 /* SudokuGroupNode.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,8 +46,8 @@
 		AA6924CC1BFA3EE8006CED46 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		AA6924CE1BFA3EE8006CED46 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AA6924D61BFA40BC006CED46 /* Algorithm.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Algorithm.mm; sourceTree = "<group>"; };
-		AACE956E1C1DCB6200DC15E8 /* SudokuCubeShapeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SudokuCubeShapeNode.h; sourceTree = "<group>"; };
-		AACE956F1C1DCB6200DC15E8 /* SudokuCubeShapeNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SudokuCubeShapeNode.m; sourceTree = "<group>"; };
+		AACE956E1C1DCB6200DC15E8 /* SudokuCubeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SudokuCubeNode.h; sourceTree = "<group>"; };
+		AACE956F1C1DCB6200DC15E8 /* SudokuCubeNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SudokuCubeNode.m; sourceTree = "<group>"; };
 		AAE3C37E1C192C6E00FF500F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Main.strings"; sourceTree = "<group>"; };
 		AAE3C37F1C192C6E00FF500F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/LaunchScreen.strings"; sourceTree = "<group>"; };
 		AAE3C3811C192C8D00FF500F /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = en.lproj/LaunchScreen.strings; sourceTree = "<group>"; };
@@ -55,6 +57,9 @@
 		AAE3C38A1C192E9B00FF500F /* zh-Hans */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = "zh-Hans"; path = "zh-Hans.lproj/Localizable.strings"; sourceTree = "<group>"; };
 		AAE3C3931C198B2100FF500F /* shader_game_scene_background.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_game_scene_background.fsh; sourceTree = "<group>"; };
 		AAE4548E1BFFAE630089D442 /* Algorithm.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Algorithm.h; sourceTree = "<group>"; };
+		AAFDBA371C1E847300E96044 /* shader_game_cube_background.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_game_cube_background.fsh; sourceTree = "<group>"; };
+		AAFDBA391C1E8B1200E96044 /* SudokuGroupNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SudokuGroupNode.h; sourceTree = "<group>"; };
+		AAFDBA3A1C1E8B1200E96044 /* SudokuGroupNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SudokuGroupNode.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -91,14 +96,17 @@
 				AA6924D61BFA40BC006CED46 /* Algorithm.mm */,
 				AA5B41D41C0090A1002B6730 /* Presenter.h */,
 				AA5B41D51C0090A1002B6730 /* Presenter.mm */,
-				AACE956E1C1DCB6200DC15E8 /* SudokuCubeShapeNode.h */,
-				AACE956F1C1DCB6200DC15E8 /* SudokuCubeShapeNode.m */,
+				AACE956E1C1DCB6200DC15E8 /* SudokuCubeNode.h */,
+				AACE956F1C1DCB6200DC15E8 /* SudokuCubeNode.m */,
+				AAFDBA391C1E8B1200E96044 /* SudokuGroupNode.h */,
+				AAFDBA3A1C1E8B1200E96044 /* SudokuGroupNode.m */,
 				AA6924BE1BFA3EE8006CED46 /* GameScene.h */,
 				AA6924BF1BFA3EE8006CED46 /* GameScene.m */,
 				AA6924C11BFA3EE8006CED46 /* GameScene.sks */,
 				AA6924C31BFA3EE8006CED46 /* GameViewController.h */,
 				AA6924C41BFA3EE8006CED46 /* GameViewController.m */,
 				AAE3C3931C198B2100FF500F /* shader_game_scene_background.fsh */,
+				AAFDBA371C1E847300E96044 /* shader_game_cube_background.fsh */,
 				AAE3C3881C192E9900FF500F /* Localizable.strings */,
 				AA6924C61BFA3EE8006CED46 /* Main.storyboard */,
 				AA6924C91BFA3EE8006CED46 /* Assets.xcassets */,
@@ -184,6 +192,7 @@
 				AA6924C21BFA3EE8006CED46 /* GameScene.sks in Resources */,
 				AAE3C3941C198B2100FF500F /* shader_game_scene_background.fsh in Resources */,
 				AAE3C3861C192E9900FF500F /* Localizable.strings in Resources */,
+				AAFDBA381C1E847300E96044 /* shader_game_cube_background.fsh in Resources */,
 				AA3663D91C0E86AC00F9513C /* Game.atlas in Resources */,
 				AA6924CD1BFA3EE8006CED46 /* LaunchScreen.storyboard in Resources */,
 				AA6924CA1BFA3EE8006CED46 /* Assets.xcassets in Resources */,
@@ -198,9 +207,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAFDBA3B1C1E8B1200E96044 /* SudokuGroupNode.m in Sources */,
 				AA6924C51BFA3EE8006CED46 /* GameViewController.m in Sources */,
 				AA6924BD1BFA3EE8006CED46 /* AppDelegate.m in Sources */,
-				AACE95701C1DCB6200DC15E8 /* SudokuCubeShapeNode.m in Sources */,
+				AACE95701C1DCB6200DC15E8 /* SudokuCubeNode.m in Sources */,
 				AA5B41D61C0090A1002B6730 /* Presenter.mm in Sources */,
 				AA6924D71BFA40BC006CED46 /* Algorithm.mm in Sources */,
 				AA6924C01BFA3EE8006CED46 /* GameScene.m in Sources */,
