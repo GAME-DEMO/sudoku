@@ -16,6 +16,9 @@
 
 @property (nonatomic, readonly) int eachCount;
 @property (nonatomic, readonly) int dimension;
+@property (nonatomic, readonly) int groupsCount;
+@property (nonatomic, readonly) int cubesCountForDimension;
+@property (nonatomic, readonly) int cubesCountForAll;
 
 @property (nonatomic, readonly) NSArray *resultArray;
 

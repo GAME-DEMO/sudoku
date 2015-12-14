@@ -40,7 +40,6 @@
 #import "GameScene.h"
 #import "Presenter.h"
 #import "SudokuCubeNode.h"
-#import "SudokuGroupNode.h"
 
 static const NSInteger HeaderNodeHeight = 64;
 static const NSInteger TailNodeHeight = 128;
@@ -53,7 +52,7 @@ static const NSInteger TailNodeHeight = 128;
 @property (nonatomic, strong) SKShapeNode *headNode;
 @property (nonatomic, strong) SKShapeNode *bodyNode;
 @property (nonatomic, strong) SKShapeNode *tailNode;
-@property (nonatomic, strong) NSArray<SudokuGroupNode *> *bodyGroupNodeArray;
+@property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
 
 @end
@@ -117,10 +116,14 @@ static const NSInteger TailNodeHeight = 128;
     self.bodyNode.fillColor = [UIColor clearColor];
     self.bodyNode.lineWidth = 0;
     
-    if (!self.bodyGroupNodeArray) {
-        NSMutableArray *groups = [NSMutableArray array];
+    if (!self.cubeArray) {
+        NSMutableArray *cubes = [NSMutableArray array];
         
-        self.bodyGroupNodeArray = [NSArray arrayWithArray:groups];
+        for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
+            
+        }
+        
+        self.cubeArray = [NSArray arrayWithArray:cubes];
     }
 }
 

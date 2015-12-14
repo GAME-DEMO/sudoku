@@ -12,6 +12,8 @@
 int GetEachCount();
 int GetDimension();
 int GetGroupsCount();
+int GetCubesCountForDimension();
+int GetCubesCountForAll();
 
 void MainTest();
 

@@ -2398,6 +2398,16 @@ int GetGroupsCount()
     return groupsCount;
 }
 
+int GetCubesCountForDimension()
+{
+    return cubesCount;
+}
+
+int GetCubesCountForAll()
+{
+    return cubesCount * cubesCount;
+}
+
 void MainTest()
 {
     AlgInitRandom();

@@ -33,6 +33,18 @@
     return GetDimension();
 }
 
+- (int)groupsCount {
+    return GetGroupsCount();
+}
+
+- (int)cubesCountForDimension {
+    return GetCubesCountForDimension();
+}
+
+- (int)cubesCountForAll {
+    return GetCubesCountForAll();
+}
+
 - (CGFloat)sudokuWidth {
     return self.viewWidth - self.viewEdgeInsets.left - self.viewEdgeInsets.right;
 }
