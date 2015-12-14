@@ -6,7 +6,7 @@
 //  Copyright © 2015 Peng Wang. All rights reserved.
 //
 
-#import "SudokuCubeNode.h"
+#import "SudokuCubeShapeNode.h"
 
 @interface SudokuCubeShapeNode ()
 
