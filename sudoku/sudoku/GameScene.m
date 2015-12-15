@@ -120,6 +120,8 @@ static const NSInteger TailNodeHeight = 128;
         NSMutableArray *cubes = [NSMutableArray array];
         
         for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
+            SudokuCubeNode *node = [SudokuCubeNode node];
+            node.index = i;
             
         }
         

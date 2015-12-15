@@ -10,4 +10,6 @@
 
 @interface SudokuCubeNode : SKShapeNode
 
+@property (nonatomic, assign) int index;
+
 @end
