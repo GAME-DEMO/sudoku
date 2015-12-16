@@ -51,6 +51,7 @@ static const NSInteger TailNodeHeight = 128;
 
 @property (nonatomic, strong) SKShapeNode *headNode;
 @property (nonatomic, strong) SKShapeNode *bodyNode;
+@property (nonatomic, strong) SKShapeNode *bodyContentNode;
 @property (nonatomic, strong) SKShapeNode *tailNode;
 @property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
@@ -94,6 +95,11 @@ static const NSInteger TailNodeHeight = 128;
         [self addChild:self.backgroundNode];
     }
     
+    if (!self.bodyContentNode) {
+        self.bodyContentNode = [SKShapeNode node];
+        [self.bodyNode addChild:self.bodyContentNode];
+    }
+    
     self.backgroundNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height), nil);
 
     SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
@@ -116,13 +122,25 @@ static const NSInteger TailNodeHeight = 128;
     self.bodyNode.fillColor = [UIColor clearColor];
     self.bodyNode.lineWidth = 0;
     
+    
+    
     if (!self.cubeArray) {
         NSMutableArray *cubes = [NSMutableArray array];
+        
+        CGFloat cubeAreaSideLength = MIN(self.size.width, self.size.height - HeaderNodeHeight - TailNodeHeight);
+        CGFloat cubeSideLength = cubeAreaSideLength / ((CGFloat)[Presenter sharedInstance].dimension);
+        CGFloat cubeAreaBottomMargin = (self.size.height - cubeAreaSideLength) / 2.0;
+        CGFloat cubeAreaLeftMargin = (self.size.width - cubeAreaSideLength) / 2.0;
         
         for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
             SudokuCubeNode *node = [SudokuCubeNode node];
             node.index = i;
-            
+            node.path = CGPathCreateWithRect(CGRectMake(0, 0, cubeSideLength, cubeSideLength), nil);
+            CGFloat row = i % [Presenter sharedInstance].dimension;
+            CGFloat col = i / [Presenter sharedInstance].dimension;
+            node.position = CGPointMake(row * cubeSideLength + cubeAreaLeftMargin, col * cubeSideLength + cubeAreaBottomMargin);
+            node.lineWidth = 0;
+            [self.bodyNode addChild:node];
         }
         
         self.cubeArray = [NSArray arrayWithArray:cubes];

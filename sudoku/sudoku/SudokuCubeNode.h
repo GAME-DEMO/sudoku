@@ -11,5 +11,6 @@
 @interface SudokuCubeNode : SKShapeNode
 
 @property (nonatomic, assign) int index;
+@property (nonatomic, assign) CGFloat cubeSideLength;
 
 @end
