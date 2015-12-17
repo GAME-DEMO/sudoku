@@ -26,7 +26,7 @@
  |                                       |
  |---------------------------------------|
  |                                    |  |
- |                                   128 |
+ |                                   120 |
  |                                    |  |
  |                Tail View           |  |
  |                                    |  |
@@ -42,7 +42,7 @@
 #import "SudokuCubeNode.h"
 
 static const NSInteger HeadNodeHeight = 64;
-static const NSInteger TailNodeHeight = 128;
+static const NSInteger TailNodeHeight = 120;
 
 @interface GameScene ()
 
@@ -120,7 +120,7 @@ static const NSInteger TailNodeHeight = 128;
     self.bodyNode.position = CGPointMake(0, TailNodeHeight);
     self.bodyNode.size = CGSizeMake(self.size.width, self.size.height - HeadNodeHeight - TailNodeHeight);
     
-    CGFloat cubeAreaSideLength = MIN(self.bodyNode.size.width, self.bodyNode.size.height) * 0.9;
+    CGFloat cubeAreaSideLength = MIN(self.bodyNode.size.width, self.bodyNode.size.height) * 0.96;
     CGFloat cubeAreaBottomMargin = (self.bodyNode.size.height - cubeAreaSideLength) / 2.0;
     CGFloat cubeAreaLeftMargin = (self.bodyNode.size.width - cubeAreaSideLength) / 2.0;
     

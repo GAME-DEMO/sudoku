@@ -69,6 +69,7 @@
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
+    [self.gameScene setSize:size];
 }
 
 - (void)viewDidLayoutSubviews {
