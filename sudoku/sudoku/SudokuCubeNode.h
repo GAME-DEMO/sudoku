@@ -8,9 +8,8 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-@interface SudokuCubeNode : SKShapeNode
+@interface SudokuCubeNode : SKSpriteNode
 
 @property (nonatomic, assign) int index;
-@property (nonatomic, assign) CGFloat cubeSideLength;
 
 @end

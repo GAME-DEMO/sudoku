@@ -45,12 +45,10 @@
     skView.showsFPS = YES;
     skView.showsNodeCount = YES;
     /* Sprite Kit applies additional optimizations to improve rendering performance */
-    skView.ignoresSiblingOrder = YES;
+    //skView.ignoresSiblingOrder = YES;
     
-    // Create and configure the scene.
-    self.gameScene = [GameScene unarchiveFromFile:@"GameScene"];
-//    scene.scaleMode = SKSceneScaleModeAspectFill;
-    
+    self.gameScene = [GameScene sceneWithSize:self.view.bounds.size];
+
     // Present the scene.
     [skView presentScene:self.gameScene];
 }
@@ -71,12 +69,10 @@
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
     [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-    [self.gameScene viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
 }
 
 - (void)viewDidLayoutSubviews {
     [super viewDidLayoutSubviews];
-    [self.gameScene viewDidLayoutSubviews];
 }
 
 - (void)didReceiveMemoryWarning

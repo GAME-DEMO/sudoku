@@ -31,15 +31,5 @@
 
 @implementation SudokuCubeNode
 
-- (void)setPath:(CGPathRef)path {
-    [super setPath:path];
-    
-    [self reloadLayout];
-}
-
-- (void)reloadLayout {
-    SKShader *backgroundShader = [SKShader shaderWithFileNamed:@"shader_game_cube_background.fsh"];
-    self.fillShader = backgroundShader;
-}
 
 @end
