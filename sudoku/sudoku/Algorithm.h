@@ -9,13 +9,15 @@
 #ifndef Algorithm_h
 #define Algorithm_h
 
+#include <vector>
+
 int GetEachCount();
 int GetDimension();
 int GetGroupsCount();
 int GetCubesCountForDimension();
 int GetCubesCountForAll();
 
-int GetCubeValue(int index);
+std::vector<int> GetCubeValues();
 
 void RandomResult();
 

@@ -2408,9 +2408,13 @@ int GetCubesCountForAll()
     return cubesCount * cubesCount;
 }
 
-int GetCubeValue(int index)
+vector<int> GetCubeValues()
 {
-    return AlgGetCubeByLinear(index)->GetValue();
+    vector<int> values;
+    for (int i = 0; i < GetCubesCountForAll(); ++i) {
+        values.push_back(AlgGetCubeByLinear(i)->GetValue());
+    }
+    return values;
 }
 
 void RandomResult()
