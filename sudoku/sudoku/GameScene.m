@@ -90,7 +90,6 @@ static const NSInteger TailNodeHeight = 128;
         SudokuCubeNode *node = [SudokuCubeNode node];
         node.index = i;
         node.anchorPoint = CGPointMake(0, 0);
-        node.texture = [self.gameTextureAtlas textureNamed:@"cube_white@2x.png"];
         [self.bodyNode addChild:node];
         [cubes addObject:node];
     }
@@ -128,9 +127,14 @@ static const NSInteger TailNodeHeight = 128;
     CGFloat cubeSideLength = cubeAreaSideLength / ((CGFloat)[Presenter sharedInstance].dimension);
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
         SudokuCubeNode *node = [self.cubeArray objectAtIndex:i];
-        CGFloat row = i % [Presenter sharedInstance].dimension;
-        CGFloat col = i / [Presenter sharedInstance].dimension;
-        node.position = CGPointMake(row * cubeSideLength + cubeAreaLeftMargin, col * cubeSideLength + cubeAreaBottomMargin);
+        node.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength + cubeAreaLeftMargin,
+                                    [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength + cubeAreaBottomMargin);
+        if ([[Presenter sharedInstance] groupIndexFromCubeIndex:i] % 2 == 0) {
+            node.texture = [self.gameTextureAtlas textureNamed:@"cube_white@2x.png"];
+        } else {
+            node.texture = [self.gameTextureAtlas textureNamed: @"cube_gray@2x.png"];
+        }
+        
         node.size = CGSizeMake(cubeSideLength, cubeSideLength);
     }
 }

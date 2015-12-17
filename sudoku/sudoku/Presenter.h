@@ -21,24 +21,11 @@
 @property (nonatomic, readonly) int cubesCountForAll;
 @property (nonatomic, readonly) NSArray *resultArray;
 
+- (int)rowFromCubeIndx:(int)index;
+- (int)colFromCubeIndex:(int)index;
+- (int)groupIndexFromCubeIndex:(int)index;
+
 - (void)randomResult;
-
-#pragma mark - View related
-/////////////////////////////////////////
-/// Y, ROW
-/// |-------------------|
-/// |----6----7----8----|
-/// |----3----4----5----|
-/// |----0----1----2----|
-/// |-------------------| X, COL
-@property (nonatomic, assign) CGFloat viewWidth;
-@property (nonatomic, assign) UIEdgeInsets viewEdgeInsets;
-
-// Sudoku Square, width == height
-@property (nonatomic, readonly) CGFloat sudokuWidth;
-@property (nonatomic, assign) CGFloat lineWidth;
-@property (nonatomic, readonly) CGFloat cubeWidth;
-
 
 #pragma mark - UI related
 

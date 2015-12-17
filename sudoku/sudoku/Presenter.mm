@@ -11,6 +11,7 @@
 
 @interface Presenter ()
 
+@property (nonatomic, strong) NSArray *resultArray;
 
 @end
 
@@ -45,12 +46,19 @@
     return GetCubesCountForAll();
 }
 
-- (CGFloat)sudokuWidth {
-    return self.viewWidth - self.viewEdgeInsets.left - self.viewEdgeInsets.right;
+- (int)rowFromCubeIndx:(int)index {
+    return index / self.dimension;
 }
 
-- (CGFloat)cubeWidth {
-    return (self.sudokuWidth - (self.dimension + 1) * self.lineWidth) / self.dimension;
+- (int)colFromCubeIndex:(int)index {
+    return index % self.dimension;
+}
+
+- (int)groupIndexFromCubeIndex:(int)index {
+    int row = [self rowFromCubeIndx:index];
+    int col = [self colFromCubeIndex:index];
+    
+    return (row / self.eachCount) * self.eachCount + col / self.eachCount;
 }
 
 - (void)randomResult {
@@ -59,7 +67,7 @@
     for (int i = 0; i < GetCubesCountForAll(); ++i) {
         [results addObject:@(GetCubeValue(i))];
     }
-    _resultArray = [NSArray arrayWithArray:results];
+    self.resultArray = [NSArray arrayWithArray:results];
 }
 
 #pragma mark - UI related
