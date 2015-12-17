@@ -10,6 +10,13 @@
 #import <UIKit/UIKit.h>
 #import <SpriteKit/SpriteKit.h>
 
+typedef NS_ENUM(NSUInteger, DIFFICULT_LEVEL) {
+    DIFFICULT_LEVEL_NONE,
+    DIFFICULT_LEVEL_EASY,
+    DIFFICULT_LEVEL_MID,
+    DIFFICULT_LEVEL_HARD,
+};
+
 @interface Presenter : NSObject
 
 + (instancetype)sharedInstance;
