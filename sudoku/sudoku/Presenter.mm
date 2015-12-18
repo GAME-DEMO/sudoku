@@ -62,9 +62,8 @@
 }
 
 - (void)randomResult {
-    RandomResult();
+    std::vector<int> cubeValues = RandomResult();
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:GetCubesCountForAll()];
-    std::vector<int> cubeValues = GetCubeValues();
     for (int i = 0; i < cubeValues.size(); ++i) {
         [results addObject:@(cubeValues[i])];
     }

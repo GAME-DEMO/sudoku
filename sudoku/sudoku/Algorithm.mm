@@ -2408,16 +2408,7 @@ int GetCubesCountForAll()
     return cubesCount * cubesCount;
 }
 
-vector<int> GetCubeValues()
-{
-    vector<int> values;
-    for (int i = 0; i < GetCubesCountForAll(); ++i) {
-        values.push_back(AlgGetCubeByLinear(i)->GetValue());
-    }
-    return values;
-}
-
-void RandomResult()
+vector<int> RandomResult()
 {
     AlgInitRandom();
     InitializeData();
@@ -2426,4 +2417,10 @@ void RandomResult()
     clock_t nowClock = clock();
     AlgBruteForce(false, &resultCount);
     printf("result count: %d, time consumed: %g \n", resultCount, (double)(clock() - nowClock) / (double)CLOCKS_PER_SEC);
+    
+    vector<int> values;
+    for (int i = 0; i < GetCubesCountForAll(); ++i) {
+        values.push_back(AlgGetCubeByLinear(i)->GetValue());
+    }
+    return values;
 }

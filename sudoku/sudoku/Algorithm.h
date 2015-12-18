@@ -17,9 +17,7 @@ int GetGroupsCount();
 int GetCubesCountForDimension();
 int GetCubesCountForAll();
 
-std::vector<int> GetCubeValues();
-
-void RandomResult();
+std::vector<int> RandomResult();
 
 
 #endif /* Algorithm_h */
