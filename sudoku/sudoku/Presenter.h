@@ -12,10 +12,10 @@
 
 typedef NS_ENUM(NSUInteger, DIFFICULT_LEVEL) {
     DIFFICULT_LEVEL_NONE,
-    DIFFICULT_LEVEL_EASY,
-    DIFFICULT_LEVEL_MID,
-    DIFFICULT_LEVEL_HARD,
-    DIFFICULT_LEVEL_EXTRE_HARD,
+    DIFFICULT_LEVEL_EASY,           // 40 ~ 45 Empty Cells
+    DIFFICULT_LEVEL_MID,            // 46 ~ 49 Empty Cells
+    DIFFICULT_LEVEL_HARD,           // 50 ~ 53 Empty Cells
+    DIFFICULT_LEVEL_EXTRE_HARD,     // 54 ~ 58 Empty Cells
 };
 
 @interface Presenter : NSObject
@@ -27,13 +27,12 @@ typedef NS_ENUM(NSUInteger, DIFFICULT_LEVEL) {
 @property (nonatomic, readonly) int groupsCount;
 @property (nonatomic, readonly) int cubesCountForDimension;
 @property (nonatomic, readonly) int cubesCountForAll;
-@property (nonatomic, readonly) NSArray *resultArray;
 
 - (int)rowFromCubeIndx:(int)index;
 - (int)colFromCubeIndex:(int)index;
 - (int)groupIndexFromCubeIndex:(int)index;
 
-- (void)randomResult;
+- (NSArray *)randomResultForLevel:(DIFFICULT_LEVEL)level;
 
 #pragma mark - UI related
 

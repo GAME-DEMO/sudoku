@@ -18,7 +18,8 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
-    //[[Presenter sharedInstance] randomResult];
+    NSArray * results = [[Presenter sharedInstance] randomResultForLevel:DIFFICULT_LEVEL_EASY];
+    NSLog(@"%@", results);
     return YES;
 }
 

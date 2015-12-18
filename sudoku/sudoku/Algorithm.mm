@@ -1380,6 +1380,18 @@ int AlgValueCount(CUBE_VECTOR cubeVector, int value)
 }
 
 /////////////////////////////////////////
+// Algorithm Assign Cubes by linearity
+
+void AlgAssignGroup(vector<int> cubeValues)
+{
+    for (int i = 0; i < cubeValues.size(); ++i)
+    {
+        CXYCube *cube = AlgGetCubeByLinear(i);
+        cube->SetValue(cubeValues[i]);
+    }
+}
+
+/////////////////////////////////////////
 // One way linked list
 #pragma mark - History List
 bool AttachHistoryNode(CHistoryNode *node)
@@ -2423,4 +2435,16 @@ vector<int> RandomResult()
         values.push_back(AlgGetCubeByLinear(i)->GetValue());
     }
     return values;
+}
+
+int ResultsCount(std::vector<int> cubeValues)
+{
+    AlgInitRandom();
+    InitializeData();
+    AlgAssignGroup(cubeValues);
+    int resultCount = 0;
+    clock_t nowClock = clock();
+    AlgBruteForce(true, &resultCount);
+    printf("random result count: %d, time consumed: %g \n", resultCount, (double)(clock() - nowClock) / (double)CLOCKS_PER_SEC);
+    return resultCount;
 }

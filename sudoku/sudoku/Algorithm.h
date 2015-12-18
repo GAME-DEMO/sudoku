@@ -19,5 +19,6 @@ int GetCubesCountForAll();
 
 std::vector<int> RandomResult();
 
+int ResultsCount(std::vector<int> cubeValues);
 
 #endif /* Algorithm_h */
