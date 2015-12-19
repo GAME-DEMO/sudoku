@@ -2334,7 +2334,7 @@ void AlgAdvancedTriples()
     }
 }
 
-CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
+CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount, bool uniqueSolution)
 {
     CHECK_RESULT result = CHECK_RESULT_NONE;
     
@@ -2384,7 +2384,10 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount)
     }
     while ((result == CHECK_RESULT_UNFINISH && StepIn()) ||
            (result == CHECK_RESULT_ERROR && StepOut()) ||
-           (result == CHECK_RESULT_DONE && allResult && (resultCount != NULL ? ++*resultCount : true) && StepOut()));
+           (result == CHECK_RESULT_DONE && allResult &&
+            (resultCount != NULL ? ({PrintFunc(PRINT_CUBE_VALUE); ++*resultCount;}) : true) &&
+            (uniqueSolution ? (*resultCount > 1 ? false : true) : true) &&
+            StepOut()));
     
     printf("\n -=-=>Result E: %d \n", result);
     PrintFunc(PRINT_CUBE_VALUE);
@@ -2427,7 +2430,7 @@ vector<int> RandomResult()
     AlgRandomGroup(0, 0);
     int resultCount = 0;
     clock_t nowClock = clock();
-    AlgBruteForce(false, &resultCount);
+    AlgBruteForce(false, &resultCount, false);
     printf("result count: %d, time consumed: %g \n", resultCount, (double)(clock() - nowClock) / (double)CLOCKS_PER_SEC);
     
     vector<int> values;
@@ -2444,7 +2447,19 @@ int ResultsCount(std::vector<int> cubeValues)
     AlgAssignGroup(cubeValues);
     int resultCount = 0;
     clock_t nowClock = clock();
-    AlgBruteForce(true, &resultCount);
+    AlgBruteForce(true, &resultCount, false);
+    printf("random result count: %d, time consumed: %g \n", resultCount, (double)(clock() - nowClock) / (double)CLOCKS_PER_SEC);
+    return resultCount;
+}
+
+int ResultsCount(std::vector<int> cubeValues, BOOL uniqueSolution)
+{
+    AlgInitRandom();
+    InitializeData();
+    AlgAssignGroup(cubeValues);
+    int resultCount = 0;
+    clock_t nowClock = clock();
+    AlgBruteForce(true, &resultCount, true);
     printf("random result count: %d, time consumed: %g \n", resultCount, (double)(clock() - nowClock) / (double)CLOCKS_PER_SEC);
     return resultCount;
 }

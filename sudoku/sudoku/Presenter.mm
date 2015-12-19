@@ -77,6 +77,7 @@
     std::vector<int> cubeValues;
     
     do {
+        resultsCount = 0;
         cubeValues.clear();
         for (int i = 0; i < self.resultArray.count; ++i) {
             cubeValues.push_back([[self.resultArray objectAtIndex:i] intValue]);
@@ -119,12 +120,12 @@
             }
         }
         
-        resultsCount = ResultsCount(cubeValues);
-    } while (resultsCount == 1);
+        resultsCount = ResultsCount(cubeValues, YES);
+    } while (resultsCount != 1);
     
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:cubeValues.size()];
     for (int i = 0; i < cubeValues.size(); ++i) {
-        cubeValues.push_back(cubeValues[i]);
+        [results addObject:(@(cubeValues[i]))];
     }
     return results;
 }
