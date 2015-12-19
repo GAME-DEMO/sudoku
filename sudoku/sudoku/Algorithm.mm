@@ -1244,6 +1244,8 @@ void PrintFunc(PRINT_TYPE type)
             }
         }
     }
+    
+    printf("---------------- \n");
 }
 
 #pragma mark - Algorithms
@@ -1382,12 +1384,12 @@ int AlgValueCount(CUBE_VECTOR cubeVector, int value)
 /////////////////////////////////////////
 // Algorithm Assign Cubes by linearity
 
-void AlgAssignGroup(vector<int> cubeValues)
+void AlgAssignGroup(const vector<int> * pCubeValues)
 {
-    for (int i = 0; i < cubeValues.size(); ++i)
+    for (int i = 0; i < pCubeValues->size(); ++i)
     {
         CXYCube *cube = AlgGetCubeByLinear(i);
-        cube->SetValue(cubeValues[i]);
+        cube->SetValue((*pCubeValues)[i]);
     }
 }
 
@@ -2390,7 +2392,9 @@ CHECK_RESULT AlgBruteForce(bool allResult, int *resultCount, bool uniqueSolution
             StepOut()));
     
     printf("\n -=-=>Result E: %d \n", result);
-    PrintFunc(PRINT_CUBE_VALUE);
+    if (result != CHECK_RESULT_DONE) {
+        PrintFunc(PRINT_CUBE_VALUE);
+    }
     
     return result;
 }
@@ -2440,11 +2444,11 @@ vector<int> RandomResult()
     return values;
 }
 
-int ResultsCount(std::vector<int> cubeValues)
+int ResultsCount(const std::vector<int> *pCubeValues)
 {
     AlgInitRandom();
     InitializeData();
-    AlgAssignGroup(cubeValues);
+    AlgAssignGroup(pCubeValues);
     int resultCount = 0;
     clock_t nowClock = clock();
     AlgBruteForce(true, &resultCount, false);
@@ -2452,11 +2456,11 @@ int ResultsCount(std::vector<int> cubeValues)
     return resultCount;
 }
 
-int ResultsCount(std::vector<int> cubeValues, BOOL uniqueSolution)
+int ResultsCount(const std::vector<int> *pCubeValues, BOOL uniqueSolution)
 {
     AlgInitRandom();
     InitializeData();
-    AlgAssignGroup(cubeValues);
+    AlgAssignGroup(pCubeValues);
     int resultCount = 0;
     clock_t nowClock = clock();
     AlgBruteForce(true, &resultCount, true);

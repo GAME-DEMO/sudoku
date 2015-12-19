@@ -74,54 +74,93 @@
     [self randomResult];
     
     int resultsCount = 0;
+    NSMutableArray *cubeValueArray = [[NSMutableArray alloc] initWithArray:self.resultArray copyItems:YES];
     std::vector<int> cubeValues;
+    int emptyCellsCount = 0;
     
+    // Clear base items
     do {
-        resultsCount = 0;
         cubeValues.clear();
-        for (int i = 0; i < self.resultArray.count; ++i) {
-            cubeValues.push_back([[self.resultArray objectAtIndex:i] intValue]);
+        for (int i = 0; i < cubeValueArray.count; ++i) {
+            cubeValues.push_back([[cubeValueArray objectAtIndex:i] intValue]);
         }
         
-        int emptyCellsCount = 0;
-        switch (level) {
-            case DIFFICULT_LEVEL_EASY: {
-                emptyCellsCount = arc4random() % 6 + 40;
-                break;
-            }
-                
-            case DIFFICULT_LEVEL_MID: {
-                emptyCellsCount = arc4random() % 4 + 46;
-                break;
-            }
-                
-            case DIFFICULT_LEVEL_HARD: {
-                emptyCellsCount = arc4random() % 4 + 50;
-                break;
-            }
-                
-            case DIFFICULT_LEVEL_EXTRE_HARD: {
-                emptyCellsCount = arc4random() % 5 + 54;
-                break;
-            }
-                
-            case DIFFICULT_LEVEL_NONE:
-            default:
-                break;
-        }
-        
-        NSMutableArray *emptyCells = [NSMutableArray arrayWithCapacity:emptyCellsCount];
+        emptyCellsCount = 40;
+        NSMutableArray *emptyCellIndexArray = [NSMutableArray arrayWithCapacity:emptyCellsCount];
         while (emptyCellsCount > 0) {
             int emptyCellIndex = arc4random() % 81;
-            if ([emptyCells indexOfObject:@(emptyCellIndex)] == NSNotFound) {
-                [emptyCells addObject:@(emptyCellIndex)];
+            if ([emptyCellIndexArray indexOfObject:@(emptyCellIndex)] == NSNotFound &&
+                cubeValues[emptyCellIndex] != 0) {
+                [emptyCellIndexArray addObject:@(emptyCellIndex)];
                 cubeValues[emptyCellIndex] = 0;
                 emptyCellsCount--;
             }
         }
         
-        resultsCount = ResultsCount(cubeValues, YES);
+        resultsCount = ResultsCount(&cubeValues, YES);
     } while (resultsCount != 1);
+    
+    [cubeValueArray removeAllObjects];
+    for (int i = 0; i < cubeValues.size(); ++i) {
+        [cubeValueArray addObject:(@(cubeValues[i]))];
+    }
+    
+    switch (level) {
+        case DIFFICULT_LEVEL_EASY: {
+            emptyCellsCount = arc4random() % 6 + 0;
+            break;
+        }
+            
+        case DIFFICULT_LEVEL_MID: {
+            emptyCellsCount = arc4random() % 4 + 6;
+            break;
+        }
+            
+        case DIFFICULT_LEVEL_HARD: {
+            emptyCellsCount = arc4random() % 4 + 10;
+            break;
+        }
+            
+        case DIFFICULT_LEVEL_EXTRE_HARD: {
+            emptyCellsCount = arc4random() % 5 + 14;
+            break;
+        }
+            
+        case DIFFICULT_LEVEL_NONE:
+        default:
+            break;
+    }
+
+    do {
+        cubeValues.clear();
+        for (int i = 0; i < cubeValueArray.count; ++i) {
+            cubeValues.push_back([[cubeValueArray objectAtIndex:i] intValue]);
+        }
+        
+        bool found = false;
+        do {
+            int index = arc4random() % 81;
+            if (cubeValues[index] == 0) {
+                continue;
+            }
+            
+            int value = cubeValues[index];
+            cubeValues[value] = 0;
+            resultsCount = ResultsCount(&cubeValues, YES);
+            
+            if (resultsCount == 1) {
+                found = true;
+                emptyCellsCount--;
+                
+                [cubeValueArray removeAllObjects];
+                for (int i = 0; i < cubeValues.size(); ++i) {
+                    [cubeValueArray addObject:(@(cubeValues[i]))];
+                }
+            } else {
+                cubeValues[value] = value;
+            }
+        } while (found == false);
+    } while (emptyCellsCount > 0);
     
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:cubeValues.size()];
     for (int i = 0; i < cubeValues.size(); ++i) {
