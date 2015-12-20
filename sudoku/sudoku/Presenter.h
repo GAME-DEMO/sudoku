@@ -42,4 +42,6 @@ typedef NS_ENUM(NSUInteger, DIFFICULT_LEVEL) {
 + (BOOL)isPortraitForSize:(CGSize)size;
 + (BOOL)isLandscapeForSize:(CGSize)size;
 
+@property (nonatomic, readonly) SKTextureAtlas *gameTextureAtlas;
+
 @end

@@ -13,6 +13,8 @@
 
 @property (nonatomic, strong) NSArray *resultArray;
 
+@property (nonatomic, strong) SKTextureAtlas *gameTextureAtlas;
+
 @end
 
 @implementation Presenter
@@ -24,6 +26,13 @@
         instance = [[Presenter alloc] init];
     });
     return instance;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game"];
+    }
+    return self;
 }
 
 - (int)eachCount {
@@ -78,7 +87,6 @@
     std::vector<int> cubeValues;
     int emptyCellsCount = 0;
     
-    // Clear base items
     do {
         cubeValues.clear();
         for (int i = 0; i < cubeValueArray.count; ++i) {
@@ -86,6 +94,33 @@
         }
         
         emptyCellsCount = 40;
+        
+        switch (level) {
+            case DIFFICULT_LEVEL_EASY: {
+                emptyCellsCount = arc4random() % 6 + 0;
+                break;
+            }
+                
+            case DIFFICULT_LEVEL_MID: {
+                emptyCellsCount = arc4random() % 4 + 6;
+                break;
+            }
+                
+            case DIFFICULT_LEVEL_HARD: {
+                emptyCellsCount = arc4random() % 4 + 10;
+                break;
+            }
+                
+            case DIFFICULT_LEVEL_EXTRE_HARD: {
+                emptyCellsCount = arc4random() % 5 + 14;
+                break;
+            }
+                
+            case DIFFICULT_LEVEL_NONE:
+            default:
+                break;
+        }
+        
         NSMutableArray *emptyCellIndexArray = [NSMutableArray arrayWithCapacity:emptyCellsCount];
         while (emptyCellsCount > 0) {
             int emptyCellIndex = arc4random() % 81;
@@ -99,68 +134,6 @@
         
         resultsCount = ResultsCount(&cubeValues, YES);
     } while (resultsCount != 1);
-    
-    [cubeValueArray removeAllObjects];
-    for (int i = 0; i < cubeValues.size(); ++i) {
-        [cubeValueArray addObject:(@(cubeValues[i]))];
-    }
-    
-    switch (level) {
-        case DIFFICULT_LEVEL_EASY: {
-            emptyCellsCount = arc4random() % 6 + 0;
-            break;
-        }
-            
-        case DIFFICULT_LEVEL_MID: {
-            emptyCellsCount = arc4random() % 4 + 6;
-            break;
-        }
-            
-        case DIFFICULT_LEVEL_HARD: {
-            emptyCellsCount = arc4random() % 4 + 10;
-            break;
-        }
-            
-        case DIFFICULT_LEVEL_EXTRE_HARD: {
-            emptyCellsCount = arc4random() % 5 + 14;
-            break;
-        }
-            
-        case DIFFICULT_LEVEL_NONE:
-        default:
-            break;
-    }
-
-    do {
-        cubeValues.clear();
-        for (int i = 0; i < cubeValueArray.count; ++i) {
-            cubeValues.push_back([[cubeValueArray objectAtIndex:i] intValue]);
-        }
-        
-        bool found = false;
-        do {
-            int index = arc4random() % 81;
-            if (cubeValues[index] == 0) {
-                continue;
-            }
-            
-            int value = cubeValues[index];
-            cubeValues[value] = 0;
-            resultsCount = ResultsCount(&cubeValues, YES);
-            
-            if (resultsCount == 1) {
-                found = true;
-                emptyCellsCount--;
-                
-                [cubeValueArray removeAllObjects];
-                for (int i = 0; i < cubeValues.size(); ++i) {
-                    [cubeValueArray addObject:(@(cubeValues[i]))];
-                }
-            } else {
-                cubeValues[value] = value;
-            }
-        } while (found == false);
-    } while (emptyCellsCount > 0);
     
     NSMutableArray *results = [NSMutableArray arrayWithCapacity:cubeValues.size()];
     for (int i = 0; i < cubeValues.size(); ++i) {

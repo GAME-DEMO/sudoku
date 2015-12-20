@@ -31,5 +31,22 @@
 
 @implementation SudokuCubeNode
 
+- (instancetype)initWithCoder:(NSCoder *)aDecoder {
+    if (self = [super initWithCoder:aDecoder]) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (instancetype)init {
+    if (self = [super init]) {
+        [self initialize];
+    }
+    return self;
+}
+
+- (void)initialize {
+    self.userInteractionEnabled = NO;
+}
 
 @end

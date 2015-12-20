@@ -39,7 +39,7 @@
 
 #import "GameScene.h"
 #import "Presenter.h"
-#import "SudokuCubeNode.h"
+#import "SudokuBodyContentNode.h"
 
 static const NSInteger HeadNodeHeight = 64;
 static const NSInteger TailNodeHeight = 120;
@@ -47,12 +47,12 @@ static const NSInteger TailNodeHeight = 120;
 @interface GameScene ()
 
 @property (nonatomic, assign) BOOL initialized;
-@property (nonatomic, strong) SKTextureAtlas *gameTextureAtlas;
+
 @property (nonatomic, strong) SKShapeNode *backgroundNode;
 @property (nonatomic, strong) SKSpriteNode *headNode;
 @property (nonatomic, strong) SKSpriteNode *bodyNode;
+@property (nonatomic, strong) SudokuBodyContentNode *bodyContentNode;
 @property (nonatomic, strong) SKSpriteNode *tailNode;
-@property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
 
 @end
@@ -68,8 +68,6 @@ static const NSInteger TailNodeHeight = 120;
 }
 
 - (void)initialize {
-    self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game"];
-
     self.backgroundNode = [SKShapeNode node];
     SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
     self.backgroundNode.fillShader = backgroundShapeShader;
@@ -85,15 +83,8 @@ static const NSInteger TailNodeHeight = 120;
     self.bodyNode = [SKSpriteNode node];
     [self addChild:self.bodyNode];
     
-    NSMutableArray *cubes = [NSMutableArray array];
-    for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
-        SudokuCubeNode *node = [SudokuCubeNode node];
-        node.index = i;
-        node.anchorPoint = CGPointMake(0, 0);
-        [self.bodyNode addChild:node];
-        [cubes addObject:node];
-    }
-    self.cubeArray = [NSArray arrayWithArray:cubes];
+    self.bodyContentNode = [SudokuBodyContentNode node];
+    [self.bodyNode addChild:self.bodyContentNode];
     
     self.initialized = YES;
 }
@@ -120,23 +111,13 @@ static const NSInteger TailNodeHeight = 120;
     self.bodyNode.position = CGPointMake(0, TailNodeHeight);
     self.bodyNode.size = CGSizeMake(self.size.width, self.size.height - HeadNodeHeight - TailNodeHeight);
     
-    CGFloat cubeAreaSideLength = MIN(self.bodyNode.size.width, self.bodyNode.size.height) * 0.96;
+    CGFloat cubeAreaSideLength = MIN(self.bodyNode.size.width, self.bodyNode.size.height);
     CGFloat cubeAreaBottomMargin = (self.bodyNode.size.height - cubeAreaSideLength) / 2.0;
     CGFloat cubeAreaLeftMargin = (self.bodyNode.size.width - cubeAreaSideLength) / 2.0;
     
-    CGFloat cubeSideLength = cubeAreaSideLength / ((CGFloat)[Presenter sharedInstance].dimension);
-    for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
-        SudokuCubeNode *node = [self.cubeArray objectAtIndex:i];
-        node.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength + cubeAreaLeftMargin,
-                                    [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength + cubeAreaBottomMargin);
-        if ([[Presenter sharedInstance] groupIndexFromCubeIndex:i] % 2 == 0) {
-            node.texture = [self.gameTextureAtlas textureNamed:@"cube_white@2x.png"];
-        } else {
-            node.texture = [self.gameTextureAtlas textureNamed: @"cube_gray@2x.png"];
-        }
-        
-        node.size = CGSizeMake(cubeSideLength, cubeSideLength);
-    }
+    self.bodyContentNode.anchorPoint = CGPointMake(0, 0);
+    self.bodyContentNode.position = CGPointMake(cubeAreaLeftMargin, cubeAreaBottomMargin);
+    self.bodyContentNode.size = CGSizeMake(cubeAreaSideLength, cubeAreaSideLength);
 }
 
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
