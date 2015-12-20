@@ -1,6 +1,6 @@
 # sudoku
 
-## Algorithm:
+### Algorithm:
 
 Implements with C++ (backup/algorithm.cpp).
 
@@ -14,5 +14,5 @@ run:
 > ./algorithm 
 > ```
 
-## UI:
+### UI:
 Implements with SpriteKit
