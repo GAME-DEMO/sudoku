@@ -14,6 +14,8 @@
 
 @property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
+@property (nonatomic, strong) SudokuCubeNode *currentSelectedCube;
+
 @end
 
 @implementation SudokuBodyContentNode
@@ -33,13 +35,15 @@
 }
 
 - (void)initialize {
+    self.userInteractionEnabled = YES;
+    
     NSMutableArray *cubes = [NSMutableArray array];
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
-        SudokuCubeNode *node = [SudokuCubeNode node];
-        node.index = i;
-        node.anchorPoint = CGPointMake(0, 0);
-        [self addChild:node];
-        [cubes addObject:node];
+        SudokuCubeNode *cube = [SudokuCubeNode node];
+        cube.index = i;
+        cube.anchorPoint = CGPointMake(0, 0);
+        [self addChild:cube];
+        [cubes addObject:cube];
     }
     self.cubeArray = [NSArray arrayWithArray:cubes];
 }
@@ -52,17 +56,87 @@
 - (void)reloadLayout {
     CGFloat cubeSideLength = self.size.width / ((CGFloat)[Presenter sharedInstance].dimension);
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
-        SudokuCubeNode *node = [self.cubeArray objectAtIndex:i];
-        node.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength,
+        SudokuCubeNode *cube = [self.cubeArray objectAtIndex:i];
+        cube.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength,
                                     [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength);
         if ([[Presenter sharedInstance] groupIndexFromCubeIndex:i] % 2 == 0) {
-            node.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"cube_white@2x.png"];
+            cube.textureName = @"cube_white@2x.png";
         } else {
-            node.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed: @"cube_gray@2x.png"];
+            cube.textureName = @"cube_gray@2x.png";
         }
-        
-        node.size = CGSizeMake(cubeSideLength, cubeSideLength);
+        cube.selectedTextureName = @"cube_red@2x.png";
+        cube.size = CGSizeMake(cubeSideLength, cubeSideLength);
     }
+}
+
+// 一维上点到线段的距离，线段用一个数组表示，[0]表示左点坐标，[1]表示右点坐标
+- (CGFloat)distanceFromDot:(CGFloat)dot toLine:(NSArray *)line {
+    if (dot < [line[0] floatValue]) {
+        return [line[0] floatValue] - dot;
+    } else if (dot > [line[1] floatValue]) {
+        return dot - [line[1] floatValue];
+    } else {
+        return 0;
+    }
+}
+
+// 这里使用曼哈顿距离而不是用欧几里得距离，是为了减轻计算量。
+- (CGFloat)distanceToCube:(SudokuCubeNode *)cube fromPoint:(CGPoint)point {
+    CGRect frame = CGRectMake(cube.position.x, cube.position.y, cube.size.width, cube.size.height);
+    
+    CGFloat xDistance = [self distanceFromDot:point.x toLine:@[@(frame.origin.x), @(frame.origin.x + frame.size.width)]];
+    CGFloat yDistance = [self distanceFromDot:point.y toLine:@[@(frame.origin.y), @(frame.origin.y + frame.size.height)]];
+    
+    return xDistance + yDistance;
+}
+
+- (SudokuCubeNode *)nearestCubeFromPoint:(CGPoint)point {
+    SudokuCubeNode *nearestCube = nil;
+    CGFloat nearestDistance = CGFLOAT_MAX;
+    for (SudokuCubeNode *cube in self.cubeArray) {
+        CGFloat distance = [self distanceToCube:cube fromPoint:point];
+        if (distance < nearestDistance) {
+            nearestDistance = distance;
+            nearestCube = cube;
+        }
+    }
+    return nearestCube;
+}
+
+- (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesBegan:touches withEvent:event];
+    
+    UITouch *touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInNode:self];
+    
+    SudokuCubeNode *cube = [self nearestCubeFromPoint:touchPoint];
+    if (cube != self.currentSelectedCube) {
+        self.currentSelectedCube.selected = NO;
+        self.currentSelectedCube = cube;
+        self.currentSelectedCube.selected = YES;
+    }
+}
+
+- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesMoved:touches withEvent:event];
+    
+    UITouch *touch = [touches anyObject];
+    CGPoint touchPoint = [touch locationInNode:self];
+    
+    SudokuCubeNode *cube = [self nearestCubeFromPoint:touchPoint];
+    if (cube != self.currentSelectedCube) {
+        self.currentSelectedCube.selected = NO;
+        self.currentSelectedCube = cube;
+        self.currentSelectedCube.selected = YES;
+    }
+}
+
+- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesEnded:touches withEvent:event];
+}
+
+- (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
+    [super touchesCancelled:touches withEvent:event];
 }
 
 @end

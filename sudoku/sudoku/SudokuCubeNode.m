@@ -24,6 +24,7 @@
 
 
 #import "SudokuCubeNode.h"
+#import "Presenter.h"
 
 @interface SudokuCubeNode ()
 
@@ -47,6 +48,15 @@
 
 - (void)initialize {
     self.userInteractionEnabled = NO;
+}
+
+- (void)setTextureName:(NSString *)textureName {
+    _textureName = [textureName copy];
+    self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:_textureName];
+}
+
+- (void)setSelected:(BOOL)selected {
+    self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:selected ? self.selectedTextureName : self.textureName];
 }
 
 @end

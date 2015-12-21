@@ -12,4 +12,10 @@
 
 @property (nonatomic, assign) int index;
 
+@property (nonatomic, assign) BOOL selected;
+
+@property (nonatomic, copy) NSString *textureName;
+
+@property (nonatomic, copy) NSString *selectedTextureName;
+
 @end
