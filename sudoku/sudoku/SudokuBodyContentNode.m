@@ -60,9 +60,9 @@
         cube.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength,
                                     [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength);
         if ([[Presenter sharedInstance] groupIndexFromCubeIndex:i] % 2 == 0) {
-            cube.textureName = @"cube_white@2x.png";
+            cube.backgroundTextureName = @"cube_white@2x.png";
         } else {
-            cube.textureName = @"cube_gray@2x.png";
+            cube.backgroundTextureName = @"cube_gray@2x.png";
         }
         cube.selectedTextureName = @"cube_red@2x.png";
         cube.size = CGSizeMake(cubeSideLength, cubeSideLength);

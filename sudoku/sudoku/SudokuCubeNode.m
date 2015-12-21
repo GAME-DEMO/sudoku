@@ -50,13 +50,22 @@
     self.userInteractionEnabled = NO;
 }
 
-- (void)setTextureName:(NSString *)textureName {
-    _textureName = [textureName copy];
-    self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:_textureName];
+- (void)setBackgroundTextureName:(NSString *)textureName {
+    _backgroundTextureName = [textureName copy];
+    [self updateCubeNodeTexture];
 }
 
 - (void)setSelected:(BOOL)selected {
-    self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:selected ? self.selectedTextureName : self.textureName];
+    _selected = selected;
+    [self updateCubeNodeTexture];
+}
+
+- (void)updateCubeNodeTexture {
+    if (self.selected) {
+        self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:self.selectedTextureName];
+    } else {
+        self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:self.backgroundTextureName];
+    }
 }
 
 @end

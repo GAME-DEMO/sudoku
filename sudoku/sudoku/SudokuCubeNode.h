@@ -14,7 +14,7 @@
 
 @property (nonatomic, assign) BOOL selected;
 
-@property (nonatomic, copy) NSString *textureName;
+@property (nonatomic, copy) NSString *backgroundTextureName;
 
 @property (nonatomic, copy) NSString *selectedTextureName;
 
