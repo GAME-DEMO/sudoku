@@ -18,6 +18,8 @@ typedef NS_ENUM(NSUInteger, DIFFICULT_LEVEL) {
     DIFFICULT_LEVEL_EXTRE_HARD,     // 54 ~ 58 Empty Cells
 };
 
+@class SudokuCubeNode;
+
 @interface Presenter : NSObject
 
 + (instancetype)sharedInstance;
@@ -43,5 +45,7 @@ typedef NS_ENUM(NSUInteger, DIFFICULT_LEVEL) {
 + (BOOL)isLandscapeForSize:(CGSize)size;
 
 @property (nonatomic, readonly) SKTextureAtlas *gameTextureAtlas;
+
+- (void)cubeDidSelect:(SudokuCubeNode *)cube;
 
 @end

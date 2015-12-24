@@ -18,8 +18,12 @@
 
 @property (nonatomic, copy) NSString *selectedTextureName;
 
+#pragma mark - data
+
 @property (nonatomic, assign) int value;
 
-@property (nonatomic, assign) NSMutableArray *guessArray;
+@property (nonatomic, assign) NSMutableArray<NSNumber *> *guessArray;
+
+
 
 @end

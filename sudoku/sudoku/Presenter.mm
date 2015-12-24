@@ -166,4 +166,8 @@
     return size.width > size.height;
 }
 
+- (void)cubeDidSelect:(SudokuCubeNode *)cube {
+    
+}
+
 @end

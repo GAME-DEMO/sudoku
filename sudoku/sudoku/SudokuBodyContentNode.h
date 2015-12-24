@@ -8,6 +8,10 @@
 
 #import <SpriteKit/SpriteKit.h>
 
+@class SudokuCubeNode;
+
 @interface SudokuBodyContentNode : SKSpriteNode
+
+@property (nonatomic, readonly) NSArray<SudokuCubeNode *> *cubeArray;
 
 @end
