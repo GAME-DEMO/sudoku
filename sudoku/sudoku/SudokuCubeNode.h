@@ -18,4 +18,8 @@
 
 @property (nonatomic, copy) NSString *selectedTextureName;
 
+@property (nonatomic, assign) int value;
+
+@property (nonatomic, assign) NSMutableArray *guessArray;
+
 @end

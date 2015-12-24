@@ -48,6 +48,7 @@
 
 - (void)initialize {
     self.userInteractionEnabled = NO;
+    self.guessArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
 }
 
 - (void)setBackgroundTextureName:(NSString *)textureName {
