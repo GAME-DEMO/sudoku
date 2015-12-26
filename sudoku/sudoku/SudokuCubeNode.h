@@ -26,6 +26,4 @@
 
 - (void)removeGuess:(int)guess;
 
-
-
 @end

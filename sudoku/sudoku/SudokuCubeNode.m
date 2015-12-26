@@ -128,9 +128,7 @@
     if (guess <= 0) {
         return;
     }
-    
     int index = guess - 1;
-    
     [self.guessArray setObject:@(guess) atIndexedSubscript:index];
     
     SKTexture *guessTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", [[self.guessArray objectAtIndex:index] intValue]]];
@@ -142,6 +140,10 @@
     if (guess <= 0) {
         return;
     }
+    int index = guess - 1;
+    [self.guessArray setObject:@(0) atIndexedSubscript:index];
+    SKSpriteNode *guessSpriteNode = [self.guessSpriteNodeArray objectAtIndex:index];
+    [guessSpriteNode setTexture:nil];
 }
 
 - (CGFloat)sideLengthForGuess {

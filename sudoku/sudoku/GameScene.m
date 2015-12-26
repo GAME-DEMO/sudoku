@@ -123,7 +123,7 @@ static const NSInteger TailNodeHeight = 120;
 - (void)touchesBegan:(NSSet *)touches withEvent:(UIEvent *)event {
     /* Called when a touch begins */
 
-
+    
 }
 
 - (void)update:(CFTimeInterval)currentTime {
