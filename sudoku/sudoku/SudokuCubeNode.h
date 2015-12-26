@@ -22,7 +22,9 @@
 
 @property (nonatomic, assign) int value;
 
-@property (nonatomic, assign) NSMutableArray<NSNumber *> *guessArray;
+- (void)setGuess:(int)guess;
+
+- (void)removeGuess:(int)guess;
 
 
 

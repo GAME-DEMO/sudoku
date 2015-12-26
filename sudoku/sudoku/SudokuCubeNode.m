@@ -32,6 +32,8 @@
 @property (nonatomic, strong) SKSpriteNode *guessUnionInSpriteNode;
 @property (nonatomic, strong) NSMutableArray<SKSpriteNode *> *guessSpriteNodeArray;
 
+@property (nonatomic, assign) NSMutableArray<NSNumber *> *guessArray;
+
 @end
 
 @implementation SudokuCubeNode
@@ -114,22 +116,31 @@
 - (void)setValue:(int)value {
     if (_value != value) {
         _value = value;
-        [self updateValueSpriteNode];
+        
+        if (self.value != 0) {
+            SKTexture *valueTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", self.value]];
+            [self.valueSpriteNode setTexture:valueTexture];
+        }
     }
 }
 
-- (void)updateValueSpriteNode {
-    if (self.value != 0) {
-        SKTexture *valueTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", self.value]];
-        [self.valueSpriteNode setTexture:valueTexture];
+- (void)setGuess:(int)guess {
+    if (guess <= 0) {
+        return;
     }
+    
+    int index = guess - 1;
+    
+    [self.guessArray setObject:@(guess) atIndexedSubscript:index];
+    
+    SKTexture *guessTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", [[self.guessArray objectAtIndex:index] intValue]]];
+    SKSpriteNode *guessSpriteNode = [self.guessSpriteNodeArray objectAtIndex:index];
+    [guessSpriteNode setTexture:guessTexture];
 }
 
-- (void)updateGuessSpriteNode {
-    for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
-        SKTexture *guessTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", [[self.guessArray objectAtIndex:i] intValue]]];
-        SKSpriteNode *guessSpriteNode = [self.guessSpriteNodeArray objectAtIndex:i];
-        [guessSpriteNode setTexture:guessTexture];
+- (void)removeGuess:(int)guess {
+    if (guess <= 0) {
+        return;
     }
 }
 
