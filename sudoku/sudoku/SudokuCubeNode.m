@@ -9,15 +9,15 @@
 /*
  |-----------------------------|
  |         |         |         |
- |        11        12         |
+ |    6    |    7    |    8    |
  |         |         |         |
- |----4----|----5----|----6----|
+ |---------|---------|---------|
  |         |         |         |
- |         9        10         |
+ |    3    |    4    |    5    |
  |         |         |         |
- |----1----|----2----|----3----|
+ |---------|---------|---------|
  |         |         |         |
- |         7         8         |
+ |    0    |    1    |    2    |
  |         |         |         |
  |-----------------------------|
  */
@@ -25,13 +25,11 @@
 
 #import "SudokuCubeNode.h"
 #import "Presenter.h"
-#import "SudokuCubeValueNode.h"
-#import "SudokuCubeGuessNode.h"
 
 @interface SudokuCubeNode ()
 
-@property (nonatomic, strong) SudokuCubeValueNode *valueNode;
-@property (nonatomic, strong) SKSpriteNode *guessSpriteNode;
+@property (nonatomic, strong) SKSpriteNode *valueSpriteNode;
+@property (nonatomic, strong) SKSpriteNode *guessUnionInSpriteNode;
 @property (nonatomic, strong) NSMutableArray<SKSpriteNode *> *guessSpriteNodeArray;
 
 @end
@@ -55,17 +53,17 @@
 - (void)initialize {
     self.userInteractionEnabled = NO;
     
-    self.valueNode = [SudokuCubeValueNode node];
-    self.valueNode.anchorPoint = CGPointMake(0, 0);
-    self.valueNode.position = CGPointMake(0, 0);
-    self.valueNode.size = self.size;
-    [self addChild:self.valueNode];
+    self.valueSpriteNode = [SKSpriteNode node];
+    self.valueSpriteNode.anchorPoint = CGPointMake(0, 0);
+    self.valueSpriteNode.position = CGPointMake(0, 0);
+    self.valueSpriteNode.size = self.size;
+    [self addChild:self.valueSpriteNode];
     
-    self.guessSpriteNode = [SKSpriteNode node];
-    self.guessSpriteNode.anchorPoint = CGPointMake(0, 0);
-    self.guessSpriteNode.position = CGPointMake(0, 0);
-    self.guessSpriteNode.size = self.size;
-    [self addChild:self.guessSpriteNode];
+    self.guessUnionInSpriteNode = [SKSpriteNode node];
+    self.guessUnionInSpriteNode.anchorPoint = CGPointMake(0, 0);
+    self.guessUnionInSpriteNode.position = CGPointMake(0, 0);
+    self.guessUnionInSpriteNode.size = self.size;
+    [self addChild:self.guessUnionInSpriteNode];
     
     self.guessArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
@@ -73,21 +71,25 @@
     }
     self.guessSpriteNodeArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
-        SudokuCubeGuessNode *guessNode = [SudokuCubeGuessNode node];
-        guessNode.anchorPoint = CGPointMake(0, 0);
-        guessNode.position = [self positionForGuess:i];
-        guessNode.size = [self sizeForGuess];
-        [self.guessSpriteNode addChild:guessNode];
-        [self.guessSpriteNodeArray addObject:guessNode];
+        SKSpriteNode *guessSpriteNode = [SKSpriteNode node];
+        guessSpriteNode.anchorPoint = CGPointMake(0, 0);
+        guessSpriteNode.position = [self positionForGuess:i];
+        guessSpriteNode.size = [self sizeForGuess];
+        [self.guessUnionInSpriteNode addChild:guessSpriteNode];
+        [self.guessSpriteNodeArray addObject:guessSpriteNode];
     }
 }
 
 - (void)setSize:(CGSize)size {
     [super setSize:size];
     
-    self.valueNode.size = size;
-    self.guessSpriteNode.size = size;
-    
+    self.valueSpriteNode.size = size;
+    self.guessUnionInSpriteNode.size = size;
+    for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
+        SKSpriteNode *guessSpriteNode = [self.guessSpriteNodeArray objectAtIndex:i];
+        guessSpriteNode.position = [self positionForGuess:i];
+        guessSpriteNode.size = [self sizeForGuess];
+    }
 }
 
 - (void)setBackgroundTextureName:(NSString *)textureName {
@@ -117,15 +119,22 @@
 }
 
 - (void)updateValueSpriteNode {
-    
+    if (self.value != 0) {
+        SKTexture *valueTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", self.value]];
+        [self.valueSpriteNode setTexture:valueTexture];
+    }
 }
 
 - (void)updateGuessSpriteNode {
-    
+    for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
+        SKTexture *guessTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", [[self.guessArray objectAtIndex:i] intValue]]];
+        SKSpriteNode *guessSpriteNode = [self.guessSpriteNodeArray objectAtIndex:i];
+        [guessSpriteNode setTexture:guessTexture];
+    }
 }
 
 - (CGFloat)sideLengthForGuess {
-    return MIN(self.guessSpriteNode.size.width, self.guessSpriteNode.size.height) / (CGFloat)[Presenter sharedInstance].eachCount;
+    return MIN(self.guessUnionInSpriteNode.size.width, self.guessUnionInSpriteNode.size.height) / (CGFloat)[Presenter sharedInstance].eachCount;
 }
 
 - (CGPoint)positionForGuess:(int)guessIndex {
