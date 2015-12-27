@@ -32,7 +32,7 @@
 @property (nonatomic, strong) SKSpriteNode *guessUnionInSpriteNode;
 @property (nonatomic, strong) NSMutableArray<SKSpriteNode *> *guessSpriteNodeArray;
 
-@property (nonatomic, assign) NSMutableArray<NSNumber *> *guessArray;
+@property (nonatomic, strong) NSMutableArray<NSNumber *> *guessArray;
 
 @end
 
