@@ -55,30 +55,30 @@
 - (void)initialize {
     self.userInteractionEnabled = NO;
     
-    self.valueSpriteNode = [SKSpriteNode node];
-    self.valueSpriteNode.anchorPoint = CGPointMake(0, 0);
-    self.valueSpriteNode.position = CGPointMake(0, 0);
-    self.valueSpriteNode.size = self.size;
-    [self addChild:self.valueSpriteNode];
+    _valueSpriteNode = [SKSpriteNode node];
+    _valueSpriteNode.anchorPoint = CGPointMake(0, 0);
+    _valueSpriteNode.position = CGPointMake(0, 0);
+    _valueSpriteNode.size = self.size;
+    [self addChild:_valueSpriteNode];
     
-    self.guessUnionInSpriteNode = [SKSpriteNode node];
-    self.guessUnionInSpriteNode.anchorPoint = CGPointMake(0, 0);
-    self.guessUnionInSpriteNode.position = CGPointMake(0, 0);
-    self.guessUnionInSpriteNode.size = self.size;
-    [self addChild:self.guessUnionInSpriteNode];
+    _guessUnionInSpriteNode = [SKSpriteNode node];
+    _guessUnionInSpriteNode.anchorPoint = CGPointMake(0, 0);
+    _guessUnionInSpriteNode.position = CGPointMake(0, 0);
+    _guessUnionInSpriteNode.size = self.size;
+    [self addChild:_guessUnionInSpriteNode];
     
-    self.guessArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
+    _guessArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
-        [self.guessArray addObject:@(0)];
+        [_guessArray addObject:@(0)];
     }
-    self.guessSpriteNodeArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
+    _guessSpriteNodeArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
         SKSpriteNode *guessSpriteNode = [SKSpriteNode node];
         guessSpriteNode.anchorPoint = CGPointMake(0, 0);
         guessSpriteNode.position = [self positionForGuess:i];
         guessSpriteNode.size = [self sizeForGuess];
-        [self.guessUnionInSpriteNode addChild:guessSpriteNode];
-        [self.guessSpriteNodeArray addObject:guessSpriteNode];
+        [_guessUnionInSpriteNode addChild:guessSpriteNode];
+        [_guessSpriteNodeArray addObject:guessSpriteNode];
     }
 }
 

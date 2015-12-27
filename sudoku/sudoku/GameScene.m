@@ -68,25 +68,25 @@ static const NSInteger TailNodeHeight = 120;
 }
 
 - (void)initialize {
-    self.backgroundNode = [SKShapeNode node];
+    _backgroundNode = [SKShapeNode node];
     SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
-    self.backgroundNode.fillShader = backgroundShapeShader;
-    self.backgroundNode.lineWidth = 0;
-    [self addChild:self.backgroundNode];
+    _backgroundNode.fillShader = backgroundShapeShader;
+    _backgroundNode.lineWidth = 0;
+    [self addChild:_backgroundNode];
     
-    self.headNode = [SKSpriteNode node];
-    [self addChild:self.headNode];
+    _headNode = [SKSpriteNode node];
+    [self addChild:_headNode];
     
-    self.tailNode = [SKSpriteNode node];
-    [self addChild:self.tailNode];
+    _tailNode = [SKSpriteNode node];
+    [self addChild:_tailNode];
     
-    self.bodyNode = [SKSpriteNode node];
-    [self addChild:self.bodyNode];
+    _bodyNode = [SKSpriteNode node];
+    [self addChild:_bodyNode];
     
-    self.bodyContentNode = [SudokuBodyContentNode node];
-    [self.bodyNode addChild:self.bodyContentNode];
+    _bodyContentNode = [SudokuBodyContentNode node];
+    [_bodyNode addChild:_bodyContentNode];
     
-    self.initialized = YES;
+    _initialized = YES;
 }
 
 - (void)setSize:(CGSize)size {

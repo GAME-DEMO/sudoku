@@ -45,7 +45,7 @@
         [self addChild:cube];
         [cubes addObject:cube];
     }
-    self.cubeArray = [NSArray arrayWithArray:cubes];
+    _cubeArray = [NSArray arrayWithArray:cubes];
 }
 
 - (void)setSize:(CGSize)size {

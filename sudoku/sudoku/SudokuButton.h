@@ -8,23 +8,27 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-@class SudokuButton;
-
-typedef NS_OPTIONS(NSUInteger, SudokuButtonControlEvent)
+typedef NS_OPTIONS(NSUInteger, SudokuButtonEvent)
 {
-    SudokuButtonControlEventTouchDown = 1,
-    SudokuButtonControlEventTouchUpInside,
-    SudokuButtonControlEventTouchCancel,
+    SudokuButtonEventTouchDown,
+    SudokuButtonEventTouchUpInside,
+    SudokuButtonEventClick,
+    SudokuButtonEventTouchCancel,
+    SudokuButtonEventAll,
 };
 
-typedef void(^ButtonTouchEventBlock)(SudokuButton *button, SudokuButtonControlEvent event);
+
+@class SudokuButton;
 
 @interface SudokuButton : SKSpriteNode
 
-@property (nonatomic, strong) SKTexture *buttonNormalTexture;
-@property (nonatomic, strong) SKTexture *buttonHighlightedTexture;
-@property (nonatomic, readonly) SKLabelNode *buttonLabel;
+// UIControl
+@property (nonatomic, strong, nullable) SKTexture *buttonNormalTexture;
+@property (nonatomic, strong, nullable) SKTexture *buttonHighlightedTexture;
+@property (nonatomic, readonly, nullable) SKLabelNode *buttonLabel;
 
+- (void)addTarget:(nullable id)target action:(_Nonnull SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent;
 
+- (void)removeTarget:(nullable id)target action:(nullable SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent;
 
 @end
