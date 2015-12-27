@@ -39,6 +39,7 @@
 
 #import "GameScene.h"
 #import "Presenter.h"
+#import "SudokuHeadContentNode.h"
 #import "SudokuBodyContentNode.h"
 
 static const NSInteger HeadNodeHeight = 64;
@@ -50,6 +51,7 @@ static const NSInteger TailNodeHeight = 120;
 
 @property (nonatomic, strong) SKShapeNode *backgroundNode;
 @property (nonatomic, strong) SKSpriteNode *headNode;
+@property (nonatomic, strong) SudokuHeadContentNode *headContentNode;
 @property (nonatomic, strong) SKSpriteNode *bodyNode;
 @property (nonatomic, strong) SudokuBodyContentNode *bodyContentNode;
 @property (nonatomic, strong) SKSpriteNode *tailNode;
@@ -77,6 +79,9 @@ static const NSInteger TailNodeHeight = 120;
     _headNode = [SKSpriteNode node];
     [self addChild:_headNode];
     
+    _headContentNode = [SudokuHeadContentNode node];
+    [_headNode addChild:_headContentNode];
+    
     _tailNode = [SKSpriteNode node];
     [self addChild:_tailNode];
     
@@ -102,6 +107,10 @@ static const NSInteger TailNodeHeight = 120;
     self.headNode.anchorPoint = CGPointMake(0, 0);
     self.headNode.position = CGPointMake(0, self.size.height - HeadNodeHeight);
     self.headNode.size = CGSizeMake(self.size.width, HeadNodeHeight);
+    
+    self.headContentNode.anchorPoint = CGPointMake(0, 0);
+    self.headContentNode.position = CGPointMake(0, 0);
+    self.headContentNode.size = self.headNode.size;
 
     self.tailNode.anchorPoint = CGPointMake(0, 0);
     self.tailNode.position = CGPointMake(0, 0);

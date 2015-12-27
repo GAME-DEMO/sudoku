@@ -8,17 +8,15 @@
 
 #import <SpriteKit/SpriteKit.h>
 
-typedef NS_OPTIONS(NSUInteger, SudokuButtonEvent)
-{
+typedef NS_ENUM(NSUInteger, SudokuButtonEvent) {
     SudokuButtonEventTouchDown,
-    SudokuButtonEventTouchUpInside,
-    SudokuButtonEventClick,
+    SudokuButtonEventTouchUp,
     SudokuButtonEventTouchCancel,
     SudokuButtonEventAll,
 };
 
-
-@class SudokuButton;
+//@class SudokuButton;
+//typedef void(^SudokuButtonEventBlock)(SudokuButton * _Nonnull button);
 
 @interface SudokuButton : SKSpriteNode
 
@@ -27,8 +25,7 @@ typedef NS_OPTIONS(NSUInteger, SudokuButtonEvent)
 @property (nonatomic, strong, nullable) SKTexture *buttonHighlightedTexture;
 @property (nonatomic, readonly, nullable) SKLabelNode *buttonLabel;
 
-- (void)addTarget:(nullable id)target action:(_Nonnull SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent;
-
+- (void)addTarget:(nullable id)target action:(_Nonnull SEL)action withObject:(nullable id)object forButtonEvent:(SudokuButtonEvent)buttonEvent;
 - (void)removeTarget:(nullable id)target action:(nullable SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent;
 
 @end

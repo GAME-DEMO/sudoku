@@ -8,13 +8,14 @@
 
 #import "SudokuButton.h"
 
+static NSString * const SudokuSELTarget = @"SudokuSELTarget";
+static NSString * const SudokuSELSelector = @"SudokuSELSelector";
+static NSString * const SudokuSELObject = @"SudokuSELObject";
+
 @interface SudokuButton ()
 
 @property (nonatomic, strong) SKLabelNode *buttonLabel;
 
-@property (nonatomic, assign) BOOL buttonPressedDown;
-
-// ButtonEvent -> SELArray
 @property (nonatomic, strong) NSMutableDictionary *buttonEventDictionary;
 
 @end
@@ -40,57 +41,84 @@
     
     _buttonEventDictionary = [NSMutableDictionary dictionary];
     for (NSUInteger i = SudokuButtonEventTouchDown; i < SudokuButtonEventAll; ++i) {
-        [_buttonEventDictionary setObject:[NSMutableDictionary dictionary] forKey:@(i)];
+        [_buttonEventDictionary setObject:[NSMutableArray array] forKey:@(i)];
     }
 }
 
-- (void)addTarget:(nullable id)target action:(_Nonnull SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent {
-    NSMutableArray *SELArray = [_buttonEventDictionary objectForKey:@(buttonEvent)];
-    if (!SELArray) {
-        SELArray = [NSMutableArray array];
-        [_buttonEventDictionary setObject:SELArray forKey:target];
+- (void)addTarget:(nullable id)target action:(_Nonnull SEL)action withObject:(nullable id)object forButtonEvent:(SudokuButtonEvent)buttonEvent {
+    NSMutableArray *SELArray = [self.buttonEventDictionary objectForKey:@(buttonEvent)];
+    NSMutableDictionary *SELDict = [NSMutableDictionary dictionary];
+    [SELDict setObject:target forKey:SudokuSELTarget];
+    [SELDict setObject:[NSValue valueWithPointer:action] forKey:SudokuSELSelector];
+    if (object) {
+        [SELDict setObject:object forKey:SudokuSELObject];
     }
-    
-    NSInvocation *invocation = [[NSInvocation alloc] init];
-    invocation.target = target;
-    invocation.selector = action;
-    [SELArray addObject:invocation];
+    [SELArray addObject:SELDict];
 }
 
 - (void)removeTarget:(nullable id)target action:(nullable SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent {
-    NSMutableArray *SELArray = [_buttonEventDictionary objectForKey:@(buttonEvent)];
-    for (NSInteger i = SELArray.count - 1; i >= 0; --i) {
-        NSInvocation *invocation = [SELArray objectAtIndex:i];
-        if (invocation.target == target && (invocation.selector == action || action == nil)) {
-            [SELArray removeObjectAtIndex:i];
+    if (buttonEvent == SudokuButtonEventAll) {
+        for (NSUInteger i = SudokuButtonEventTouchDown; i < SudokuButtonEventAll; ++i) {
+            [self removeTarget:target action:action forButtonEvent:i];
+        }
+        return;
+    }
+    
+    NSMutableArray *SELArray = [self.buttonEventDictionary objectForKey:@(buttonEvent)];
+    if (action != nil) {
+        for (NSInteger i = SELArray.count - 1; i >= 0; --i) {
+            NSDictionary *SELDict = [SELArray objectAtIndex:i];
+            if ([SELDict objectForKey:SudokuSELTarget] == target &&
+                [[SELDict objectForKey:SudokuSELSelector] pointerValue] == action) {
+                [SELArray removeObjectAtIndex:i];
+                return;
+            }
+        }
+    } else {
+        for (NSInteger i = SELArray.count - 1; i >= 0; --i) {
+            NSDictionary *SELDict = [SELArray objectAtIndex:i];
+            if ([SELDict objectForKey:SudokuSELTarget] == target) {
+                [SELArray removeObjectAtIndex:i];
+            }
         }
     }
 }
 
 - (void)invokeForButtonEvent:(SudokuButtonEvent)buttonEvent {
-    NSArray *SELArray = [_buttonEventDictionary objectForKey:@(buttonEvent)];
+    NSMutableArray *SELArray = [self.buttonEventDictionary objectForKey:@(buttonEvent)];
     for (int i = 0; i < SELArray.count; ++i) {
-        NSInvocation *invocation = [SELArray objectAtIndex:i];
-        [invocation setArgument:(__bridge void * _Nonnull)(self) atIndex:3];
-        [invocation invoke];
+        NSDictionary *SELDict = [SELArray objectAtIndex:i];
+        id target = [SELDict objectForKey:SudokuSELTarget];
+        SEL selector = [[SELDict objectForKey:SudokuSELSelector] pointerValue];
+        id object = [SELDict objectForKey:SudokuSELObject];
+        IMP implementation = [target methodForSelector:selector];
+        if (object) {
+            void (*func)(id, SEL, id) = (void *)implementation;
+            func(target, selector, object);
+        } else {
+            void (*func)(id, SEL) = (void *)implementation;
+            func(target, selector);
+        }
     }
 }
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    self.buttonPressedDown = YES;
-    
+    [super touchesBegan:touches withEvent:event];
+    [self invokeForButtonEvent:SudokuButtonEventTouchDown];
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    
+    [super touchesMoved:touches withEvent:event];
 }
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    
+    [super touchesEnded:touches withEvent:event];
+    [self invokeForButtonEvent:SudokuButtonEventTouchUp];
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
-    
+    [super touchesCancelled:touches withEvent:event];
+    [self invokeForButtonEvent:SudokuButtonEventTouchCancel];
 }
 
 @end
