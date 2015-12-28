@@ -28,7 +28,7 @@
  |                                    |  |
  |                                   120 |
  |                                    |  |
- |                Tail View           |  |
+ |                Foot View           |  |
  |                                    |  |
  |                                    |  |
  |                                    |  |
@@ -43,7 +43,7 @@
 #import "SudokuBodyContentNode.h"
 
 static const NSInteger HeadNodeHeight = 64;
-static const NSInteger TailNodeHeight = 120;
+static const NSInteger FootNodeHeight = 120;
 
 @interface GameScene ()
 
@@ -54,7 +54,7 @@ static const NSInteger TailNodeHeight = 120;
 @property (nonatomic, strong) SudokuHeadContentNode *headContentNode;
 @property (nonatomic, strong) SKSpriteNode *bodyNode;
 @property (nonatomic, strong) SudokuBodyContentNode *bodyContentNode;
-@property (nonatomic, strong) SKSpriteNode *tailNode;
+@property (nonatomic, strong) SKSpriteNode *footNode;
 
 
 @end
@@ -82,8 +82,8 @@ static const NSInteger TailNodeHeight = 120;
     _headContentNode = [SudokuHeadContentNode node];
     [_headNode addChild:_headContentNode];
     
-    _tailNode = [SKSpriteNode node];
-    [self addChild:_tailNode];
+    _footNode = [SKSpriteNode node];
+    [self addChild:_footNode];
     
     _bodyNode = [SKSpriteNode node];
     [self addChild:_bodyNode];
@@ -112,13 +112,13 @@ static const NSInteger TailNodeHeight = 120;
     self.headContentNode.position = CGPointMake(0, 0);
     self.headContentNode.size = self.headNode.size;
 
-    self.tailNode.anchorPoint = CGPointMake(0, 0);
-    self.tailNode.position = CGPointMake(0, 0);
-    self.tailNode.size = CGSizeMake(self.size.width, TailNodeHeight);
+    self.footNode.anchorPoint = CGPointMake(0, 0);
+    self.footNode.position = CGPointMake(0, 0);
+    self.footNode.size = CGSizeMake(self.size.width, FootNodeHeight);
     
     self.bodyNode.anchorPoint = CGPointMake(0, 0);
-    self.bodyNode.position = CGPointMake(0, TailNodeHeight);
-    self.bodyNode.size = CGSizeMake(self.size.width, self.size.height - HeadNodeHeight - TailNodeHeight);
+    self.bodyNode.position = CGPointMake(0, FootNodeHeight);
+    self.bodyNode.size = CGSizeMake(self.size.width, self.size.height - HeadNodeHeight - FootNodeHeight);
     
     CGFloat cubeAreaSideLength = MIN(self.bodyNode.size.width, self.bodyNode.size.height);
     CGFloat cubeAreaBottomMargin = (self.bodyNode.size.height - cubeAreaSideLength) / 2.0;

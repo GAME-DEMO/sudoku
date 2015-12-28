@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		AA2484A71C2E996E00444B90 /* SudokuHeadContentNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2484A61C2E996E00444B90 /* SudokuHeadContentNode.m */; };
 		AA2484AA1C2E9C5800444B90 /* SudokuButton.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2484A91C2E9C5800444B90 /* SudokuButton.m */; };
+		AA2EC0CA1C31A54D0073F7C5 /* SudokuFootContentNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2EC0C91C31A54D0073F7C5 /* SudokuFootContentNode.m */; };
 		AA3663D91C0E86AC00F9513C /* Game.atlas in Resources */ = {isa = PBXBuildFile; fileRef = AA3663D81C0E86AC00F9513C /* Game.atlas */; };
 		AA5B41D61C0090A1002B6730 /* Presenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA5B41D51C0090A1002B6730 /* Presenter.mm */; };
 		AA5D272D1C2702910069C7DC /* SudokuBodyContentNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AA5D272C1C2702900069C7DC /* SudokuBodyContentNode.m */; };
@@ -32,6 +33,8 @@
 		AA2484A61C2E996E00444B90 /* SudokuHeadContentNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SudokuHeadContentNode.m; sourceTree = "<group>"; };
 		AA2484A81C2E9C5800444B90 /* SudokuButton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SudokuButton.h; sourceTree = "<group>"; };
 		AA2484A91C2E9C5800444B90 /* SudokuButton.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SudokuButton.m; sourceTree = "<group>"; };
+		AA2EC0C81C31A54D0073F7C5 /* SudokuFootContentNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SudokuFootContentNode.h; sourceTree = "<group>"; };
+		AA2EC0C91C31A54D0073F7C5 /* SudokuFootContentNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SudokuFootContentNode.m; sourceTree = "<group>"; };
 		AA3663D81C0E86AC00F9513C /* Game.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = Game.atlas; sourceTree = "<group>"; };
 		AA5B41D41C0090A1002B6730 /* Presenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Presenter.h; sourceTree = "<group>"; };
 		AA5B41D51C0090A1002B6730 /* Presenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Presenter.mm; sourceTree = "<group>"; };
@@ -106,6 +109,8 @@
 				AACE956F1C1DCB6200DC15E8 /* SudokuCubeNode.m */,
 				AA5D272B1C2702900069C7DC /* SudokuBodyContentNode.h */,
 				AA5D272C1C2702900069C7DC /* SudokuBodyContentNode.m */,
+				AA2EC0C81C31A54D0073F7C5 /* SudokuFootContentNode.h */,
+				AA2EC0C91C31A54D0073F7C5 /* SudokuFootContentNode.m */,
 				AA6924BE1BFA3EE8006CED46 /* GameScene.h */,
 				AA6924BF1BFA3EE8006CED46 /* GameScene.m */,
 				AA6924C31BFA3EE8006CED46 /* GameViewController.h */,
@@ -209,6 +214,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AA2EC0CA1C31A54D0073F7C5 /* SudokuFootContentNode.m in Sources */,
 				AA6924C51BFA3EE8006CED46 /* GameViewController.m in Sources */,
 				AA6924BD1BFA3EE8006CED46 /* AppDelegate.m in Sources */,
 				AA2484A71C2E996E00444B90 /* SudokuHeadContentNode.m in Sources */,

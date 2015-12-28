@@ -40,7 +40,7 @@
     _backButton.normalTexture = backButtonTexture;
     _backButton.texture = backButtonTexture;
     _backButton.anchorPoint = CGPointMake(0, 0);
-    _backButton.position = CGPointMake(0, 0);
+    _backButton.position = CGPointMake(12, 0);
     [_backButton addTarget:self action:@selector(returnButtonDidTouchUp) withObject:nil forButtonEvent:SudokuButtonEventTouchUp];
     [self addChild:_backButton];
 }
@@ -51,7 +51,7 @@
 }
 
 - (void)reloadLayout {
-    CGFloat backButtonHeight = self.size.height * 1.0 / 4.0;
+    CGFloat backButtonHeight = self.size.height * 1.0 / 3.0;
     CGFloat backButtonWidth = self.backButton.texture.size.width / self.backButton.texture.size.height * backButtonHeight;
     self.backButton.size = CGSizeMake(backButtonWidth, backButtonHeight);
 
