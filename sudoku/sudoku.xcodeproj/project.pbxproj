@@ -99,10 +99,10 @@
 			children = (
 				AAE4548E1BFFAE630089D442 /* Algorithm.h */,
 				AA6924D61BFA40BC006CED46 /* Algorithm.mm */,
-				AA2484A81C2E9C5800444B90 /* SudokuButton.h */,
-				AA2484A91C2E9C5800444B90 /* SudokuButton.m */,
 				AA5B41D41C0090A1002B6730 /* Presenter.h */,
 				AA5B41D51C0090A1002B6730 /* Presenter.mm */,
+				AA2484A81C2E9C5800444B90 /* SudokuButton.h */,
+				AA2484A91C2E9C5800444B90 /* SudokuButton.m */,
 				AA2484A51C2E996E00444B90 /* SudokuHeadContentNode.h */,
 				AA2484A61C2E996E00444B90 /* SudokuHeadContentNode.m */,
 				AACE956E1C1DCB6200DC15E8 /* SudokuCubeNode.h */,

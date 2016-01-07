@@ -43,7 +43,7 @@
 #import "SudokuBodyContentNode.h"
 
 static const NSInteger HeadNodeHeight = 64;
-static const NSInteger FootNodeHeight = 120;
+static const CGFloat FootNodeHeightPercent = 1.0 - 0.618;
 
 @interface GameScene ()
 
@@ -114,11 +114,11 @@ static const NSInteger FootNodeHeight = 120;
 
     self.footNode.anchorPoint = CGPointMake(0, 0);
     self.footNode.position = CGPointMake(0, 0);
-    self.footNode.size = CGSizeMake(self.size.width, FootNodeHeight);
+    self.footNode.size = CGSizeMake(self.size.width, self.size.height * FootNodeHeightPercent);
     
     self.bodyNode.anchorPoint = CGPointMake(0, 0);
-    self.bodyNode.position = CGPointMake(0, FootNodeHeight);
-    self.bodyNode.size = CGSizeMake(self.size.width, self.size.height - HeadNodeHeight - FootNodeHeight);
+    self.bodyNode.position = CGPointMake(0, self.footNode.size.height);
+    self.bodyNode.size = CGSizeMake(self.size.width, self.size.height - self.headNode.size.height - self.footNode.size.height);
     
     CGFloat cubeAreaSideLength = MIN(self.bodyNode.size.width, self.bodyNode.size.height);
     CGFloat cubeAreaBottomMargin = (self.bodyNode.size.height - cubeAreaSideLength) / 2.0;
