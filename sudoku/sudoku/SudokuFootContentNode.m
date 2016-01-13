@@ -13,6 +13,9 @@
 @interface SudokuFootContentNode ()
 
 @property (nonatomic, strong) NSMutableArray<SudokuButton *> *numberButtonArray;
+@property (nonatomic, assign) int buttonCountForCol;
+@property (nonatomic, assign) int buttonCountForRow;
+@property (nonatomic, assign) CGFloat buttonSideLength;
 
 @end
 
@@ -46,8 +49,14 @@
 }
 
 - (void)reloadLayout {
-    CGFloat buttonsPerCol = sqrtf(((CGFloat)[Presenter sharedInstance].dimension) * (self.size.height * 0.8) / self.size.width);
-    
+    CGFloat spaceDelta = 4.0;
+    CGFloat buttonCount = [Presenter sharedInstance].dimension + 1;
+    CGFloat height = self.size.height - spaceDelta * 2.0;
+    CGFloat width = self.size.width - spaceDelta * 2.0;
+    CGFloat buttonCountForCol = sqrtf(buttonCount * height / width);
+    self.buttonCountForCol = ceil(buttonCountForCol);
+    self.buttonSideLength = height / self.buttonCountForCol;
+    self.buttonCountForRow = ceil(buttonCount / self.buttonCountForCol);
 }
 
 @end
