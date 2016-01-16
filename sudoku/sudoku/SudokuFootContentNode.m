@@ -13,8 +13,9 @@
 @interface SudokuFootContentNode ()
 
 @property (nonatomic, strong) NSMutableArray<SudokuButton *> *numberButtonArray;
-@property (nonatomic, assign) int buttonCountForCol;
-@property (nonatomic, assign) int buttonCountForRow;
+@property (nonatomic, strong) SudokuButton *switchButton;
+@property (nonatomic, assign) CGFloat buttonCountForCol;
+@property (nonatomic, assign) CGFloat buttonCountForRow;
 @property (nonatomic, assign) CGFloat buttonSideLength;
 
 @end
@@ -41,6 +42,11 @@
         SudokuButton *button = [[SudokuButton alloc] init];
         [_numberButtonArray addObject:button];
     }
+    
+    if ([Presenter sharedInstance].dimension == DIMENSION_LEVEL_NINE) {
+        self.buttonCountForCol = 2.0;
+        self.buttonCountForRow = 5.0;
+    }
 }
 
 - (void)setSize:(CGSize)size {
@@ -49,14 +55,12 @@
 }
 
 - (void)reloadLayout {
-    CGFloat spaceDelta = 4.0;
-    CGFloat buttonCount = [Presenter sharedInstance].dimension + 1;
-    CGFloat height = self.size.height - spaceDelta * 2.0;
-    CGFloat width = self.size.width - spaceDelta * 2.0;
-    CGFloat buttonCountForCol = sqrtf(buttonCount * height / width);
-    self.buttonCountForCol = ceil(buttonCountForCol);
-    self.buttonSideLength = height / self.buttonCountForCol;
-    self.buttonCountForRow = ceil(buttonCount / self.buttonCountForCol);
+    if ([Presenter sharedInstance].dimension == DIMENSION_LEVEL_NINE) {
+        CGFloat height = self.size.height * 2.0 / 3.0;
+        CGFloat width = self.size.width;
+        CGFloat sideLength = MIN(width / self.buttonCountForRow, height / self.buttonCountForCol);
+        self.buttonSideLength = sideLength - 4.0;
+    }
 }
 
 @end

@@ -18,6 +18,10 @@ typedef NS_ENUM(NSUInteger, DIFFICULT_LEVEL) {
     DIFFICULT_LEVEL_EXTRE_HARD,     // 54 ~ 58 Empty Cells
 };
 
+typedef NS_ENUM(NSUInteger, DIMENSION_LEVEL) {
+    DIMENSION_LEVEL_NINE = 9,
+};
+
 @class SudokuCubeNode;
 
 @interface Presenter : NSObject
