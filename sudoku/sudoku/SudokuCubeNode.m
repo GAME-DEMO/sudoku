@@ -118,7 +118,7 @@
         _value = value;
         
         if (self.value != 0) {
-            SKTexture *valueTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", self.value]];
+            SKTexture *valueTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d.png", self.value]];
             [self.valueSpriteNode setTexture:valueTexture];
         }
     }
@@ -131,7 +131,7 @@
     int index = guess - 1;
     [self.guessArray setObject:@(guess) atIndexedSubscript:index];
     
-    SKTexture *guessTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d@2x.png", [[self.guessArray objectAtIndex:index] intValue]]];
+    SKTexture *guessTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"s%d.png", [[self.guessArray objectAtIndex:index] intValue]]];
     SKSpriteNode *guessSpriteNode = [self.guessSpriteNodeArray objectAtIndex:index];
     [guessSpriteNode setTexture:guessTexture];
 }

@@ -12,6 +12,8 @@
 
 @interface SudokuBodyContentNode ()
 
+@property (nonatomic, strong) SKSpriteNode *backgroundFrameSprite;
+
 @property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
 @property (nonatomic, strong) SudokuCubeNode *currentSelectedCube;
@@ -46,6 +48,11 @@
         [cubes addObject:cube];
     }
     _cubeArray = [NSArray arrayWithArray:cubes];
+    
+    _backgroundFrameSprite = [[SKSpriteNode alloc] initWithImageNamed:@"background_frame.png"];
+    _backgroundFrameSprite.centerRect = CGRectMake(200 / 600, 200 / 600, 200 / 600, 122 / 522);
+//    self.backgroundFrameSprite.anchorPoint = CGPointMake(0, 0);
+//    [self addChild:_backgroundFrameSprite];
 }
 
 - (void)setSize:(CGSize)size {
@@ -60,13 +67,15 @@
         cube.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength,
                                     [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength);
         if ([[Presenter sharedInstance] groupIndexFromCubeIndex:i] % 2 == 0) {
-            cube.backgroundTextureName = @"cube_white@2x.png";
+            cube.backgroundTextureName = @"cube_white.png";
         } else {
-            cube.backgroundTextureName = @"cube_gray@2x.png";
+            cube.backgroundTextureName = @"cube_gray.png";
         }
-        cube.selectedTextureName = @"cube_red@2x.png";
+        cube.selectedTextureName = @"cube_red.png";
         cube.size = CGSizeMake(cubeSideLength, cubeSideLength);
     }
+
+//    self.backgroundFrameSprite.size = self.size;
 }
 
 // 一维上点到线段的距离，线段用一个数组表示，[0]表示左点坐标，[1]表示右点坐标

@@ -37,6 +37,8 @@
 }
 
 - (void)initialize {
+    self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"background_below.png"];
+    
     _numberButtonArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
         SudokuButton *button = [[SudokuButton alloc] init];

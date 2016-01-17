@@ -104,6 +104,7 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
+    self.texture = self.buttonHighlightTexture;
     [self invokeForButtonEvent:SudokuButtonEventTouchDown];
 }
 
@@ -113,12 +114,31 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
-    [self invokeForButtonEvent:SudokuButtonEventTouchUp];
+    self.texture = self.buttonNormalTexture;
+    for (UITouch *touch in touches) {
+        if (CGRectContainsPoint(CGRectMake(0, 0, self.size.width, self.size.height), [touch locationInNode:self])) {
+            [self invokeForButtonEvent:SudokuButtonEventTouchUpInside];
+            return;
+        }
+    }
+    [self invokeForButtonEvent:SudokuButtonEventTouchUpOutside];
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
+    self.texture = self.buttonNormalTexture;
     [self invokeForButtonEvent:SudokuButtonEventTouchCancel];
+}
+
+- (void)setButtonNormalTexture:(SKTexture *)buttonNormalTexture {
+    _buttonNormalTexture = buttonNormalTexture;
+    if (self.texture == nil) {
+        self.texture = buttonNormalTexture;
+    }
+}
+
+- (void)setButtonHighlightTexture:(SKTexture *)buttonHighlightTexture {
+    _buttonHighlightTexture = buttonHighlightTexture;
 }
 
 @end

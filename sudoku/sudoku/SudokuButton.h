@@ -10,7 +10,8 @@
 
 typedef NS_ENUM(NSUInteger, SudokuButtonEvent) {
     SudokuButtonEventTouchDown,
-    SudokuButtonEventTouchUp,
+    SudokuButtonEventTouchUpInside,
+    SudokuButtonEventTouchUpOutside,
     SudokuButtonEventTouchCancel,
     SudokuButtonEventAll,
 };
@@ -22,7 +23,7 @@ typedef NS_ENUM(NSUInteger, SudokuButtonEvent) {
 
 // UIControl
 @property (nonatomic, strong, nullable) SKTexture *buttonNormalTexture;
-@property (nonatomic, strong, nullable) SKTexture *buttonHighlightedTexture;
+@property (nonatomic, strong, nullable) SKTexture *buttonHighlightTexture;
 @property (nonatomic, readonly, nullable) SKLabelNode *buttonLabel;
 
 - (void)addTarget:(nullable id)target action:(_Nonnull SEL)action withObject:(nullable id)object forButtonEvent:(SudokuButtonEvent)buttonEvent;

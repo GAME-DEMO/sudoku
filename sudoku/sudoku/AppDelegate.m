@@ -18,6 +18,7 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
     // Override point for customization after application launch.
+    [[UIApplication sharedApplication] setStatusBarStyle:UIStatusBarStyleLightContent];
     NSArray * results = [[Presenter sharedInstance] randomResultForLevel:DIFFICULT_LEVEL_HARD];
     NSLog(@"%@", results);
     return YES;
