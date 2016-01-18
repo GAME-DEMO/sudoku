@@ -28,6 +28,8 @@
 
 @interface SudokuCubeNode ()
 
+@property (nonatomic, assign) BOOL initialized;
+
 @property (nonatomic, strong) SKSpriteNode *valueSpriteNode;
 @property (nonatomic, strong) SKSpriteNode *guessUnionInSpriteNode;
 @property (nonatomic, strong) NSMutableArray<SKSpriteNode *> *guessSpriteNodeArray;
@@ -80,13 +82,21 @@
         [_guessUnionInSpriteNode addChild:guessSpriteNode];
         [_guessSpriteNodeArray addObject:guessSpriteNode];
     }
+    
+    _initialized = YES;
 }
 
 - (void)setSize:(CGSize)size {
     [super setSize:size];
-    
-    self.valueSpriteNode.size = size;
-    self.guessUnionInSpriteNode.size = size;
+    [self reloadLayout];
+}
+
+- (void)reloadLayout {
+    if (!self.initialized) {
+        return;
+    }
+    self.valueSpriteNode.size = self.size;
+    self.guessUnionInSpriteNode.size = self.size;
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
         SKSpriteNode *guessSpriteNode = [self.guessSpriteNodeArray objectAtIndex:i];
         guessSpriteNode.position = [self positionForGuess:i];

@@ -12,8 +12,10 @@
 
 @interface SudokuBodyContentNode ()
 
-@property (nonatomic, strong) SKSpriteNode *backgroundFrameSprite;
+@property (nonatomic, assign) BOOL initialized;
 
+@property (nonatomic, strong) SKShapeNode *backgroundNode;
+@property (nonatomic, strong) SKSpriteNode *backgroundFrameSprite;
 @property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
 @property (nonatomic, strong) SudokuCubeNode *currentSelectedCube;
@@ -39,11 +41,19 @@
 - (void)initialize {
     self.userInteractionEnabled = YES;
     
+    _backgroundNode = [SKShapeNode node];
+    SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_body_content_background.fsh"];
+    _backgroundNode.fillShader = backgroundShapeShader;
+    _backgroundNode.lineWidth = 0;
+    _backgroundNode.zPosition = 0;
+    [self addChild:_backgroundNode];
+    
     NSMutableArray *cubes = [NSMutableArray array];
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
         SudokuCubeNode *cube = [SudokuCubeNode node];
         cube.index = i;
         cube.anchorPoint = CGPointMake(0, 0);
+        cube.zPosition = 2;
         [self addChild:cube];
         [cubes addObject:cube];
     }
@@ -53,6 +63,8 @@
     _backgroundFrameSprite.centerRect = CGRectMake(200 / 600, 200 / 600, 200 / 600, 122 / 522);
 //    self.backgroundFrameSprite.anchorPoint = CGPointMake(0, 0);
 //    [self addChild:_backgroundFrameSprite];
+
+    _initialized = YES;
 }
 
 - (void)setSize:(CGSize)size {
@@ -61,6 +73,12 @@
 }
 
 - (void)reloadLayout {
+    if (!self.initialized) {
+        return;
+    }
+    
+    self.backgroundNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height), nil);
+    
     CGFloat cubeSideLength = self.size.width / ((CGFloat)[Presenter sharedInstance].dimension);
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
         SudokuCubeNode *cube = [self.cubeArray objectAtIndex:i];

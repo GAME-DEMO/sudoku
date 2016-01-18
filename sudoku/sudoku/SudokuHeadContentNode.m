@@ -12,6 +12,8 @@
 
 @interface SudokuHeadContentNode ()
 
+@property (nonatomic, assign) BOOL initialized;
+
 @property (nonatomic, strong) SudokuButton *backButton;
 @property (nonatomic, strong) SudokuButton *setButton;
 @property (nonatomic, strong) SKLabelNode *titleLabel;
@@ -48,6 +50,8 @@
     _setButton.buttonNormalTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_set.png"];
     _setButton.buttonHighlightTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_set_highlight.png"];
     [self addChild:_setButton];
+    
+    _initialized = YES;
 }
 
 - (void)setSize:(CGSize)size {
@@ -56,6 +60,10 @@
 }
 
 - (void)reloadLayout {
+    if (!self.initialized) {
+        return;
+    }
+    
     CGFloat buttonHeight = self.size.height - 20;
     CGFloat setButtonHeight = MIN(buttonHeight, self.setButton.buttonNormalTexture.size.height);
     CGFloat setButtonWidth = self.setButton.buttonNormalTexture.size.width / self.setButton.buttonNormalTexture.size.height * setButtonHeight;

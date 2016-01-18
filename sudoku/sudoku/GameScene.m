@@ -49,7 +49,6 @@ static const NSInteger HeadNodeHeight = 64;
 
 @property (nonatomic, assign) BOOL initialized;
 
-@property (nonatomic, strong) SKShapeNode *backgroundNode;
 @property (nonatomic, strong) SKSpriteNode *headNode;
 @property (nonatomic, strong) SudokuHeadContentNode *headContentNode;
 @property (nonatomic, strong) SKSpriteNode *bodyNode;
@@ -70,12 +69,6 @@ static const NSInteger HeadNodeHeight = 64;
 }
 
 - (void)initialize {
-    _backgroundNode = [SKShapeNode node];
-    SKShader *backgroundShapeShader = [SKShader shaderWithFileNamed:@"shader_game_scene_background.fsh"];
-    _backgroundNode.fillShader = backgroundShapeShader;
-    _backgroundNode.lineWidth = 0;
-    [self addChild:_backgroundNode];
-    
     _headNode = [SKSpriteNode node];
     [self addChild:_headNode];
     
@@ -105,8 +98,6 @@ static const NSInteger HeadNodeHeight = 64;
 }
 
 - (void)reloadLayout {
-    self.backgroundNode.path = CGPathCreateWithRect(CGRectMake(0, 0, self.size.width, self.size.height), nil);
-    
     self.headNode.anchorPoint = CGPointMake(0, 0);
     self.headNode.position = CGPointMake(0, self.size.height - HeadNodeHeight);
     self.headNode.size = CGSizeMake(self.size.width, HeadNodeHeight);

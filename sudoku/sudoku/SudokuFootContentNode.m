@@ -12,6 +12,8 @@
 
 @interface SudokuFootContentNode ()
 
+@property (nonatomic, assign) BOOL initialized;
+
 @property (nonatomic, strong) NSMutableArray<SudokuButton *> *numberButtonArray;
 @property (nonatomic, strong) SudokuButton *switchButton;
 @property (nonatomic, assign) CGFloat buttonCountForCol;
@@ -49,6 +51,8 @@
         self.buttonCountForCol = 2.0;
         self.buttonCountForRow = 5.0;
     }
+    
+    _initialized = YES;
 }
 
 - (void)setSize:(CGSize)size {
@@ -57,6 +61,10 @@
 }
 
 - (void)reloadLayout {
+    if (!self.initialized) {
+        return;
+    }
+    
     if ([Presenter sharedInstance].dimension == DIMENSION_LEVEL_NINE) {
         CGFloat height = self.size.height * 2.0 / 3.0;
         CGFloat width = self.size.width;
