@@ -104,11 +104,6 @@
     }
 }
 
-- (void)setBackgroundTextureName:(NSString *)textureName {
-    _backgroundTextureName = [textureName copy];
-    [self updateCubeNodeTexture];
-}
-
 - (void)setSelected:(BOOL)selected {
     _selected = selected;
     [self updateCubeNodeTexture];
@@ -116,11 +111,7 @@
 }
 
 - (void)updateCubeNodeTexture {
-    if (self.selected) {
-        self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:self.selectedTextureName];
-    } else {
-        self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:self.backgroundTextureName];
-    }
+
 }
 
 - (void)setValue:(int)value {

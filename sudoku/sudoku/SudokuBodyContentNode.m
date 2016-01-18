@@ -15,6 +15,7 @@
 @property (nonatomic, assign) BOOL initialized;
 
 @property (nonatomic, strong) SKShapeNode *backgroundNode;
+@property (nonatomic, strong) NSArray<SKSpriteNode *> *backgroundChipArray;
 @property (nonatomic, strong) SKSpriteNode *backgroundFrameSprite;
 @property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
@@ -49,7 +50,14 @@
     [self addChild:_backgroundNode];
     
     NSMutableArray *cubes = [NSMutableArray array];
+    NSMutableArray *chips = [NSMutableArray array];
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
+        SKSpriteNode *chip = [SKSpriteNode spriteNodeWithImageNamed:@"background_wave.png"];
+        chip.anchorPoint = CGPointMake(0, 0);
+        chip.zPosition = 1;
+        [self addChild:chip];
+        [chips addObject:chip];
+        
         SudokuCubeNode *cube = [SudokuCubeNode node];
         cube.index = i;
         cube.anchorPoint = CGPointMake(0, 0);
@@ -58,6 +66,7 @@
         [cubes addObject:cube];
     }
     _cubeArray = [NSArray arrayWithArray:cubes];
+    _backgroundChipArray = [NSArray arrayWithArray:chips];
     
     _backgroundFrameSprite = [[SKSpriteNode alloc] initWithImageNamed:@"background_frame.png"];
     _backgroundFrameSprite.centerRect = CGRectMake(200 / 600, 200 / 600, 200 / 600, 122 / 522);
@@ -81,15 +90,14 @@
     
     CGFloat cubeSideLength = self.size.width / ((CGFloat)[Presenter sharedInstance].dimension);
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
+        SKSpriteNode *chip = [self.backgroundChipArray objectAtIndex:i];
+        chip.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength,
+                                    [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength);
+        chip.size = CGSizeMake(cubeSideLength, cubeSideLength);
+        
         SudokuCubeNode *cube = [self.cubeArray objectAtIndex:i];
         cube.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength,
                                     [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength);
-        if ([[Presenter sharedInstance] groupIndexFromCubeIndex:i] % 2 == 0) {
-            cube.backgroundTextureName = @"cube_white.png";
-        } else {
-            cube.backgroundTextureName = @"cube_gray.png";
-        }
-        cube.selectedTextureName = @"cube_red.png";
         cube.size = CGSizeMake(cubeSideLength, cubeSideLength);
     }
 
