@@ -16,6 +16,7 @@
 
 @property (nonatomic, strong) SKShapeNode *backgroundNode;
 @property (nonatomic, strong) NSArray<SKSpriteNode *> *backgroundChipArray;
+@property (nonatomic, strong) NSArray<SKSpriteNode *> *backgroundLineArray;
 @property (nonatomic, strong) SKSpriteNode *backgroundFrameSprite;
 @property (nonatomic, strong) NSArray<SudokuCubeNode *> *cubeArray;
 
@@ -68,6 +69,27 @@
     _cubeArray = [NSArray arrayWithArray:cubes];
     _backgroundChipArray = [NSArray arrayWithArray:chips];
     
+    NSMutableArray *lines = [NSMutableArray array];
+    UIColor *lineColor = [UIColor colorWithRed:11.0 / 255.0 green:37.0 / 255.0 blue:65.0 / 255.0 alpha:1];
+    for (int i = 0; i < ([Presenter sharedInstance].dimension - 1); ++i) {
+        SKSpriteNode *line = [SKSpriteNode node];
+        line.anchorPoint = CGPointMake(0, 0.5);
+        line.zPosition = 1;
+        line.color = lineColor;
+        [lines addObject:line];
+        [self addChild:line];
+    }
+    
+    for (int i = 0; i < ([Presenter sharedInstance].dimension - 1); ++i) {
+        SKSpriteNode *line = [SKSpriteNode node];
+        line.anchorPoint = CGPointMake(0.5, 0);
+        line.zPosition = 1;
+        line.color = lineColor;
+        [lines addObject:line];
+        [self addChild:line];
+    }
+    _backgroundLineArray = [NSArray arrayWithArray:lines];
+    
     _backgroundFrameSprite = [[SKSpriteNode alloc] initWithImageNamed:@"background_frame.png"];
     _backgroundFrameSprite.centerRect = CGRectMake(200 / 600, 200 / 600, 200 / 600, 122 / 522);
 //    self.backgroundFrameSprite.anchorPoint = CGPointMake(0, 0);
@@ -99,6 +121,18 @@
         cube.position = CGPointMake([[Presenter sharedInstance] colFromCubeIndex:i] * cubeSideLength,
                                     [[Presenter sharedInstance] rowFromCubeIndx:i] * cubeSideLength);
         cube.size = CGSizeMake(cubeSideLength, cubeSideLength);
+    }
+    
+    for (int i = 0; i < ([Presenter sharedInstance].dimension - 1); ++i) {
+        SKSpriteNode *line = [self.backgroundLineArray objectAtIndex:i];
+        line.size = CGSizeMake(self.size.width, 1);
+        line.position = CGPointMake(0, cubeSideLength * (i + 1));
+    }
+    
+    for (int i = 0; i < ([Presenter sharedInstance].dimension - 1); ++i) {
+        SKSpriteNode *line = [self.backgroundLineArray objectAtIndex:i + ([Presenter sharedInstance].dimension - 1)];
+        line.size = CGSizeMake(1, self.size.height);
+        line.position = CGPointMake(cubeSideLength * (i + 1), 0);
     }
 
 //    self.backgroundFrameSprite.size = self.size;
