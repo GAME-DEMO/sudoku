@@ -91,8 +91,9 @@
     _backgroundLineArray = [NSArray arrayWithArray:lines];
     
     _backgroundFrameSprite = [[SKSpriteNode alloc] initWithImageNamed:@"background_frame.png"];
-    _backgroundFrameSprite.centerRect = CGRectMake(200 / 600, 200 / 600, 200 / 600, 122 / 522);
-//    self.backgroundFrameSprite.anchorPoint = CGPointMake(0, 0);
+    //_backgroundFrameSprite.centerRect = CGRectMake(200.0 / 590.0, 200.0 / 590.0, 200.0 / 590.0, 84.0 / 484.0);
+//    _backgroundFrameSprite.zPosition = 3;
+//    self.backgroundFrameSprite.anchorPoint = CGPointMake(0.5, 0.5);
 //    [self addChild:_backgroundFrameSprite];
 
     _initialized = YES;
@@ -135,7 +136,8 @@
         line.position = CGPointMake(cubeSideLength * (i + 1), 0);
     }
 
-//    self.backgroundFrameSprite.size = self.size;
+    self.backgroundFrameSprite.size = self.size;
+    self.backgroundFrameSprite.position = CGPointMake(self.size.width / 2.0, self.size.height / 2.0);
 }
 
 // 一维上点到线段的距离，线段用一个数组表示，[0]表示左点坐标，[1]表示右点坐标
