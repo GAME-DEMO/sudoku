@@ -12,7 +12,7 @@
 		AA278A701C4BE17F008C3DEC /* sample.png in Resources */ = {isa = PBXBuildFile; fileRef = AA278A6F1C4BE17F008C3DEC /* sample.png */; };
 		AA278A721C4C681A008C3DEC /* shader_body_content_background.fsh in Resources */ = {isa = PBXBuildFile; fileRef = AA278A711C4C681A008C3DEC /* shader_body_content_background.fsh */; };
 		AA2EC0CA1C31A54D0073F7C5 /* SudokuFootContentNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AA2EC0C91C31A54D0073F7C5 /* SudokuFootContentNode.m */; };
-		AA3663D91C0E86AC00F9513C /* Game.atlas in Resources */ = {isa = PBXBuildFile; fileRef = AA3663D81C0E86AC00F9513C /* Game.atlas */; };
+		AA329DCD1C4E9F660064EE44 /* Game@3x.atlas in Resources */ = {isa = PBXBuildFile; fileRef = AA329DCC1C4E9F660064EE44 /* Game@3x.atlas */; };
 		AA5B41D61C0090A1002B6730 /* Presenter.mm in Sources */ = {isa = PBXBuildFile; fileRef = AA5B41D51C0090A1002B6730 /* Presenter.mm */; };
 		AA5D272D1C2702910069C7DC /* SudokuBodyContentNode.m in Sources */ = {isa = PBXBuildFile; fileRef = AA5D272C1C2702900069C7DC /* SudokuBodyContentNode.m */; };
 		AA6924BA1BFA3EE8006CED46 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = AA6924B91BFA3EE8006CED46 /* main.m */; };
@@ -38,7 +38,7 @@
 		AA278A711C4C681A008C3DEC /* shader_body_content_background.fsh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.glsl; path = shader_body_content_background.fsh; sourceTree = "<group>"; };
 		AA2EC0C81C31A54D0073F7C5 /* SudokuFootContentNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SudokuFootContentNode.h; sourceTree = "<group>"; };
 		AA2EC0C91C31A54D0073F7C5 /* SudokuFootContentNode.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = SudokuFootContentNode.m; sourceTree = "<group>"; };
-		AA3663D81C0E86AC00F9513C /* Game.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = Game.atlas; sourceTree = "<group>"; };
+		AA329DCC1C4E9F660064EE44 /* Game@3x.atlas */ = {isa = PBXFileReference; lastKnownFileType = folder.skatlas; path = "Game@3x.atlas"; sourceTree = "<group>"; };
 		AA5B41D41C0090A1002B6730 /* Presenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Presenter.h; sourceTree = "<group>"; };
 		AA5B41D51C0090A1002B6730 /* Presenter.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = Presenter.mm; sourceTree = "<group>"; };
 		AA5B41D71C0093D4002B6730 /* readme.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = readme.h; sourceTree = "<group>"; };
@@ -128,7 +128,7 @@
 				AA6924CE1BFA3EE8006CED46 /* Info.plist */,
 				AA6924BB1BFA3EE8006CED46 /* AppDelegate.h */,
 				AA6924BC1BFA3EE8006CED46 /* AppDelegate.m */,
-				AA3663D81C0E86AC00F9513C /* Game.atlas */,
+				AA329DCC1C4E9F660064EE44 /* Game@3x.atlas */,
 				AA6924B81BFA3EE8006CED46 /* Supporting Files */,
 			);
 			path = sudoku;
@@ -204,12 +204,12 @@
 			files = (
 				AAE3C3941C198B2100FF500F /* shader_game_scene_background.fsh in Resources */,
 				AAE3C3861C192E9900FF500F /* Localizable.strings in Resources */,
-				AA3663D91C0E86AC00F9513C /* Game.atlas in Resources */,
 				AA6924CD1BFA3EE8006CED46 /* LaunchScreen.storyboard in Resources */,
 				AA6924CA1BFA3EE8006CED46 /* Assets.xcassets in Resources */,
 				AA278A701C4BE17F008C3DEC /* sample.png in Resources */,
 				AA278A721C4C681A008C3DEC /* shader_body_content_background.fsh in Resources */,
 				AA6924C81BFA3EE8006CED46 /* Main.storyboard in Resources */,
+				AA329DCD1C4E9F660064EE44 /* Game@3x.atlas in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

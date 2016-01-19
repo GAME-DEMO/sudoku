@@ -30,7 +30,7 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game"];
+        self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game@3x"];
     }
     return self;
 }

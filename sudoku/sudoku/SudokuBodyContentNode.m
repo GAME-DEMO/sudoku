@@ -53,7 +53,7 @@
     NSMutableArray *cubes = [NSMutableArray array];
     NSMutableArray *chips = [NSMutableArray array];
     for (int i = 0; i < [Presenter sharedInstance].cubesCountForAll; ++i) {
-        SKSpriteNode *chip = [SKSpriteNode spriteNodeWithImageNamed:@"background_wave.png"];
+        SKSpriteNode *chip = [SKSpriteNode spriteNodeWithTexture:[[Presenter sharedInstance].gameTextureAtlas textureNamed:@"background_wave.png"]];
         chip.anchorPoint = CGPointMake(0, 0);
         chip.zPosition = 1;
         [self addChild:chip];
@@ -90,11 +90,11 @@
     }
     _backgroundLineArray = [NSArray arrayWithArray:lines];
     
-    _backgroundFrameSprite = [[SKSpriteNode alloc] initWithImageNamed:@"background_frame.png"];
-    //_backgroundFrameSprite.centerRect = CGRectMake(200.0 / 590.0, 200.0 / 590.0, 200.0 / 590.0, 84.0 / 484.0);
-//    _backgroundFrameSprite.zPosition = 3;
-//    self.backgroundFrameSprite.anchorPoint = CGPointMake(0.5, 0.5);
-//    [self addChild:_backgroundFrameSprite];
+    _backgroundFrameSprite = [[SKSpriteNode alloc] initWithTexture:[[Presenter sharedInstance].gameTextureAtlas textureNamed:@"background_frame.png"]];
+    _backgroundFrameSprite.centerRect = CGRectMake(1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0, 1.0 / 3.0);
+    _backgroundFrameSprite.zPosition = 3;
+    self.backgroundFrameSprite.anchorPoint = CGPointMake(0.5, 0.5);
+    [self addChild:_backgroundFrameSprite];
 
     _initialized = YES;
 }
