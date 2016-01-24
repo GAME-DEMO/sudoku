@@ -30,7 +30,9 @@
 
 - (instancetype)init {
     if (self = [super init]) {
-        self.gameTextureAtlas = [SKTextureAtlas atlasNamed:@"Game@3x"];
+        int scale = [UIScreen mainScreen].scale;
+        NSString *atlasName = [NSString stringWithFormat:@"Game@%dx", scale];
+        self.gameTextureAtlas = [SKTextureAtlas atlasNamed:atlasName];
     }
     return self;
 }
