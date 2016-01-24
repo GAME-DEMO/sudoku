@@ -60,6 +60,8 @@
         SudokuButton *button = [[SudokuButton alloc] init];
         [_numberButtonArray addObject:button];
     }
+    
+    _switchButton = [[SudokuButton alloc] init];
 
     _initialized = YES;
 }
@@ -93,16 +95,23 @@
         
         CGFloat sideLength = MIN(perWidth, perHeight);
         self.buttonSideLength = sideLength * 5.0 / 6.0;
-        for (int i = 0; i < self.numberButtonArray.count; ++i) {
+        for (int i = 0; i < self.numberButtonArray.count + 1; ++i) {
             SKSpriteNode *numberBackgroundNode = [self.numberBackgroundArray objectAtIndex:i];
-            SudokuButton *numberButton = [self.numberButtonArray objectAtIndex:i];
-            [numberBackgroundNode addChild:numberButton];
-            numberButton.anchorPoint = CGPointMake(0.5, 0);
-            numberButton.position = CGPointMake(numberBackgroundNode.size.width / 2.0, 0);
-            numberButton.size = CGSizeMake(self.buttonSideLength, self.buttonSideLength);
-            numberButton.buttonNormalTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number.png"];
-            numberButton.buttonHighlightTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number.png"];
+            SudokuButton *button = nil;
+            if (i < self.numberButtonArray.count) {
+                button = [self.numberButtonArray objectAtIndex:i];
+            } else {
+                button = _switchButton;
+            }
+            [numberBackgroundNode addChild:button];
+            button.anchorPoint = CGPointMake(0.5, 0);
+            button.position = CGPointMake(numberBackgroundNode.size.width / 2.0, 0);
+            button.size = CGSizeMake(self.buttonSideLength, self.buttonSideLength);
+            button.buttonNormalTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number.png"];
+            button.buttonHighlightTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number_highlight.png"];
         }
+        
+        
     }
 }
 
