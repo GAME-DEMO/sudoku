@@ -144,6 +144,14 @@
     return results;
 }
 
+#pragma mark - Helper functions
+
+- (UIColor *)randomColor {
+    static const CGFloat alphaBase = 10;
+    CGFloat alpha = arc4random() % (int)alphaBase;
+    return RGBA(arc4random() % 255, arc4random() % 255, arc4random() % 255, alpha / alphaBase);
+}
+
 #pragma mark - UI related
 
 + (UIInterfaceOrientation) appOrientation {

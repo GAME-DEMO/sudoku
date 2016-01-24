@@ -14,10 +14,11 @@
 
 @property (nonatomic, assign) BOOL initialized;
 
+@property (nonatomic, strong) NSMutableArray<SKSpriteNode *> *numberBackgroundArray;
 @property (nonatomic, strong) NSMutableArray<SudokuButton *> *numberButtonArray;
 @property (nonatomic, strong) SudokuButton *switchButton;
-@property (nonatomic, assign) CGFloat buttonCountForCol;
-@property (nonatomic, assign) CGFloat buttonCountForRow;
+@property (nonatomic, assign) int buttonCountForCol;
+@property (nonatomic, assign) int buttonCountForRow;
 @property (nonatomic, assign) CGFloat buttonSideLength;
 
 @end
@@ -41,17 +42,25 @@
 - (void)initialize {
     self.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"background_below.png"];
     
+    if ([Presenter sharedInstance].dimension == DIMENSION_LEVEL_NINE) {
+        self.buttonCountForCol = 2;
+        self.buttonCountForRow = 5;
+    }
+    
+    int allCubes = self.buttonCountForCol * self.buttonCountForRow;
+    _numberBackgroundArray = [NSMutableArray arrayWithCapacity:allCubes];
+    for (int i = 0; i < allCubes; ++i) {
+        SKSpriteNode *numberBackgroundNode = [SKSpriteNode node];
+        [_numberBackgroundArray addObject:numberBackgroundNode];
+        [self addChild:numberBackgroundNode];
+    }
+    
     _numberButtonArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
         SudokuButton *button = [[SudokuButton alloc] init];
         [_numberButtonArray addObject:button];
     }
-    
-    if ([Presenter sharedInstance].dimension == DIMENSION_LEVEL_NINE) {
-        self.buttonCountForCol = 2.0;
-        self.buttonCountForRow = 5.0;
-    }
-    
+
     _initialized = YES;
 }
 
@@ -67,9 +76,33 @@
     
     if ([Presenter sharedInstance].dimension == DIMENSION_LEVEL_NINE) {
         CGFloat height = self.size.height * 2.0 / 3.0;
+        CGFloat baseHeight = self.size.height - height;
         CGFloat width = self.size.width;
-        CGFloat sideLength = MIN(width / self.buttonCountForRow, height / self.buttonCountForCol);
-        self.buttonSideLength = sideLength - 4.0;
+        
+        CGFloat perHeight = height / self.buttonCountForCol;
+        CGFloat perWidth = width / self.buttonCountForRow;
+        
+        for (int i = 0; i < self.numberBackgroundArray.count; ++i) {
+            SKSpriteNode *numberBackgroundNode = [self.numberBackgroundArray objectAtIndex:i];
+            CGFloat col = i % self.buttonCountForRow;
+            CGFloat row = self.buttonCountForCol - 1 - i / self.buttonCountForRow;
+            numberBackgroundNode.anchorPoint = CGPointMake(0, 0);
+            numberBackgroundNode.position = CGPointMake(col * perWidth, row * perHeight + baseHeight);
+            numberBackgroundNode.size = CGSizeMake(perWidth, perHeight);
+        }
+        
+        CGFloat sideLength = MIN(perWidth, perHeight);
+        self.buttonSideLength = sideLength * 5.0 / 6.0;
+        for (int i = 0; i < self.numberButtonArray.count; ++i) {
+            SKSpriteNode *numberBackgroundNode = [self.numberBackgroundArray objectAtIndex:i];
+            SudokuButton *numberButton = [self.numberButtonArray objectAtIndex:i];
+            [numberBackgroundNode addChild:numberButton];
+            numberButton.anchorPoint = CGPointMake(0.5, 0);
+            numberButton.position = CGPointMake(numberBackgroundNode.size.width / 2.0, 0);
+            numberButton.size = CGSizeMake(self.buttonSideLength, self.buttonSideLength);
+            numberButton.buttonNormalTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number.png"];
+            numberButton.buttonHighlightTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number.png"];
+        }
     }
 }
 

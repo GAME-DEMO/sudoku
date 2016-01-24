@@ -40,6 +40,8 @@ typedef NS_ENUM(NSUInteger, DIMENSION_LEVEL) {
 
 - (NSArray *)randomResultForLevel:(DIFFICULT_LEVEL)level;
 
+- (UIColor *)randomColor;
+
 #pragma mark - UI related
 
 + (BOOL)isPortrait;

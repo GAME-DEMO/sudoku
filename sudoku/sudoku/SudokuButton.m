@@ -15,6 +15,7 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
 @interface SudokuButton ()
 
 @property (nonatomic, strong) SKLabelNode *buttonLabel;
+@property (nonatomic, strong) SKSpriteNode *buttonImage;
 
 @property (nonatomic, strong) NSMutableDictionary *buttonEventDictionary;
 
