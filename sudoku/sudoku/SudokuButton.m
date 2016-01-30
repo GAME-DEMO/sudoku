@@ -14,9 +14,10 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
 
 @interface SudokuButton ()
 
+@property (nonatomic, assign) BOOL initialized;
+
 @property (nonatomic, strong) SKLabelNode *buttonLabel;
 @property (nonatomic, strong) SKSpriteNode *buttonImage;
-
 @property (nonatomic, strong) NSMutableDictionary *buttonEventDictionary;
 
 @end
@@ -41,9 +42,30 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
     self.userInteractionEnabled = YES;
     
     _buttonEventDictionary = [NSMutableDictionary dictionary];
-    for (NSUInteger i = SudokuButtonEventTouchDown; i < SudokuButtonEventAll; ++i) {
+    for (NSUInteger i = ButtonEventTouchDown; i < ButtonEventAll; ++i) {
         [_buttonEventDictionary setObject:[NSMutableArray array] forKey:@(i)];
     }
+    
+    _buttonImage = [SKSpriteNode node];
+    _buttonImage.anchorPoint = CGPointMake(0.5, 0.5);
+    _buttonImage.userInteractionEnabled = NO;
+    [self addChild:_buttonImage];
+    
+    _initialized = YES;
+}
+
+- (void)setSize:(CGSize)size {
+    [super setSize:size];
+    [self reloadLayout];
+}
+
+- (void)reloadLayout {
+    if (!self.initialized) {
+        return;
+    }
+    
+    self.buttonImage.size = self.size;
+    self.buttonImage.position = CGPointMake(0, self.size.height / 2.0);
 }
 
 - (void)addTarget:(nullable id)target action:(_Nonnull SEL)action withObject:(nullable id)object forButtonEvent:(SudokuButtonEvent)buttonEvent {
@@ -58,8 +80,8 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
 }
 
 - (void)removeTarget:(nullable id)target action:(nullable SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent {
-    if (buttonEvent == SudokuButtonEventAll) {
-        for (NSUInteger i = SudokuButtonEventTouchDown; i < SudokuButtonEventAll; ++i) {
+    if (buttonEvent == ButtonEventAll) {
+        for (NSUInteger i = ButtonEventTouchDown; i < ButtonEventAll; ++i) {
             [self removeTarget:target action:action forButtonEvent:i];
         }
         return;
@@ -103,10 +125,23 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
     }
 }
 
+- (void)setButtonImageHighlight:(BOOL)highlight {
+    if (self.buttonImage) {
+        if (highlight) {
+            self.buttonImage.color = [UIColor blackColor];
+            self.buttonImage.colorBlendFactor = 0.3;
+        } else {
+            self.buttonImage.color = [UIColor clearColor];
+            self.buttonImage.colorBlendFactor = 0.0;
+        }
+    }
+}
+
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesBegan:touches withEvent:event];
     self.texture = self.buttonHighlightTexture;
-    [self invokeForButtonEvent:SudokuButtonEventTouchDown];
+    [self invokeForButtonEvent:ButtonEventTouchDown];
+    [self setButtonImageHighlight:YES];
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
@@ -115,20 +150,32 @@ static NSString * const SudokuSELObject = @"SudokuSELObject";
 
 - (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesEnded:touches withEvent:event];
+    BOOL bFound = NO;
     self.texture = self.buttonNormalTexture;
     for (UITouch *touch in touches) {
-        if (CGRectContainsPoint(CGRectMake(0, 0, self.size.width, self.size.height), [touch locationInNode:self])) {
-            [self invokeForButtonEvent:SudokuButtonEventTouchUpInside];
-            return;
+//        NSLog(@"touch: %@", touch);
+//        CGPoint touchLocation = [touch locationInNode:self];
+//        NSLog(@"touch location: %g, %g", touchLocation.x, touchLocation.y);
+        if (CGRectContainsPoint(CGRectMake(-self.size.width / 2.0, 0, self.size.width, self.size.height), [touch locationInNode:self])) {
+            [self invokeForButtonEvent:ButtonEventTouchUpInside];
+            bFound = YES;
         }
     }
-    [self invokeForButtonEvent:SudokuButtonEventTouchUpOutside];
+    
+    if (!bFound) {
+        [self invokeForButtonEvent:ButtonEventTouchUpOutside];
+    }
+
+    [self setButtonImageHighlight:self.buttonSelected];
 }
 
 - (void)touchesCancelled:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event {
     [super touchesCancelled:touches withEvent:event];
     self.texture = self.buttonNormalTexture;
-    [self invokeForButtonEvent:SudokuButtonEventTouchCancel];
+    self.buttonImage.color = [UIColor clearColor];
+    self.buttonImage.colorBlendFactor = 0.0;
+    [self invokeForButtonEvent:ButtonEventTouchCancel];
+    [self setButtonImageHighlight:self.buttonSelected];
 }
 
 - (void)setButtonNormalTexture:(SKTexture *)buttonNormalTexture {

@@ -9,11 +9,11 @@
 #import <SpriteKit/SpriteKit.h>
 
 typedef NS_ENUM(NSUInteger, SudokuButtonEvent) {
-    SudokuButtonEventTouchDown,
-    SudokuButtonEventTouchUpInside,
-    SudokuButtonEventTouchUpOutside,
-    SudokuButtonEventTouchCancel,
-    SudokuButtonEventAll,
+    ButtonEventTouchDown,
+    ButtonEventTouchUpInside,
+    ButtonEventTouchUpOutside,
+    ButtonEventTouchCancel,
+    ButtonEventAll,
 };
 
 //@class SudokuButton;
@@ -26,6 +26,7 @@ typedef NS_ENUM(NSUInteger, SudokuButtonEvent) {
 @property (nonatomic, strong, nullable) SKTexture *buttonHighlightTexture;
 @property (nonatomic, readonly, nullable) SKLabelNode *buttonLabel;
 @property (nonatomic, readonly, nullable) SKSpriteNode *buttonImage;
+@property (nonatomic, assign) BOOL buttonSelected;
 
 - (void)addTarget:(nullable id)target action:(_Nonnull SEL)action withObject:(nullable id)object forButtonEvent:(SudokuButtonEvent)buttonEvent;
 - (void)removeTarget:(nullable id)target action:(nullable SEL)action forButtonEvent:(SudokuButtonEvent)buttonEvent;

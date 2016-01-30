@@ -43,7 +43,7 @@
     _backButton = [SudokuButton node];
     _backButton.buttonNormalTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_back.png"];
     _backButton.buttonHighlightTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_back_highlight.png"];
-    [_backButton addTarget:self action:@selector(returnButtonDidTouchUp) withObject:nil forButtonEvent:SudokuButtonEventTouchUpInside];
+    [_backButton addTarget:self action:@selector(returnButtonDidTouchUp) withObject:nil forButtonEvent:ButtonEventTouchUpInside];
     [self addChild:_backButton];
     
     _setButton = [SudokuButton node];

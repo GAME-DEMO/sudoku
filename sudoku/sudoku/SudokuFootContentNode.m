@@ -58,6 +58,7 @@
     _numberButtonArray = [NSMutableArray arrayWithCapacity:[Presenter sharedInstance].dimension];
     for (int i = 0; i < [Presenter sharedInstance].dimension; ++i) {
         SudokuButton *button = [[SudokuButton alloc] init];
+        [button addTarget:self action:@selector(sudokuNumberButtonDidTouchUpInside:) withObject:button forButtonEvent:ButtonEventTouchUpInside];
         [_numberButtonArray addObject:button];
     }
     
@@ -100,8 +101,10 @@
             SudokuButton *button = nil;
             if (i < self.numberButtonArray.count) {
                 button = [self.numberButtonArray objectAtIndex:i];
+                button.buttonImage.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:[NSString stringWithFormat:@"b%d.png", i + 1]];
             } else {
                 button = _switchButton;
+                button.buttonImage.texture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"pencil.png"];
             }
             [numberBackgroundNode addChild:button];
             button.anchorPoint = CGPointMake(0.5, 0);
@@ -110,9 +113,11 @@
             button.buttonNormalTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number.png"];
             button.buttonHighlightTexture = [[Presenter sharedInstance].gameTextureAtlas textureNamed:@"button_number_highlight.png"];
         }
-        
-        
     }
+}
+
+- (void)sudokuNumberButtonDidTouchUpInside:(SudokuButton *)button {
+    button.buttonSelected = !button.buttonSelected;
 }
 
 @end
